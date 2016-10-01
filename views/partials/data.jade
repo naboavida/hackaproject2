@@ -1,0 +1,312 @@
+//- include leftMenu
+script
+	//mixpanel.track("Data")
+
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+
+include sidebarDashboard
+
+div.content-wrapper
+	div#powerwidgets.row(ng-controller="DemoController")
+		#myModal1.modal
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Select the type of point insertion
+					.modal-body
+						p
+							i.fa.fa-lg.fa-info-circle
+							|  If you have data in spreadsheet format (.xls, .xlsx), you can copy-paste it into Earthindicators and quickly add your data points. Otherwise, you can manually input your data points in our map.
+						div(style='margin: 0 auto; width: 400px;')
+							div.big-icons-buttons
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', data-toggle='modal', target='_self', href='#myModal')
+									i.fa.fa-file-excel-o
+									| Spreadsheet
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', data-toggle='modal', target='_self', href='#myModal3')
+									i.fa.fa-file-excel-o
+									| GeoJSON
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', data-dismiss='modal', aria-hidden='true', href='/addPoint/{{pid}}')
+									i.fa.fa-pencil
+									| Manual
+					.modal-footer
+						a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+		script
+			$('#openBtn').click(function(){
+				$('#myModal1').modal({show:true});
+			});
+		#myModal.modal(ng-controller='ModalSpreadsheetCtrl')
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Insert points from spreadsheet
+					.modal-body
+						p Copy your points from a spreadsheet and paste them here. 
+							a(href='misc/template-points.xlsx', target='_self') Download and use our template
+							|  to follow our format (instructions inside).
+						p: textarea(placeholder='Latitude	Longitude	Place	Type	Attribute1	Attribute2	Attribute3 ...', ng-model='sentence',rows='10', style='width:100%;')
+					.modal-footer
+						a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+						a.btn.btn-success(style='{{addPointsButtonStyle}}', href='#', target='_self', ng-click='saveSpreadsheet()') Add points
+						a.btn.btn-danger(style='{{cancelAddPointsButtonStyle}}', href='#', target='_self', ng-click='cancelAddSpreadsheet()') Cancel
+						p(style='{{addMessageStyle}};margin-top:10px;') {{addMessage}}
+						p(style='{{addMessageStyle2}};margin-top:10px;') {{addMessage2}}
+		#myModal2.modal(ng-controller='AddMultiIndicatorsSpreadsheetCtrl')
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Insert indicators to multiple points from spreadsheet
+					.modal-body
+						p Copy your indicators from a spreadsheet and paste them here. Also include their corresponding readings if you want to. One column will be matched to an attribute of your points. 
+							a(href='misc/template-indicators-points.xlsx', target='_self') Download and use our template
+							|  to follow our format (instructions inside).
+						p: textarea(placeholder='Title	Unit	Alarm (Y/N)	Minimum	Maximum	ReadingDate	ReadingValue	PointKey', ng-model='sentence2',rows='10', style='width:100%;')
+						a.btn.btn-success( href='#', target='_self', ng-click='parseSpreadsheetColumns()') Process
+						p(style='{{parseMessageStyle}};margin-top:10px;') {{parseMessage}}
+						hr
+						div(style="{{bottomMatchDivStyle}}")
+							p Now match one of the columns above to a point attribute
+							form.orb-form
+								fieldset
+									div.row
+										section.col-md-3
+											label.label Point Attribute
+											label.select
+												select(ng-model="pointselected", ng-change="dropdownChange()")
+													option(value="0") Choose attribute
+													option(ng-repeat="option in pointoptions", value="{{option}}") {{option}}
+												i
+										section.col-md-3
+											label.label Indicator Attribute
+											label.select
+												select( ng-model="indicatorselected", ng-change="dropdownChange()")
+													option(value="0") Choose attribute
+													option(ng-repeat="option in indicatoroptions", value="{{option}}") {{option}}
+												i
+										section.col-md-3
+											p Status: {{matchStatus}}
+					.modal-footer
+						a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+						a.btn.btn-success(style='{{addPointsButtonStyle}}', href='#', target='_self', ng-click='saveMultiSpreadsheet()') Add indicators
+						a.btn.btn-danger(style='{{cancelAddPointsButtonStyle}}', href='#', target='_self', ng-click='cancelAddMultiSpreadsheet()') Cancel
+						p(style='{{addMessageStyle}};margin-top:10px;') {{addMessage}}
+						p(style='{{addMessageStyle2}};margin-top:10px;') {{addMessage2}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModal2').modal({show:true});
+			});
+		#myModal3.modal(ng-controller='SpreadsheetGeojsonCtrl')
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Insert geometries to multiple points from GeoJSON format
+					.modal-body
+						p Copy your geometries' GeoJSON. Also include on each of their entries the key attribute to match with the one added on the point.
+						p: textarea(placeholder='GeoJSON', ng-model='sentence2',rows='10', style='width:100%;')
+						//- a.btn.btn-success( href='#', target='_self', ng-click='parseGeojson()') Process
+						p(style='{{parseMessageStyle}};margin-top:10px;') {{parseMessage}}
+					.modal-footer
+						a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+						a.btn.btn-success(href='#', target='_self', ng-click='saveGeojson()') Add GeoJSON
+						a.btn.btn-danger(style='{{cancelAddPointsButtonStyle}}', href='#', target='_self', ng-click='cancelAddMultiSpreadsheet()') Cancel
+						p(style='{{addMessageStyle}};margin-top:10px;') {{addMessage}}
+						p(style='{{addMessageStyle2}};margin-top:10px;') {{addMessage2}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModal3').modal({show:true});
+			});
+		script
+			//- setTimeout(function() {
+			//- 	var str = $('#allPointsButton').text();
+			//- 	//- console.log("points "+str);
+			//- 	if(str == "All points (0)")
+			//- 		$('#myModal').modal({show:true});
+			//- }, 1000);
+
+			function checkNumPointsAndActivateModal() {
+				var str = $('#allPointsButton').text();
+				console.log("points "+str);
+				if(str == "All points (0)")
+					$('#myModal').modal({show:true});
+				else if(str == "All points ({{numOfPoints}})" || str == "All points ()")
+					setTimeout(checkNumPointsAndActivateModal, 500);
+			}
+
+			setTimeout(checkNumPointsAndActivateModal, 500);
+			
+			$('#openBtn').click(function(){
+				$('#myModal').modal({show:true});
+			});
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+						h2
+							| Map
+							small {{numOfPoints}} points
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-edit-btn(ng-click='toggleConfigClass()',href='#', target='_self', title='Hide/show the points control panel')
+								i.fa.fa-lg(class='{{iconConfig}}')
+				div(role='content')
+					.powerwidget-editbox(class='{{configClass}}')
+						//- div
+						//- 	a.addPointButton(ng-click='addPoint()',class='{{addingPointClass}}')
+						//- 		small ADD POINT
+						//- 	a.addPointButton(ng-click='deletePoint()',class='{{deletingPointClass}}')
+						//- 		small DELETE POINT
+						//- 	a.addPointButton(ng-click='setPoint()',class='{{settingPointClass}}')
+						//- 		small SET POINT
+						//- pre {{userProfile | json}} 
+						.btn-group.btn-group-justified
+							.btn-group
+								//- , style='background-color: #5bc0de;'
+								//- a.btn.btn-default.btn-sm(href='/addPoint/{{pid}}') ADD POINT
+								a.btn.btn-default.btn-sm(data-toggle='modal', target='_self', href='#myModal1') ADD POINT
+								div.popover.bottom(style='display: {{popoverDivDisplay}}; top: 27px; color: #555555;')
+									div.arrow
+									h3.popover-title
+										i.fa.fa-info-circle
+										|   Add point to map
+									div.popover-content
+										p Click on this button to add a data point to the project.
+										button.btn.btn-info.btn-sm(type='button', ng-click='hidePopoverDiv()') Close
+								//- a.btn.btn-default.btn-sm(ng-click='addPoint()',class='{{addingPointClass}}') ADD POINT
+							.btn-group
+								a#deleteButton.btn.btn-default.btn-sm(data-toggle='modal', target='_self', href='#myModal2', ng-hide='userProfile.addIndicator') ADD INDICATORS
+								div#deletePopover.popover.bottom(style='top: 27px; color: #555555;')
+									div.arrow
+									div.popover-content
+										p Click on this button to add indicators to multiple points.
+							.btn-group
+								a.btn.btn-default.btn-sm(ng-click='deletePoint()',class='{{deletingPointClass}}') DELETE POINT
+							.btn-group
+								a#deleteButton.btn.btn-default.btn-sm(ng-click='setPoint()',class='{{settingPointClass}}') SET CENTER
+								div#deletePopover.popover.bottom(style='top: 27px; color: #555555;')
+									div.arrow
+									div.popover-content
+										p Click on this button to change the project's location coordinates.
+					.powerwidget-editbox(class='{{dropdownClass}}')
+						div
+							label(style='width:25%;') Template
+							select.form-control(ng-model="form", ng-options="item as item.title for item in itemsPointTemplates", style='color:#333;width:75%;', ng-change="onDropdownChange()")
+										//- 		i
+
+
+										//- section
+
+										//- 	label.select
+					div.inner-spacer.nopadding
+						div
+							div#map(style="height: calc(100vh - 48px - 40px - 30px - 62px)")
+								div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+								leaflet(center="madeira",markers="markers",layers="layers",geojson="geojson")
+		div.col-md-6.bootstrap-grid(ng-show='showAddPointHelp')
+			//- div.powerwidget.powerwidget-as-portlet-white
+				header(role='heading')
+				div.inner-spacer(role='content')
+			div.row
+				//- div.col-md-12
+				//- 	.callout.callout-info.callout-info-new-icon(style='margin-top: 0px;')
+				//- 		h4 This project has {{markers.length}} data points.
+				//- 		h6.lead(style='font-size: 16px;') To start adding your data, please insert a point by pressing the button "Add Point" on the map (or click 
+				//- 			a(href='/addPoint/{{pid}}') here
+				//- 			| ).
+				div.col-md-12
+					.callout.callout-info.callout-info-new-icon(style='background: white; margin-top: 0px;')
+						h4 Start your analysis
+						h6.lead(style='font-size: 16px;') Please insert your first point by pressing the button "Add Point" (or click 
+							a(data-toggle='modal', target='_self', href='#myModal1') here
+							| ).
+						h6.lead(style='font-size: 16px;') Earthindicators supports point insertion through copy-paste from spreadsheet (.xls, .xlsx) or manual input.
+						div(style='margin: 0 auto; width: 275px;')
+							div.big-icons-buttons
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', target='_self', disabled="disabled")
+									i.fa.fa-file-excel-o
+									| Spreadsheet
+								//- div.btn(disabled="disabled")
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', aria-hidden='true', disabled="disabled")
+									i.fa.fa-pencil
+									| Manual
+								//- div.btn(disabled="disabled")
+		div.col-md-6.bootstrap-grid(ng-show='numOfPoints')
+			div.row
+				div.col-md-12
+					.callout.callout-info.callout-info-new-icon(style='background: white; margin-top: 0px;')
+						h4 Select a point
+						h6.lead(style='font-size: 16px;') Please select a point by clicking the correspondent marker in the map on the left.
+		//- div.col-md-3.bootstrap-grid(ng-repeat='indicator in indicators', ng-show='markers.length')
+		//- 	div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 		header
+		//- 			h2 {{indicator.title}}
+		//- 			.powerwidget-ctrls(role='menu')
+		//- 				a.button-icon.powerwidget-edit-btn(href='#',target='_self', eat-click, class='{{indicator.alarm}}ShowAlarm')
+		//- 					i.fa.fa-bell.fa-lg(style='font-size: 1.166666666666666em;')
+		//- 				a.button-icon.powerwidget-edit-btn(href='/editIndicator/{{pid}}/{{indicator.iid}}')
+		//- 					i.fa.fa-cog.fa-lg
+		//- 				a.button-icon.powerwidget-delete-btn(ng-click='deleteIndicator(indicator.iid)', href='#', target='_self',eat-click)
+		//- 					i.fa.fa-times-circle.fa-lg
+		//- 				//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 				//- 	i.fa.fa-arrows-alt
+		//- 				//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 				//- 	i.fa.fa-chevron-circle-up
+		//- 			span.powerwidget-loader
+		//- 		.inner-spacer
+		//- 			.row
+		//- 				.col-md-10.col-sm-10.col-xs-10
+		//- 					h2
+		//- 						| {{indicator.value}}
+		//- 						small {{indicator.unit}}
+		//- 				.col-md-2.col-sm-2.col-xs-2
+		//- 					div.pull-right.pull-down
+		//- 						//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- 						h2
+		//- 							a(href='/indicator/{{pid}}/{{indicator.iid}}')
+		//- 								i.fa.fa-folder-open
+		//- //- div.col-md-3.bootstrap-grid(ng-controller="CalendarCtrl")
+		//- //- 	div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}', ng-show='markers.length')
+		//- //- 		header
+		//- //- 				h2 Next Activity
+		//- //- 				//- .powerwidget-ctrls(role='menu')
+		//- //- 				//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- //- 				//- 		i.fa.fa-times-circle
+		//- //- 				//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- //- 				//- 		i.fa.fa-arrows-alt
+		//- //- 				//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- //- 				//- 		i.fa.fa-chevron-circle-up
+		//- //- 				span.powerwidget-loader
+		//- //- 		.inner-spacer
+		//- //- 			.row
+		//- //- 				.col-md-10.col-sm-10.col-xs-10
+		//- //- 					h2 
+		//- //- 						| {{nextActivity.day}}
+		//- //- 						sup {{nextActivity.daySuffix}}
+		//- //- 						small {{nextActivity.month}}
+		//- //- 				.col-md-2.col-sm-2.col-xs-2
+		//- //- 					div.pull-right.pull-down
+		//- //- 						//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- //- 						h2
+		//- //- 							a(href='/calendar/{{pid}}')
+		//- //- 								i.fa.fa-calendar-o
+		//- div.col-md-3.bootstrap-grid(ng-show='markers.length')
+		//- 	div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 		a.btn(href='/addWidget/{{pid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+		//- 			header	
+		//- 			.inner-spacer(style='background-color: #f0f0ed;')
+		//- 				h2
+		//- 					small.noBefore(style='color: #949fb2; font-weight: normal;')
+		//- 						i.fa.fa-plus-circle
+		//- 						|  Add Indicator

@@ -1,0 +1,89 @@
+//- include leftMenu
+script
+	//mixpanel.track("Data")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+.responsive-admin-menu
+	.tabs-offcanvas
+		.main-info(style='border-bottom: 1px solid rgba(255,255,255,.1);')
+			.user-img
+				div(ng-hide="project.title == 'GenMills NB'")
+					img(src='images/project{{pid % 9}}.png', alt='Project Picture')
+				div(ng-show="project.title == 'GenMills NB'")
+					img( src='images/generalmills-bw.jpg', alt='Project Picture')
+			h1(style='margin-top:20px;')
+				| {{project.title}}
+				small(style='margin-top:15px;') {{project.location}}
+				//-small(style='margin-top:10px;') {{project.area}} ha
+	ul#menu(ng-controller="MenuCtrl")
+		li(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			a(href='/map/{{pid}}', title='Map')
+				i.entypo-map
+				span  Map
+		li
+			a(href='/dashboard/{{pid}}', title='Dashboard')
+				i.entypo-layout
+				span  Dashboard
+		li
+			a(href='/compare/{{pid}}', title='Compare')
+				i.entypo-docs
+				span  Compare
+			ul.accordion(style="display: block;")
+				li
+					a.active(href="/scatterplot/{{pid}}", title="Scatter Plot")
+						i.entypo-chart-line
+						span  Scatter Plot
+		li
+			a(href='/data/{{pid}}', title='Manage Data')
+				i.entypo-book-open
+				span  Manage Data
+		li
+			a(href='/config/{{pid}}', title='Config Data')
+				i.entypo-cog
+				span  Config Data
+		//- li
+		//- 	a(href='#', target='_self', title='Delete', ng-click='deleteProject(project.pid)', style='background-color: red;')
+		//- 		i.fa.fa-times-circle
+		//- 		span  Delete Project
+
+div.content-wrapper
+	div#powerwidgets.row
+		div.bootstrap-grid.col-xs-12
+			#point-image.powerwidget.powerwidget-as-portlet.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Choose variables
+				div.inner-spacer.text-center
+					form#selectvars.orb-form
+							div.row
+								a.btn.btn-success(style='display: inline-block; color: white; margin-top: 19px;', href='#', target='_self', ng-click='feedOccurrence()') Generate
+								
+								section.col.col-xs-4
+										input(type="text-center", ng-model="title")
+										| title
+										input(type="text-center", ng-model="date")
+										| date
+										input(type="text-center", ng-model="time")
+										| time
+										input(type="text-center", ng-model="pointid")
+										| pointid
+										input(type="text-center", ng-model="statusdate")
+										| statusdate
+										input(type="text-center", ng-model="kpi")
+										| keyperfind
+										input(type="text-center", ng-model="value")
+										| value
+										input(type="text-center", ng-model="occtype_id")
+										| taskid
+
+							

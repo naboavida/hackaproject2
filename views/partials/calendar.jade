@@ -1,0 +1,141 @@
+include leftMenu
+script
+	//mixpanel.track("Calendar")
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/')
+					i.fa.fa-home.fa-2x
+			li
+				a(href='/projects') Projects
+			li
+				a(href='/dashboard/{{pid}}') Dashboard
+			li.active Calendar
+
+	div#powerwidgets.row
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2
+							| Map
+							small Point {{pointid}}
+				div.inner-spacer.nopadding
+					div(ng-controller="DemoController")
+						div#map
+							leaflet(center="madeira",height="400",markers="markers",leafletMap="leafletMap",layers="layers")
+		div.col-md-12.bootstrap-grid
+			#calendar-widget-index.powerwidget.blue(data-widget-editbutton='false')
+				header
+						h2
+							| Calendar
+							small Events
+				.inner-spacer(ng-controller="CalendarCtrl")
+					div.col-md-3.col-sm-3.col-xs-3.text-center
+						form#input-masking.orb-form(class='{{addForm}}')
+							fieldset
+								h4 Add Activity
+								section
+									label.label Title
+									label.input
+										i.icon-append.fa.fa-star-o
+										input#date2(placeholder='Title', name='title', ng-model='toAdd.title')
+								section
+									label.label Start Date
+									label.input
+										i.icon-append.fa.fa-calendar
+										input#phone(placeholder='Start date', name='start', ng-model='toAdd.start')
+								section
+									label.label End Date
+									label.input
+										i.icon-append.fa.fa-calendar
+										input#card(placeholder='End date', name='end', ng-model='toAdd.end')
+								section
+									label.label Location
+									label.input
+										//- i.icon-append.fa.fa-crosshairs
+										i.icon-append.fa.fa-map-marker
+										input#serial(placeholder='Location', name='start', ng-model='toAdd.location')
+								section
+									label.label Assignee
+									label.input
+										i.icon-append.fa.fa-male
+										input#tax(placeholder='Assignee', name='start', ng-model='toAdd.responsible')
+								
+								button.btn.btn-default(ng-click='addActivity()') Add Activity
+
+						div(class='{{viewForm}}', style='text-align:left;')
+							h4(style='text-align: center;margin-bottom:25px;') Selected Activity
+							fieldset(style='max-width: 150px;margin-left:auto; margin-right:auto;')
+								p
+									strong Title:
+									br
+									|  {{toAdd.title}}
+								p
+									strong Start Date:
+									br
+									|  {{toAdd.start}}
+								p
+									strong End Date:
+									br
+									|  {{toAdd.end}}
+								p
+									strong Location:
+									br
+									|  {{toAdd.location}}
+								p
+									strong Assignee:
+									br
+									|  {{toAdd.responsible}}
+						//- div(class='{{addForm}}')
+						//- 	p: input(placeholder='Title', name='title', ng-model='toAdd.title')
+						//- 	p: input(placeholder='Start date', name='start', ng-model='toAdd.start')
+						//- 	p: input(placeholder='Location', name='start', ng-model='toAdd.location')
+						//- 	p: input(placeholder='Responsible', name='start', ng-model='toAdd.responsible')
+						//- 	p: button(ng-click='addActivity()') Add
+					div.col-md-9.col-sm-9.col-xs-9.text-center
+						div(ui-calendar="uiConfig.calendar", ng-model='eventSources',calendar='myCalendar1')
+
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='/projects') Projects
+//- 		li
+//- 			a(href='/dashboard/{{pid}}') Dashboard
+//- 		li
+//- 			a(href='') Calendar
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') São Tomé
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 124.455 inhabitants
+//- 						div.rightBarDiv
+//- 							h4 100 km2
+//- 			div#map(ng-controller="DemoController")
+//- 				leaflet(center="madeira",width="450",height="400",markers="markers")
+//- 	div.rightDiv
+//- 		div(ng-controller="CalendarCtrl", style='width:70%;margin-left:auto;margin-right:auto;')
+//- 			div(style='margin-top:25px;')
+//- 				div(ui-calendar="uiConfig.calendar", ng-model='eventSources',calendar='myCalendar1')
+//- 			div(class='{{viewForm}}')
+//- 				p toAddTitle: {{toAdd.title}}
+//- 				p toAddStart: {{toAdd.start}}
+//- 				p toAddEnd: {{toAdd.end}}
+//- 				p allDay: {{toAdd.allDay}}
+//- 				p toAddLocation: {{toAdd.location}}
+//- 				p toAddResponsible: {{toAdd.responsible}}
+//- 			div(class='{{addForm}}')
+//- 				p: input(placeholder='Title', name='title', ng-model='toAdd.title')
+//- 				p: input(placeholder='Start date', name='start', ng-model='toAdd.start')
+//- 				p: input(placeholder='Location', name='start', ng-model='toAdd.location')
+//- 				p: input(placeholder='Responsible', name='start', ng-model='toAdd.responsible')
+//- 				p: button(ng-click='addActivity()') Add

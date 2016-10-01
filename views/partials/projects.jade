@@ -1,0 +1,145 @@
+//- include leftMenu
+        //- li
+        //-   a.submenu(href='/addReading', title='Add Readings')
+        //-     i.entypo-book
+        //-     span  Add Readings
+script
+  //mixpanel.track("Projects")
+style
+  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide {
+    display: none !important;
+  }
+  .modal-content{ background-color: #82b964; background-color: #d24d33; }
+  .modal-header{ color: #fff; }
+  .modal-body{ background-color: #fff; }
+  .modal-footer{ background-color: #fff; margin-top: 0px; }
+
+div.content-wrapper.no-left-navigation
+  //- div.breadcrumb.clearfix
+  //-   ul
+  //-     li
+  //-       a(href='/')
+  //-         i.fa.fa-home.fa-2x
+  //-     li.active Projects
+
+  div#powerwidgets.row
+    #myModal1.modal(ng-controller='ModalDeleteConfirmCtrl')
+      //- .modal-dialog.modal-sm
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+            h4.modal-title Confirm delete
+          .modal-body
+            //- p
+            //-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+            p {{deleteMessage}}
+          .modal-footer
+            a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+            a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='delete()')
+              i.fa.fa-exclamation-triangle
+              |  Delete
+    script
+      $('#openBtn').click(function(){
+        $('#myModal1').modal({show:true});
+      });
+    div.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+      #point-image.powerwidget.col-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+            h2
+              | Projects
+              small Total projects: {{projects.length}}
+        div.inner-spacer(role='content')
+          #items.items-switcher.items-view-grid
+            .row(ng-cloak)
+                .col-md-6.margin-bottom
+                  .input-group(ng-show='projects.length')
+                    input#users.form-control(type='text', data-provide='typeahead', placeholder='Search', ng-model='query')
+                    span.input-group-btn
+                      button.btn.btn-default(type='button') Go!
+                .col-md-6.items-options(ng-show='query.length')
+                  h6.pull-left Filtered projects: {{(projects|filter:query).length}}
+                //-   button(type='button', class='btn btn-default')
+                //-     i.fa.fa-plus-circle(style='color:white')
+                //-     |  Add Project
+                  //- a.items-icon.items-grid.items-selected(data-view='items-view-grid') Grid View
+                  //- a.items-icon.items-list(data-view='items-view-list') List View
+                .col-lg-12.col-md-12.margin-bottom(ng-show='showProjectsHelp')
+                  .bs-docs-section(ng-controller='NavBarCtrl')
+                    h4 Welcome to Earthindicators, {{username}}! To start, press "Add Project" to add a new project.
+              ul
+                li(ng-repeat="project in projects | filter:query", ng-show="{{!project.hasOwnProperty('uservisible') || project.uservisible == null || project.uservisible == true || userProfile.isadmin}}")
+                  .items-inner.clearfix
+                    a.items-image(href='/newdash/{{project.pid}}', ng-if="userProfile.dashboard")
+                      img.img-circle(src='images/{{project.image || project.image_org || "project5.png"}}', alt='Project Picture')
+                    a.items-image(href='/dashboard/{{project.pid}}', ng-if="userProfile.oldDashboard")  
+                      //- img.img-circle(src='images/project1.png')
+                      //-img.img-circle(ng-show="project.title != 'Moja Farmacja' && project.title != 'General Mills'", src='images/project{{project.pid % 9}}.png')
+
+                      //- img.img-circle(ng-hide = "userProfile.logoGM",src='{{ (userProfile.logoMF && "images/moja2.png" || !userProfile.logoMF && "images/project5.png") }}', alt='Project Picture')
+                      //- img.img-circle(ng-show = "userProfile.logoGM", src='images/generalmills-bw.jpg', alt='Project Picture')
+
+                      //- img.img-circle(src='images/{{project.image || project.image_org || "project"+(project.pid % 9)+".png"}}', alt='Project Picture')
+                      img.img-circle(src='images/{{project.image || project.image_org || "project5.png"}}', alt='Project Picture')
+                      
+
+                    h3.items-title {{project.title}}
+                    //-span.label.label-danger On going
+                    .items-details
+                      strong {{project.location}}
+                      br
+                      //-strong {{project.area}} ha
+                    .control-buttons
+                      //- //- a(href='#', title='Ban')
+                      //- //-   i.fa.fa-ban
+                      //- a(href='#', target='_self', title='Delete')
+                      //-   i.fa.fa-times-circle(ng-click='deleteProject(project.pid)')
+                      //- //- a(href='#', title='Modify')
+                      //- //-   i.fa.fa-cog
+                      a(data-toggle='modal', target='_self', href='#myModal1', ng-click='deleteProject(project)')
+                        i.fa.fa-times-circle
+
+                li(ng-show="userProfile.admin")
+                  .items-inner.clearfix
+                    a.items-image(href='/addProject')
+                      i.fa.fa-plus-circle.fa-5x(style='margin: 21px 0 5px 0;color:#bbb')
+                    h3.items-title(style='color:#bbb;') Add Project
+                    span.label.label-success.overflow-hidden Finished
+                    .items-details.overflow-hidden
+                      strong.overflow-hidden {{project.location}}
+                      br
+                      //-strong.overflow-hidden {{project.area}} ha
+                //- li(ng-controller="ModalDemoCtrl")
+                //-   .items-inner.clearfix
+                //-     button(class="btn btn-default", href='#', target='_self', ng-click="open()") Show a Modal
+                //-     p Selection from a modal: {{selected}}
+
+                //-     script(id='myModalContent.html', type='text/ng-template')
+                //-         div.modal-header
+                //-           h3.modal-title I'm a modal
+                //-         div.modal-body
+                //-           ul
+                //-             li(ng-repeat='item in items')
+                //-               a(ng-click="selected.item = item") {{ item }}
+                //-           p Selected: {{ selected.item }}
+                //-         div.modal-footer
+                //-           button(type="button", ng-click="ok()", class="btn btn-primary", data-dismiss="modal") Ok
+                //-           button(type="button", ng-click="cancel()", class="btn btn-default", data-dismiss="modal") Cancel
+                
+    //-             li
+    //-               a.btn.btn-primary(data-toggle='modal', target='_self', href='#myModal') Launch modal
+    //-               #myModal.modal
+    //-                 .modal-dialog
+    //-                   .modal-content
+    //-                     .modal-header
+    //-                       button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+    //-                       h4.modal-title Modal title
+    //-                     .modal-body
+    //-                       | Content for the dialog / modal goes here.
+    //-                     .modal-footer
+    //-                       a.btn(href='#', target='_self', data-dismiss='modal') Close
+    //-                       a.btn.btn-primary(href='#', target='_self') Save changes
+    //- script
+    //-   $('#openBtn').click(function(){
+    //-     $('#myModal').modal({show:true})
+    //-   });

@@ -1,0 +1,66 @@
+include leftMenu
+script
+	//mixpanel.track("Add PointTemplate")
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/')
+					i.fa.fa-home.fa-2x
+			li
+				a(href='/projects') Projects
+			li
+				a(href='/dashboard/{{pid}}') Dashboard "{{project.title}}"
+			li
+				a(href='/addPoint/{{pid}}') Add Point
+			li.active Add Point Template...
+	div#powerwidgets.row
+		//- div.col-md-6.bootstrap-grid(ng-controller="DemoController")
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header
+		//- 				h2 Map
+		//- 		div.inner-spacer.nopadding
+		//- 			div
+		//- 				div#map
+		//- 					leaflet(center="madeira",height="550",markers="markers",layers="layers")
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Add Point Template
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							section
+								label.label Point Type
+								label.input
+									i.icon-append.fa.fa-star-o
+									input#date2(placeholder='The name of the Point Type to display and select while adding points', name='type', ng-model='form.type')
+							//- section
+							//- 	label.label Add Attribute
+							//- 	label.input
+							//- 		i.icon-append.fa.fa-star-o
+							//- 		input#date2(placeholder='Attribute Name', name='toAddAttribute', ng-model='toAddAttribute')
+							//- section
+							//- 	button.btn.btn-default(ng-click='submitNewAttribute()') Add Attribute
+							section
+								label.label Current Attributes
+								table.table.table-striped
+									thead
+										tr
+											th Name
+											th Action
+									tbody
+										tr(ng-repeat='attr in templateAttributes')
+											td {{attr.attribute}}
+											td 
+												button.btn.btn-danger.btn-xs Delete
+										tr
+											td
+												input(placeholder='Type a new attribute name', name='typeattribute', ng-model='typeattribute')
+											td
+												button.btn.btn-default.btn-sm(ng-click='submitNewAttribute()') Add Attribute
+
+							button.btn.btn-success(ng-click='submitNewPointTemplate()') Add Template
+							p(style='{{lastAddedMsgStyle}};margin-top:15px;') {{lastAddedMsg}}
+					p: a(href='/addPoint/{{pid}}') Back
+					//- p: a(href='/addPoint/{{pid}}') Back

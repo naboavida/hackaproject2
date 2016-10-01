@@ -1,0 +1,30 @@
+extends layout
+
+block body
+  div
+    h2 My Projects
+    ul.breadcrumb
+      li
+        a(href='/') Home
+      li
+        a(href='') Projects
+        
+    div
+      ul.menuItem.menuItemLarge
+        li.listItem.listItemLarge(ng-repeat="project in projects")
+          a(href='/dashboard/{{project.id}}')
+            div.innerItem.innerItemBig
+              img(src='pics/saotome.jpg')
+              div
+                p(style='color:#eee;'){{project.title}}
+                //-p(style='margin-top:5px;font-size:12px;'){{project.area}} m2
+        li.listItem.listItemLarge.project-item.add-project
+          a(href='/addProject')
+            div.innerItem.innerItemBig
+              p.innerItemBigParagraph Add a new Project
+
+  //- script(src='js/app.js')
+  //- script(src='js/services.js')
+  //- script(src='js/controllers.js')
+  //- script(src='js/filters.js')
+  //- script(src='js/directives.js')

@@ -1,0 +1,32 @@
+script(type="text/ng-template", id="tree_item_renderer.html")
+	{{data.title}}
+	//- button(ng-click="add(data)") Add node
+	//- button(ng-click="delete(data)", ng-show="data.childs.length > 0") Delete childs
+	div.btn-group.btn-group-xs.no-left-navigation
+		button.btn.btn-default(type="button", ng-disabled="findParent(data, 0) == null", ng-click="moveDown(findParent(data, 0), 0)") Move Up
+		button.btn.btn-default(type="button", ng-disabled="data.childs.length == 0", ng-click="moveDown(data, 0)") Move Down
+	ul
+		li(ng-repeat="data in data.childs", ng-include="'tree_item_renderer.html'")
+
+#myModalConfigureLevels.modal
+	//- .modal-dialog.modal-sm
+	.modal-dialog.modal-lg(ng-controller="DataLevelsCtrl")
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+				h4.modal-title Configure the hierarchy levels of your data
+			.modal-body
+				.row
+					.col-md-12.col-sm-12.col-xs-12
+						div.tree.well
+							ul
+								li.parent_li(ng-repeat="data in tree", ng-include="'tree_item_renderer.html'")
+
+			.modal-footer
+				a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Close
+				button.btn.btn-primary(ng-click="saveLevels()", ng-disabled="saving") {{savingText}}
+				|  {{savingStatusText}}
+script
+	$('#openBtn').click(function(){
+		$('#myModalConfigureLevels').modal({show:true});
+	});

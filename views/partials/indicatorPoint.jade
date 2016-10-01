@@ -1,0 +1,239 @@
+script
+	//mixpanel.track("IndicatorPoint")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+
+include sidebarData
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			//- li
+			//- 	a(href='/data/{{pid}}')
+			//- 		i.entypo-book-open.fa-2x
+			//- //- li
+			//- //- 	a(href='/projects') Projects
+			//- //- li
+			//- //- 	a(href='/dashboard/{{pid}}') Dashboard
+			li
+				a(href='/data/{{pid}}') All points
+			li
+				a(href='/data/{{pid}}/{{pointid}}') {{pointname}}
+			li.active {{indicator.title}}
+	//- div.page-header
+	//- 	h1 Indicator
+	//- 		small {{indicator.title}}
+	div#powerwidgets.row
+		div.col-md-6.bootstrap-grid
+			#chartjsgraphs-index-2.powerwidget.dark-blue.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+						h2
+							| {{indicator.title}} Value
+							small {{pointname}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-delete-btn(href='#',target='_self',eat-click)
+								i.fa.fa-share-alt.fa-lg(style='margin-right: 5px;')
+							a.button-icon.powerwidget-edit-btn(ng-click='toggleShowReadingsForm()', href='#',target='_self',eat-click)
+								i.fa.fa-lg(class='{{iconConfig}}')
+								//- i.fa.fa-upload.fa-lg
+							//- a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+							//- 	i.fa.fa-times-circle
+							//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+							//- 	i.fa.fa-arrows-alt
+							//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+							//- 	i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+					div(role='content', style='min-height: 200px;')
+						.powerwidget-editbox(class='{{readingsFormClass}}')
+							ul.nav.nav-tabs
+								li.active
+									a(href='#one-normal', target='_self', data-toggle='tab')
+										i.entypo-droplet
+										|  Add single reading
+								li
+									a(href='#two-normal', target='_self', data-toggle='tab')
+										i.entypo-water
+										|  Add multiple readings
+							.tab-content
+								#one-normal.tab-pane.active
+									p: input(placeholder='Input one value', type='text', ng-model='readingForm.value')
+									p: input(placeholder='Date', type='date', ng-model='readingForm.timestamp')
+									p: button(ng-click='submitPointReadings(false)') Add
+								#two-normal.tab-pane
+									p: textarea(placeholder='Paste values from Excel. The required format of each row is 2 columns with Date and Value. Example: 15/05/2014	23', ng-model='sentence',rows='10', style='width:85%;')
+									p: button(ng-click='submitPointReadings(true);') Add
+						.inner-spacer
+							.row
+								.col-md-12.text-center
+									//- div.semaphoreChart
+									//- 	svg(width="150px", height="60px")
+									//- 		path(d="M 1 1 L 149 1 L 149 59 L 1 59 L 1 1", 
+									//- 			stroke="rgba(170, 170, 51, 0.5)", fill="#ee9", 
+									//- 			stroke-width="1")
+									//- 		circle(style='stroke-width:5;stroke:rgba(55,55,55,0.25)', cx="40", cy="30", r="20", fill="grey")
+									//- 		circle(style='stroke-width:5;stroke:rgba(55,255,55,0.25)', cx="110", cy="30", r="20", fill="green")
+									h1.colossal
+										i.fa.fa-tachometer(style='color:#c4c5c5;')
+										|  {{indicator.value | numberEx: 2}}
+										small {{indicator.unit}}
+										i.fa.fa-caret-up(style='color:#82b964;')
+								div.col-md-12.text-center(ng-hide='parameters.length')
+									p(style='font-size: 16px;') Please insert your first parameters by clicking on Add Parameter below.
+								.col-md-4.col-sm-4.col-xs-4.text-center.margin-bottom(ng-repeat='parameter in parameters|limitTo:3')
+									h3.margin-0px.margin-top(style='margin-bottom:5px!important;') {{parameter.value}}
+										small {{parameter.unit}}
+									span.label.bg-red(style='font-size:12px;')
+										strong {{parameter.title}}
+										i.fa.fa-chevron-circle-down
+								//- .col-md-4.col-sm-4.col-xs-4.text-center
+								//- 	h3.margin-0px.margin-top 8
+								//- 	span.label.bg-orange
+								//- 		strong Coliphorms 
+								//- 		i.fa.fa-chevron-circle-up
+								//- .col-md-4.col-sm-4.col-xs-4.text-center
+								//- 	h3.margin-0px.margin-top 5523
+								//- 	span.label.bg-purple
+								//- 		strong Female
+								//- 		i.fa.fa-chevron-circle-up
+								//- .col-md-4.col-sm-4.col-xs-4.text-center.margin-bottom-20px
+								//- 	h3.margin-0px.margin-top 8943
+								//- 	span.label.bg-red
+								//- 		strong Aliens
+								//- 		i.fa.fa-chevron-circle-up
+		
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2
+						| {{indicator.title}} History
+						small {{pointname}}
+					.powerwidget-ctrls(role='menu')
+						//- a.button-icon.powerwidget-edit-btn(href='readings/{{pid}}/{{iid}}/{{pointid}}')
+						//- 	i.fa.fa-lg.fa-pencil
+						a.button-icon.powerwidget-refresh-btn(ng-click='refreshChart()',href='#',target='_self',eat-click)
+							i.fa.fa-refresh.fa-lg
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div(role='content', style='height: 200px;')
+					div.inner-spacer.text-center
+						div(style='width:90%; height:190px; margin-left:auto; margin-right:auto;')
+							//- nvd3-discrete-bar-chart(data="exampleDataRanking",ng-model="exampleDataRanking",color="colorFunction()",width='600', height='300',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+							nvd3-line-chart(id="example", data="exampleData",ng-model="exampleData",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()", forcey="[0]")
+
+		.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+			div.row(ng-hide='readings.length')
+				div.col-md-12
+					.callout.callout-info.callout-info-new-icon(style='margin-top: 0px;')
+						h4 No Data Avaliable
+						h6.lead(style='font-size: 16px;') Please insert your first value readings by clicking on add readings above.
+
+		.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+			#table1.powerwidget.green.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+					h2
+						| {{indicator.title}} History Table
+						small {{pointname}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-refresh-btn(ng-click='refreshChart()',href='#',target='_self',eat-click)
+							i.fa.fa-refresh.fa-lg
+					//- 	a.button-icon.powerwidget-delete-btn(href='#')
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#')
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#')
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				.inner-spacer(role='content')
+					div.row(ng-hide='readings.length')
+						div.col-md-12.text-center
+							h6 No Data Available.
+					table.table.table-striped.table-hover.margin-0px(ng-show='readings.length')
+						thead
+							tr
+								th Date
+								th Hour
+								th Value
+								th Category
+								th Product
+								th Promoter
+								th Actions
+						tbody
+							tr(ng-repeat='reading in readings')
+								td {{reading.rawDate}}
+								td {{reading.hour}}
+								td {{reading.value}}
+								td {{reading.category}}
+								td {{reading.product}}
+								td {{reading.promoter}}
+								td
+									.btn-group.btn-group-xs
+										//- button(type='button', class='btn btn-default') Edit
+										button(type='button', class='btn btn-default', ng-click='deleteReading(reading.rawDate, reading.hour)') Delete
+
+		div.col-md-3.bootstrap-grid(ng-repeat='parameter in parameters')
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{iid}}-{{iid}}')
+				header
+						h2 {{parameter.title}}
+						.powerwidget-ctrls(role='menu')
+							//- a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+							//- 	i.fa.fa-share-alt
+							a.button-icon.powerwidget-edit-btn(href='/editParameter/{{pid}}/{{iid}}/{{parameter.parmid}}/{{pointid}}')
+								i.fa.fa-cog.fa-lg
+							a.button-icon.powerwidget-delete-btn(ng-click='deleteParameter(parameter.parmid)', href='#', target='_self',eat-click)
+								i.fa.fa-times-circle.fa-lg
+							//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+							//- 	i.fa.fa-arrows-alt
+							//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+							//- 	i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h2
+								| {{parameter.value}}
+								small {{parameter.unit}}
+						.col-md-2.col-sm-2.col-xs-2
+							div.pull-right.pull-down
+								//- a(href='/indicator/{{pid}}/{{indicator.iid}}/{{pointid}}') Open
+								h2
+									a(href='/parameter/{{pid}}/{{iid}}/{{parameter.parmid}}/{{pointid}}')
+										i.fa.fa-folder-open
+		//- div.col-md-3.bootstrap-grid
+		//- 	div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 		a.btn(href='/addParameter/{{pid}}/{{iid}}/{{pointid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+		//- 			header	
+		//- 			.inner-spacer(style='background-color: #f0f0ed;')
+		//- 				h2
+		//- 					small.noBefore(style='color: #949fb2; font-weight: normal;')
+		//- 						i.fa.fa-plus-circle
+		//- 						|  Add Parameter
+		//- div.col-md-12.bootstrap-grid(ng-controller="ExampleBarChartCtrl")
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header
+		//- 			h2 Point Ranking in {{widget.title}}
+		//- 			//- .powerwidget-ctrls(role='menu')
+		//- 			//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 			//- 			i.fa.fa-share-alt
+		//- 			//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 			//- 		i.fa.fa-times-circle
+		//- 			//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 			//- 		i.fa.fa-arrows-alt
+		//- 			//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 			//- 		i.fa.fa-chevron-circle-up
+		//- 			span.powerwidget-loader
+		//- 		div.inner-spacer.text-center
+		//- 			div(style='width:90%; height:200px; margin-left:auto; margin-right:auto;')
+		//- 				nvd3-discrete-bar-chart(data="exampleData1", id="exampleId",  tooltips="true", showXAxis="true", showYAxis="true")

@@ -1,0 +1,110 @@
+//- include leftMenu
+script
+	//mixpanel.track("Widget")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+
+include sidebarDashboard
+
+div.content-wrapper.report
+	div.row
+		div.col-md-12
+
+			div.page-header
+				h1
+					| Reports
+					small Create, view and edit your reports
+	div.row				
+		div.col-md-6
+			form.orb-form
+				fielset
+					section
+						label.input
+							i.icon-append.fa.fa-search
+							input(type='text', placeholder='Search in your reports', ng-model='search.$')
+		div.col-md-6
+			div.pull-right
+				div.btn-group.btn-group-sm
+					button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown")
+						i.fa.fa-sort
+						span.label Sort By
+					ul.dropdown-menu.dropdown-menu-right(style="min-width: auto")
+						li
+							a(href="#", ng-click="sortReportList = 'label.text'")
+								|  Name
+						li
+							a(href="#", ng-click="sortReportList = 'info.creationDate'")
+								|  Created Date
+						li
+							a(href="#", ng-click="sortReportList = 'info.updateDate'")
+								|  Updated Date
+					
+
+	div.row
+		div.col-xs-12
+			div.powerwidget.powerwidget-sortable(role='widget')
+				a(href="/report/create/{{pid}}")
+					header.text-center.btn-new
+						h4 Create Report 
+							i.fa.fa-plus-circle
+
+		
+		div.col-md-12(ng-repeat="report in userReports | filter: search | orderBy: sortReportList")
+			div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+				header
+					a(href="/report/edit/{{pid}}/{{report.id}}")
+						h2 {{report.label.text}}
+
+					div.relative
+						div.btn-group.btn-group-sm.absolute(style="top:5px; right:5px; z-index:2")
+							button.btn.btn-danger(type="button", ng-if="!btnDelReport", ng-click="btnDelReport = true; deleteReport(report, pid)") 
+									span.label Confirm Delete
+							button.btn.btn-default(type="button", data-tooltip="Print", ng-show="userProfile.admin")
+								i.fa.fa-print.fa-lg	
+							div.btn-group.btn-group-sm
+								
+								button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown", data-tooltip="Options")
+									i.fa.fa-ellipsis-v.fa-lg
+								ul.dropdown-menu.dropdown-menu-right(style="min-width: auto")
+									li(ng-if="userProfile.admin")
+										a(href="#")
+											i.fa.fa-clone
+											|  Copy
+									li(ng-if="userProfile.admin")
+										a(href="#")
+											i.fa.fa-share
+											|  Export
+									li(ng-if="userProfile.admin")
+										a(href="/report/edit/{{pid}}/{{report.id}}")
+											i.fa.fa-pencil
+											|  Edit
+									li(ng-if="userProfile.admin")
+										a(href="#")
+											i.fa.fa-envelope-o
+											|  E-mail
+									li
+										a(href="#", ng-init="btnDelReport = true", ng-show="btnDelReport", ng-click="btnDelReport = false")
+											i.fa.fa-times-circle
+											|  Delete
+
+				div.inner-spacer(role="content")
+					div.row
+						div.col-md-12
+							p(ng-show="report.info.creationDate") 
+								strong Created: 
+								| {{report.info.creationDate | date:'dd/MM/yyyy'}}
+							p(ng-show="report.info.updateDate")
+								strong Last update: 
+								| {{report.info.updateDate | date:'dd/MM/yyyy'}}
+					//div.d-inline-block
+						p(ng-repeat="info in report.info")
+							strong {{info.label}} :
+							|  {{info.data}}
+
+		
+	

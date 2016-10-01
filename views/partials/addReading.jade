@@ -1,0 +1,282 @@
+include sidebarData
+
+aside.user-menu
+	.tabs-offcanvas
+		ul.nav.nav-tabs.nav-justified
+			li.active
+				a(href='#userbar-one', data-toggle='tab') Main
+			li
+				a(href='#userbar-two', data-toggle='tab') Users
+			li
+				a(href='#userbar-three', data-toggle='tab') ToDo
+		.tab-content
+			//
+				User Primary Panel
+			#userbar-one.tab-pane.active
+				.main-info
+					.user-img
+						img(src='images/js.jpg', alt='User Picture')
+					h1
+						| João Santos
+						small Administrator
+				.list-group
+					a.list-group-item(href='#')
+						i.fa.fa-user
+						| Profile
+					a.list-group-item(href='#')
+						i.fa.fa-cog
+						| Settings
+					a.list-group-item(href='#')
+						i.fa.fa-flask
+						| Projects
+						span.badge 2
+					.empthy
+					a.list-group-item(href='#')
+						i.fa.fa-refresh
+						| Updates
+						span.badge 5
+					a.list-group-item(href='#')
+						i.fa.fa-comment
+						| Messages
+						span.badge 12
+					a.list-group-item(href='#')
+						i.fa.fa-comments
+						| Comments
+						span.badge 45
+					.empthy
+					a.list-group-item.lockme(href='#', data-toggle='modal')
+						i.fa.fa-lock
+						| Lock
+					a.list-group-item.goaway(data-toggle='modal', href='#')
+						i.fa.fa-power-off
+						| Sign Out
+			//
+				User Chat Panel
+			div#userbar-two.tab-pane
+				.chat-users-menu
+					//
+						Adding Some Scroll
+					.nano
+						.nano-content
+							.buttons
+								.btn-group.btn-group-xs
+									button.btn.btn-default(type='button') Friends
+									button.btn.btn-default(type='button') Work
+									button.btn.btn-default(type='button') Girls
+							ul
+								li
+									a(href='#')
+										span.chat-name Chuck Norris
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+										span.badge 5
+								li
+									a(href='#')
+										span.chat-name Master Yoda
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Spiderman
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Obama
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-default Offline
+								li
+									a(href='#')
+										span.chat-name Mr. Joker
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Chewbacca
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name The Piggy
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Master Yoda
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Spiderman
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Obama
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Master Yoda
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Spiderman
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Obama
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Master Yoda
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Spiderman
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Obama
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Master Yoda
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-default Offline
+								li
+									a(href='#')
+										span.chat-name Spiderman
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+								li
+									a(href='#')
+										span.chat-name Obama
+										span.user-img
+											img(src='http://placehold.it/150x150', alt='User')
+										span.label.label-success Online
+			//
+				User Tasks Panel
+			#userbar-three.tab-pane
+				.nano
+					//
+						Adding Some Scroll
+					.nano-content
+						.small-todos
+							.input-group.input-group-sm
+								input#new-todo.form-control(placeholder='Add ToDo', type='text')
+								span.input-group-btn
+									button#add-todo.btn.btn-default(type='button')
+										i.fa.fa-plus-circle
+							section#task-list
+								ul#todo-list
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/')
+					i.fa.fa-home.fa-2x
+			li.active Add Readings...
+	div#powerwidgets.row
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Map
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							.row(style='padding:20px;')
+								.col-md-4.col-sm-4.col-xs-4(style='margin:0;padding:0;')
+									section
+										label.label Projects
+										label.select.select-multiple
+											select(multiple='',ng-model='form.projectsSelect')
+												option(value='Water Quality in Island') Water Quality in Island
+												option(value='Oilfields') Oilfields
+												option(value='Biodiversity Checking') Biodiversity Checking
+												option(value='Forest Inventory') Forest Inventory
+												option(value='Biomass Mapping') Biomass Mapping
+												option(value='Forest Species') Forest Species
+												option(value='North River Basin') North River Basin
+												option(value='Inventory on South') Inventory on South
+												option(value='Paper Project') Paper Project
+								.col-md-4.col-sm-4.col-xs-4(style='margin:0;padding:0;')
+									section
+										label.label Indicators
+										label.select.select-multiple
+											select(multiple='',ng-model='form.indicatorsSelect')
+												option(value='1') Water Quality
+												option(value='2') Budget
+												option(value='3') Biodiversity Checking
+												option(value='4') Forest Inventory
+												option(value='5') Biomass Mapping
+								.col-md-4.col-sm-4.col-xs-4(style='margin:0;padding:0;')
+									section
+										label.label Parameters
+										label.select.select-multiple
+											select(multiple='',ng-model='form.parametersSelect')
+												option(value='1') pH
+												option(value='2') Coliphorms
+												option(value='3') Biodiversity
+												option(value='4') Particles
+												option(value='5') Metal
+							.row
+								.col-md-11.col-sm-11.col-xs-11
+									section
+										label.label Single Value
+										label.input
+											i.icon-append.fa.fa-tachometer
+											input#phone(placeholder='Input a single value...', name='value', ng-model='form.value')
+									section
+										label.label Multiple Values
+										label.input
+											//- i.icon-append.fa.fa-crosshairs
+											textarea(placeholder='... or paste values from Excel', ng-model='sentence',rows='10',style='width:100%;')
+							
+									button.btn.btn-default(ng-click='submitNewReading()') Add Reading
+									p(style='color:green;margin-top:15px;') {{lastAddedMsg}}
+					p: a(href='/projects') Back
+
+
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='') Add Reading...
+			
+//- 	div(style='width:400px;margin-left:auto;margin-right:auto;margin-top:100px;')
+//- 		h1 Add Parameter Reading
+//- 		div
+//- 			p: input(placeholder='Project', name='project', ng-model='project')
+//- 			p: input(placeholder='Indicator', name='indicator', ng-model='indicator')
+//- 			p: input(placeholder='Parameter', name='parameter', ng-model='parameter')
+//- 			p: input(placeholder='Point', name='point', ng-model='point')
+//- 			p -
+//- 			p: input(placeholder='Value', name='value', ng-model='value')
+//- 			p: button(ng-click='submitNewParameter()') Add
+//- 		p: a(href='/') Home

@@ -1,0 +1,249 @@
+//- include leftMenu
+script
+	//mixpanel.track("Dashboard")
+
+.responsive-admin-menu
+	.tabs-offcanvas
+		.main-info(style='border-bottom: 1px solid rgba(255,255,255,.1);')
+			.user-img
+				img(src='images/project{{pid % 9}}.png', alt='Project Picture')
+			h1(style='margin-top:20px;')
+				| {{project.title}}
+				small(style='margin-top:15px;') {{project.location}}
+				//-small(style='margin-top:10px;') {{project.area}} ha
+	ul#menu(ng-controller="MenuCtrl")
+		li
+			a.active(href='/dashboard/{{pid}}', title='Dashboard')
+				i.entypo-layout
+				span  Dashboard
+		li
+			a(href='/data/{{pid}}', title='Manage Data')
+				i.entypo-book-open
+				span  Manage Data
+		li
+			a(href='/config/{{pid}}', title='Config Data')
+				i.entypo-cog
+				span  Config Data
+		//- li
+		//- 	a(href='#', target='_self', title='Delete', ng-click='deleteProject(project.pid)', style='background-color: red;')
+		//- 		i.fa.fa-times-circle
+		//- 		span  Delete Project
+
+div.content-wrapper
+	div#powerwidgets.row
+		.col-md-6.col-sm-6.bootstrap-grid.sortable-grid.ui-sortable
+			#widget3.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green-alt.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+					h2
+						| Budget
+						small Summary
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(href='#')
+							i.fa.fa-times-circle
+						a.button-icon.powerwidget-fullscreen-btn(href='#')
+							i.fa.fa-arrows-alt
+						a.button-icon.powerwidget-toggle-btn(href='#')
+							i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				.inner-spacer.nopadding(role='content')
+					.portlet-big-icon
+						i.fa.fa-money
+					ul.portlet-bottom-block
+						li.col-md-6.col-sm-6.col-xs-6
+							strong $2791
+							small Income
+						li.col-md-6.col-sm-6.col-xs-6
+							strong $2322
+							small Outcome
+
+		.col-md-6.bootstrap-grid.sortable-grid.ui-sortable
+			#chartjsgraphs-index-1.powerwidget.powerwidget-as-portlet-orange.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+					h2 Production
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(href='#')
+							i.fa.fa-times-circle
+						a.button-icon.powerwidget-fullscreen-btn(href='#')
+							i.fa.fa-arrows-alt
+						a.button-icon.powerwidget-toggle-btn(href='#')
+							i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				.inner-spacer(role='content')
+					.row
+						.col-md-12.text-center
+							.portlet-big-icon
+								i.entypo-clipboard
+							h1.colossal
+								i.fa.fa-dollar
+								| 8290
+								i.fa.fa-caret-up
+						.col-md-6.col-sm-6.col-xs-6.text-center
+							h3.text-white.margin-0px.margin-top 2584
+							span.label.bg-dark-cold-grey
+								strong Excellent
+								i.fa.fa-chevron-circle-up
+						.col-md-6.col-sm-6.col-xs-6.text-center
+							h3.text-white.margin-0px.margin-top 1823
+							span.label.bg-white
+								strong Good
+								i.fa.fa-chevron-circle-up
+
+		div.col-md-6.bootstrap-grid
+			#widget8.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-pink.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+					h2
+						| Chart
+						small With Tabs
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(href='#')
+							i.fa.fa-times-circle
+						a.button-icon.powerwidget-fullscreen-btn(href='#')
+							i.fa.fa-arrows-alt
+						a.button-icon.powerwidget-toggle-btn(href='#')
+							i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				.inner-spacer.nopadding(role='content')
+					.flotchart-container.bg-pink.orb-form
+						.inner-stuff
+							label.toggle
+								input#start7(type='checkbox', name='checkbox-toggle')
+								i
+								| Live Switch:
+						#placeholder7.flotchart-placeholder(style='padding: 0px;')
+							canvas.flot-base(width='455', height='210')
+							.flot-text(style='position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; font-size: smaller; color: rgb(84, 84, 84);')
+								.flot-y-axis.flot-y1-axis.yAxis.y1Axis(style='position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; display: block;')
+									div(style='position: absolute; font-style: normal; font-variant: normal; font-weight: 400; font-size: 11px; line-height: 11.5px; font-family: \'Open Sans\', sans-serif; color: rgb(255, 255, 255); top: 197px; left: 12px; text-align: right;') 0
+									div(style='position: absolute; font-style: normal; font-variant: normal; font-weight: 400; font-size: 11px; line-height: 11.5px; font-family: \'Open Sans\', sans-serif; color: rgb(255, 255, 255); top: 152px; left: 6px; text-align: right;') 25
+									div(style='position: absolute; font-style: normal; font-variant: normal; font-weight: 400; font-size: 11px; line-height: 11.5px; font-family: \'Open Sans\', sans-serif; color: rgb(255, 255, 255); top: 108px; left: 6px; text-align: right;') 50
+									div(style='position: absolute; font-style: normal; font-variant: normal; font-weight: 400; font-size: 11px; line-height: 11.5px; font-family: \'Open Sans\', sans-serif; color: rgb(255, 255, 255); top: 64px; left: 6px; text-align: right;') 75
+									div(style='position: absolute; font-style: normal; font-variant: normal; font-weight: 400; font-size: 11px; line-height: 11.5px; font-family: \'Open Sans\', sans-serif; color: rgb(255, 255, 255); top: 20px; left: 0px; text-align: right;') 100
+							canvas.flot-overlay(width='455', height='210')
+
+		//- div.col-md-3.bootstrap-grid(ng-repeat='indicator in indicators')
+		//- 	div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 		header
+		//- 			h2 {{indicator.title}}
+		//- 			.powerwidget-ctrls(role='menu')
+		//- 				a.button-icon.powerwidget-edit-btn(href='#',target='_self', eat-click, class='{{indicator.alarm}}ShowAlarm')
+		//- 					i.fa.fa-bell.fa-lg(style='margin-right: 5px;')
+		//- 				a.button-icon.powerwidget-delete-btn(ng-click='deleteIndicator(indicator.iid)', href='#', target='_self',eat-click)
+		//- 					i.fa.fa-times-circle.fa-lg
+		//- 				//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 				//- 	i.fa.fa-arrows-alt
+		//- 				//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 				//- 	i.fa.fa-chevron-circle-up
+		//- 			span.powerwidget-loader
+		//- 		.inner-spacer
+		//- 			.row
+		//- 				.col-md-10.col-sm-10.col-xs-10
+		//- 					h2
+		//- 						| {{indicator.value}}
+		//- 						small {{indicator.unit}}
+		//- 				.col-md-2.col-sm-2.col-xs-2
+		//- 					div.pull-right.pull-down
+		//- 						//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- 						h2
+		//- 							a(href='/indicator/{{pid}}/{{indicator.iid}}')
+		//- 								i.fa.fa-folder-open
+		//- div.col-md-3.bootstrap-grid(ng-controller="CalendarCtrl")
+		//- 	div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 		header
+		//- 				h2 Next Activity
+		//- 				//- .powerwidget-ctrls(role='menu')
+		//- 				//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 				//- 		i.fa.fa-times-circle
+		//- 				//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 				//- 		i.fa.fa-arrows-alt
+		//- 				//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 				//- 		i.fa.fa-chevron-circle-up
+		//- 				span.powerwidget-loader
+		//- 		.inner-spacer
+		//- 			.row
+		//- 				.col-md-10.col-sm-10.col-xs-10
+		//- 					h2 
+		//- 						| {{nextActivity.day}}
+		//- 						sup {{nextActivity.daySuffix}}
+		//- 						small {{nextActivity.month}}
+		//- 				.col-md-2.col-sm-2.col-xs-2
+		//- 					div.pull-right.pull-down
+		//- 						//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- 						h2
+		//- 							a(href='/calendar/{{pid}}')
+		//- 								i.fa.fa-calendar-o
+
+		
+
+
+
+		div.col-md-3.bootstrap-grid
+			div.powerwidget.powerwidget-as-portlet-white(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+						h2 Add Widget
+				.inner-spacer
+					a(href='/addWidget/{{pid}}')
+						div.pull-right.pull-down
+							h2
+								i.fa.fa-plus
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='/projects') Projects
+//- 		li
+//- 			a(href='') Dashboard {{project.location}}
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') {{project.title}}
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 {{project.location}}
+//- 						div.rightBarDiv
+//- 							h4 {{project.area}} km2
+//- 			div(ng-controller="DemoController")
+//- 				div
+//- 					button(ng-click='addPoint()') Add Point
+//- 					p {{addPointMode}}
+//- 				div#map
+//- 					leaflet(center="madeira",width="450",height="400",markers="markers")
+//- 					//- leaflet(center="madeira",width="500",height="400",markers="markers",event-broadcast="events")
+//- 	div.rightDiv
+//- 		ul.list-item
+//- 			li.item(ng-repeat='indicator in indicators')
+//- 				div.widgetContent
+//- 					h3.widgetTitle {{indicator.title}}
+//- 					div.line
+//- 						div.line-item.value {{indicator.value}}
+//- 						div.line-item.unit {{indicator.unit}}
+//- 					div.widgetChart(ng-controller='BulletCtrl')
+//- 						nvd3-bullet-chart(data='bulletData', width='100', height='10', showXAxis="false", margin="{left:5,top:0,bottom:0,right:5}", showYAxis="false", tooltips="true", interactive="false")
+//- 					div.line
+//- 						a(href='/indicator/{{pid}}/{{indicator.iid}}') Open
+//- 					div.bottomRow
+//- 						//- div(class='{{indicator.alarm}}')
+//- 						div(class='{{indicator.alarm}}')
+//- 							a.smallButton(href='project/readPost/{{post.id}}')
+//- 								img(src='img/alarm.png')
+//- 			li.item(ng-controller="CalendarCtrl")
+//- 				div.widgetContent
+//- 					h3.widgetTitle Next Activity
+//- 					div.line
+//- 						div.line-item.value {{nextActivity.day}}
+//- 						div.line-item.unit {{nextActivity.month}} {{nextActivity.year}}
+//- 					div.bottomRow(style='width:100%;')
+//- 						div.line-item.unit {{nextActivity.title}}
+//- 						img.line-item(src='pics/cal.png',style='width:50px;height:50px;')
+//- 					div.line.bottomRow(style='width:100%;')
+//- 						a(href='/calendar/{{pid}}') Open
+//- 			li.item.item-to-add
+//- 				a(href='/addWidget/{{pid}}')
+//- 					div.widgetContent
+//- 						h3.widgetTitle Add Widget
+					.powerwidget-ctrls(role='menu')

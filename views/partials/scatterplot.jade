@@ -1,0 +1,83 @@
+//- include leftMenu
+script
+	//mixpanel.track("Data")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div#powerwidgets.row
+		div.bootstrap-grid.col-xs-12
+			#point-image.powerwidget.powerwidget-as-portlet.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Choose variables
+				div.inner-spacer.text-center
+					form#selectvars.orb-form
+						fieldset
+							div.row
+								section.col.col-xs-3
+									label.label Performance Variable
+										label.select
+											select(ng-model="performancevar")
+												option(ng-repeat="kpi in kpis", value="{{kpi.wid}}") {{kpi.title}}
+											i
+								section.col.col-xs-3
+									label.label Influencing Variable
+										p(ng-hide="performancevar", style="font-style: italic;") Select the KPI for Performance Variable
+										label.select(ng-show="performancevar")
+											select(ng-model="influencingvar")
+												option(ng-repeat="kpi in kpis | filter:'!'+performancevar", value="{{kpi.wid}}") {{kpi.title}}
+											i
+								section.col.col-xs-2
+									label.label Geometry
+										//- pre {{specificgeometry}}
+										label.select
+											select(ng-model="specificgeometry", ng-init= " specificgeometry = specificgeometry || geometries[0].pointid", ng-options="geometry.pointid as geometry.title for geometry in geometries")
+												//- option(ng-repeat="geometry in geometries", value="{{geometry.pointid}}") {{geometry.title}}
+											i
+								section.col.col-xs-4
+									label(style="float: left;")
+										a.btn.btn-success(style='display: inline-block; color: white; margin-top: 19px;', href='#', target='_self', ng-click='processScatterPlot()') Plot
+										input(type="checkbox", ng-model="pruneZeros", style="margin-left: 25px;")
+										i 
+										| Remove Zeros
+										input(type="checkbox", ng-model="logscale", style="margin-left: 25px;")
+										i 
+										| Log Scale
+
+		div.bootstrap-grid.col-xs-12
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Scatter
+						small(ng-show="logscaleshow") (logarithmic scale)
+				div.inner-spacer.text-center
+					div.col-xs-12
+						h4(ng-hide="logscaleshow")
+							| R
+							sup 2 
+							| = 
+							span {{rsquared}}
+						h4(ng-show="logscaleshow")
+							| R
+							sup 2 
+							| (log) = 
+							span {{rsquaredlog}}
+					div(style='width:99%; height:{{600+(exampleData.length/15*25)}}px; margin-left:auto; margin-right:auto;')
+						nvd3-scatter-chart(data="exampleData", id="exampleId22", margin="{left:150,top:50,bottom:100,right:100}", showLegend="true", interactive="true")
+		//- div.bootstrap-grid.col-xs-12(ng-controller="ScatterLineController")
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header
+		//- 			h2 Scatter 2
+		//- 		div.inner-spacer.text-center
+		//- 			nvd3-scatter-plus-line-chart(data="exampleData", id="exampleId", width="600", height="300", margin="{left:150,top:100,bottom:100,right:150}", tooltips="true", interactive="true", tooltipContent="tooltipXContentFunction()", shape="getShapeCross()")

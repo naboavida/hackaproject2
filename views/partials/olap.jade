@@ -1,0 +1,112 @@
+//- include leftMenu
+script
+	//mixpanel.track("Olap")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+	.leaflet-popup-content { width: 500px!important; }
+
+.responsive-admin-menu
+	.tabs-offcanvas
+		.main-info(style='border-bottom: 1px solid rgba(255,255,255,.1);')
+			.user-img
+				div(ng-hide="project.title == 'GenMills NB'")
+					img(src='images/project{{pid % 9}}.png', alt='Project Picture')
+				div(ng-show="project.title == 'GenMills NB'")
+					img( src='images/generalmills-bw.jpg', alt='Project Picture')
+			h1(style='margin-top:20px;')
+				| {{project.title}}
+				small(style='margin-top:15px;') {{project.location}}
+				//-small(style='margin-top:10px;') {{project.area}} ha
+	ul#menu(ng-controller="MenuCtrl")
+		li(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			a(href='/map/{{pid}}', title='Map')
+				i.entypo-map
+				span  Map
+		li
+			a(href='/dashboard/{{pid}}', title='Dashboard')
+				i.entypo-layout
+				span  Dashboard
+		li
+			a(href='/compare/{{pid}}', title='Compare')
+				i.entypo-docs
+				span  Compare
+		li
+			a(href='/data/{{pid}}', title='Manage Data')
+				i.entypo-book-open
+				span  Manage Data
+			ul.accordion(style="display: block;")
+				li
+					a.active(href="/olap/{{pid}}", title="OLAP Cube")
+						i.entypo-list
+						span  OLAP Cube
+		li
+			a(href='/config/{{pid}}', title='Settings')
+				i.entypo-cog
+				span  Settings
+		//- li
+		//- 	a(href='#', target='_self', title='Delete', ng-click='deleteProject(project.pid)', style='background-color: red;')
+		//- 		i.fa.fa-times-circle
+		//- 		span  Delete Project
+
+div.content-wrapper
+	div#powerwidgets.row
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Discover
+				div.inner-spacer
+					.row
+						.col-md-6
+							button(ng-click="triggerOlapRead()") Get Data Sources
+							p(ng-repeat="dataSource in dataSources.arr", ng-click="setCubeName(dataSource)") {{dataSource}}
+							hr
+							div(ng-show="cubeName")
+								button(ng-click="triggerCubeName()") Get Dimensions and Measures for {{cubeName}}
+						.col-md-6
+							h4 Selected Measure: {{measure}}
+							h4 Selected Dimension: {{hierarchy}}
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Measures
+				div.inner-spacer.text-center
+					p(ng-repeat="m in measures.arr", ng-click="selectMeasure(m)") {{m}}
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Dimensions
+				div.inner-spacer.text-center
+					div(ng-repeat="dimension in dimensions.dims") 
+						h6 {{dimension.dimUniqueName}}
+						p(ng-repeat="h in dimension.arr", style="margin-left: 15px;", ng-click="selectHierarchy(h)") {{h}}
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Execute MDX
+				div.inner-spacer.text-center
+					textarea(rows="10", ng-model="sentence", style="width: 100%;")
+					button(ng-click="execSentence()") Execute Sentence
+					button(ng-click="execSentenceAxes()") Execute Sentence (with Axes)
+					//- button(ng-click="execSentenceSync()") Execute Sentence Sync
+					hr
+					h4 Found {{resultnodes.length}} data records
+					div.list-group
+						div.list-group-item(ng-repeat="node in resultnodes") {{node.node[0].body[0].tupleHTML}}
+							p(ng-show="node.node[0].body[0].Basket") Basket {{node.node[0].body[0].Basket}}
+							p(ng-show="node.node[0].body[0].W_sp_csn_rb") W_sp_csn_rb {{node.node[0].body[0].W_sp_csn_rb}}
+							p(ng-show="node.node[0].body[0]['M_spn_rb%']") M_spn_rb% {{node.node[0].body[0]['M_spn_rb%']}}
+							p(ng-show="node.node[0].body[0].Paragony") Paragony {{node.node[0].body[0].Paragony}}
+
+							p(ng-show="node.node[0].body[0].ParagonuOverOne") ParagonuOverOne {{node.node[0].body[0].ParagonuOverOne}}
+							p(ng-show="node.node[0].body[0].AllParagonu") AllParagonu {{node.node[0].body[0].AllParagonu}}
+							p(ng-show="node.node[0].body[0].PercBills") PercBills {{node.node[0].body[0].PercBills}}

@@ -1,0 +1,140 @@
+!!!
+html.js.csstransforms3d(ng-app="myApp")
+  head
+    meta(charset='utf8')
+    meta(name='viewport',content='width=device-width, initial-scale=1')
+    base(href='/')
+    title Earthindicators
+    //- link(rel='stylesheet', href='/css/app.css')
+    //- link(rel='stylesheet', href='/css/app-alt.css')
+    //- link(rel='stylesheet', href='/css/new-design.css')
+    link(rel="stylesheet", href="js/lib/select2/select2.css")
+
+    link(rel='stylesheet', href='/css/styles.css')
+    //- link(rel='stylesheet', href='/css/customstyles.css')
+
+    script(src='js/vendors/modernizr/modernizr.custom.js')
+
+    //- script(src='http://code.jquery.com/jquery-latest.js')
+    script(src='js/lib/jquery/dist/jquery.min.js')
+    script(src='js/lib/angular/angular.js')
+    script(src="js/lib/angular/angular-route.js")
+    
+
+    //- script(src='js/lib/jquery/dist/jquery.min.js')
+    //- script(src='http://d3js.org/d3.v3.min.js') MISSING!!!!!!!!
+    //- script(src='//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/d3/3.1.5/d3.js')
+    script(src='js/lib/nvd3/nv.d3.js')
+    script(src='js/lib/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js')
+    
+    //- apaguei para experimentar, mas isto é preciso!!!!!!!!! NUNOALEX
+    link(rel='stylesheet', href='css/nvd3/nv.d3.css')
+
+    //- link(rel='stylesheet', href='http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css') MISSING!!!!!!!!
+    link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css')
+    //- script(src='http://tombatossals.github.io/angular-leaflet-directive/dist/angular-leaflet-directive.min.js') OK
+    script(src='js/lib/angular-leaflet/dist/angular-leaflet-directive.js')
+    //- script(src='http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js') MISSING!!!!!!!!
+    script(src='//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js')
+    //- script(src='js/lib/leaflet-source/leaflet-src.js')
+
+    script(src='js/lib/leaflet.draw/dist/leaflet.draw.js')
+
+    <script src="js/lib/webgl-heatmap-leaflet/js/webgl-heatmap.js"></script>
+    <script src="js/lib/webgl-heatmap-leaflet/js/webgl-heatmap-leaflet.js"></script>
+
+    <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+    link(rel="stylesheet", href="js/lib/leaflet.draw/dist/leaflet.draw.css")
+
+    <script src="../bower_components/heatmapjs/build/heatmap.js"></script>
+    <script src="../bower_components/heatmapjs/plugins/leaflet-heatmap.js"></script>
+
+
+    //- <script src="bower_components/leaflet.draw/dist/leaflet.draw.js"></script>
+    //- <link rel="stylesheet" href="bower_components/leaflet.draw/dist/leaflet.draw.css" />
+
+
+    //- script(src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js")
+    //- script(src="js/lib/underscore/underscore-min.js")
+
+    //- <script type="text/javascript" src="test-airport-graph/flightData.js"></script>
+    //- <script type="text/javascript" src="test-airport-graph/usAirports.js"></script>
+
+    //- script(src="http://humangeo.github.io/leaflet-dvf/dist/leaflet-dvf.js")
+    //- script(src="http://humangeo.github.io/leaflet-dvf/src/leaflet.dvf.experimental.js")
+
+    
+    script(src="bower_components/Leaflet.PolylineDecorator/src/L.LineUtil.PolylineDecorator.js")
+    script(src="bower_components/Leaflet.PolylineDecorator/src/L.RotatedMarker.js")
+    script(src="bower_components/Leaflet.PolylineDecorator/src/L.Symbol.js")
+    script(src="bower_components/Leaflet.PolylineDecorator/src/L.PolylineDecorator.js")
+
+    script(src="bower_components/angular-datepicker/dist/angular-datepicker.min.js")
+    link(rel='stylesheet', href='bower_components/angular-datepicker/dist/angular-datepicker.min.css')
+    
+    script(src="bower_components/angular-moment/angular-moment.min.js")
+    script(src="bower_components/moment/min/moment.min.js")
+
+    script(src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBkvmx2BGtCTO2mIJDUWdZDvwylrVzuBAo&sensor=false&v=3")
+    //- script(src="http://maps.gstatic.com/intl/pt_pt/mapfiles/api-3/15/19/main.js", type="text/javascript")
+    script(src="http://elesdoar.github.io/angular-leaflet-directive/examples/plugins/layer/tile/Google.js")
+
+
+    script(src="bower_components/angular-growl-notifications/dist/angular-growl-notifications.min.js")
+
+
+    script(src='js/lib/jquery-ui/ui/jquery-ui.js')
+    script(src='js/lib/angular-ui-calendar/src/calendar.js')
+    script(src='js/lib/fullcalendar/fullcalendar.js')
+    script(src='js/lib/fullcalendar/gcal.js')
+    link(rel='stylesheet', href='css/fullcalendar.css')
+    link(rel='stylesheet', href='/css/new-design.css')
+
+
+    script(src='js/lib/leaflet-markers/leaflet.awesome-markers.js')
+    link(rel='stylesheet', href='js/lib/leaflet-markers/leaflet.awesome-markers.css')
+
+
+    script(src='js/lib/select2/select2.js')
+    script(src='js/lib/angular-ui-select2/src/select2.js')
+
+    script(src='//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.11.0.js')
+    //- link(rel="stylesheet", href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+
+    link(rel="stylesheet", href="http://k4r573n.github.io/leaflet-control-osm-geocoder/Control.OSMGeocoder.css")
+    script(src='http://k4r573n.github.io/leaflet-control-osm-geocoder/Control.OSMGeocoder.js')
+    
+
+    //- script(src='js/lib/angulartics/dist/angulartics.min.js')
+    //- script(src='js/lib/angulartics/dist/angulartics-mixpanel.min.js')
+    //- script(src='js/lib/angulartics/src/angulartics.js')
+    //- script(src='js/lib/angulartics/src/angulartics-mixpanel.js')
+
+
+    //- // start Mixpanel 
+    //- script(type='text/javascript')
+    //-   (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+    //-   for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+    //-   mixpanel.init("9e6ed6de4a7cece10f9245ac63f19500");
+    //- // end Mixpanel 
+
+    //- start HeapAnalytics
+    script(type="text/javascript")
+      window.heap=window.heap||[],heap.load=function(t,e){window.heap.appid=t,window.heap.config=e;var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.heapanalytics.com/js/heap-"+t+".js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n);for(var o=function(t){return function(){heap.push([t].concat(Array.prototype.slice.call(arguments,0)))}},p=["clearEventProperties","identify","setEventProperties","track","unsetEventProperty"],c=0;c<p.length;c++)heap[p[c]]=o(p[c])};
+      if (document.location.hostname.indexOf("earthindicators.com") != -1) {
+          /* Production Analytics Code */
+          heap.load("3089663559");
+      } else {
+          /* Development Analytics Code */
+          heap.load("3618723098");
+      }
+      
+    
+    //- end HeapAnalytics
+
+  body
+        block body

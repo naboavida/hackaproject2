@@ -1,0 +1,162 @@
+#myModalEditImmediateMailingList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Edit Immediate Mailing List
+					.modal-body
+						form.orb-form
+							fieldset
+								p Add e-mail accounts where you'd like to receive notifications as soon as any occurrence is triggered
+								div.row
+									section.col.col-6
+										label.label(style="margin-top: 10px") Add e-mail address
+										div
+											div(style="float: left;")
+												label.input
+													input(type="email", placeholder="Insert e-mail account", name="addemail", ng-model="addemail")
+											div(style="float: left;")
+												button.btn.btn-success.btn-sm(ng-click="addEmailToImmediateMailingList()", ng-disabled="!addemail.length")
+													i.fa.fa-plus-circle.fa-lg
+
+								div.row
+									.col.col-12
+										ul.list-group
+											li.list-group-item(ng-repeat="email in mailingLists.immediate", style="min-width: 350px; min-height: 35px;")
+												div(style="float: left; width: calc(100%-50px);")
+													p {{email}}
+												div(style="float: right; width: 50px;")
+													button.btn.btn-danger.btn-sm(ng-click="mailingLists.immediate.splice($index, 1)")
+														i.fa.fa-trash-o.fa-lg
+								
+
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self', ng-click='saveMailingList()', data-dismiss='modal') OK
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditImmediateMailingList').modal({show:true});
+			});
+
+#myModalEditDailyMailingList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Edit Daily Mailing List
+					.modal-body
+						form.orb-form
+							fieldset
+								p Add e-mail account(s) where you'd like to receive a daily summary of the occurrences generated
+								div.row
+									section.col.col-6
+										label.label(style="margin-top: 10px") Add e-mail address
+										div
+											div(style="float: left;")
+												label.input
+													input(type="email", placeholder="Insert e-mail account", name="addemail2", ng-model="addemail2")
+											div(style="float: left;")
+												button.btn.btn-success.btn-sm(ng-click="addEmailToDailyMailingList()", ng-disabled="!addemail2.length")
+													i.fa.fa-plus-circle.fa-lg
+
+								div.row
+									.col.col-12
+										ul.list-group
+											li.list-group-item(ng-repeat="email in mailingLists.daily", style="min-width: 350px; min-height: 35px;")
+												div(style="float: left; width: calc(100%-50px);")
+													p {{email}}
+												div(style="float: right; width: 50px;")
+													button.btn.btn-danger.btn-sm(ng-click="mailingLists.daily.splice($index, 1)")
+														i.fa.fa-trash-o.fa-lg
+								
+
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self', ng-click='saveMailingList()', data-dismiss='modal') OK
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditDailyMailingList').modal({show:true});
+			});
+
+#myModalEditActionMailingList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Edit Lack of Action Mailing List
+					.modal-body
+						form.orb-form
+							fieldset
+								p Add e-mail account(s) where you'd like to receive notifications when occurrences are not dealt with within the maximum time for action
+								div.row
+									section.col.col-6
+										label.label(style="margin-top: 10px") Add e-mail address
+										div
+											div(style="float: left;")
+												label.input
+													input(type="email", placeholder="Insert e-mail account", name="addemail3", ng-model="addemail3")
+											div(style="float: left;")
+												button.btn.btn-success.btn-sm(ng-click="addEmailToActionMailingList()", ng-disabled="!addemail3.length")
+													i.fa.fa-plus-circle.fa-lg
+
+								div.row
+									.col.col-12
+										ul.list-group
+											li.list-group-item(ng-repeat="email in mailingLists.action", style="min-width: 350px; min-height: 35px;")
+												div(style="float: left; width: calc(100%-50px);")
+													p {{email}}
+												div(style="float: right; width: 50px;")
+													button.btn.btn-danger.btn-sm(ng-click="mailingLists.action.splice($index, 1)")
+														i.fa.fa-trash-o.fa-lg
+								
+
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self', ng-click='saveMailingList()', data-dismiss='modal') OK
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditActionMailingList').modal({show:true});
+			});
+#myModalEditKpiDailyMailingList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Edit KpiDaily Mailing List
+					.modal-body
+						form.orb-form
+							fieldset
+								p Add e-mail account(s) where you'd like to receive a daily summary for all KPI values
+								div.row
+									section.col.col-6
+										label.label(style="margin-top: 10px") Add e-mail address
+										div
+											div(style="float: left;")
+												label.input
+													input(type="email", placeholder="Insert e-mail account", name="addemail4", ng-model="addemail4")
+											div(style="float: left;")
+												button.btn.btn-success.btn-sm(ng-click="addEmailToKpiDailyMailingList()", ng-disabled="!addemail4.length")
+													i.fa.fa-plus-circle.fa-lg
+
+								div.row
+									.col.col-12
+										ul.list-group
+											li.list-group-item(ng-repeat="email in mailingLists.kpidaily", style="min-width: 350px; min-height: 35px;")
+												div(style="float: left; width: calc(100%-50px);")
+													p {{email}}
+												div(style="float: right; width: 50px;")
+													button.btn.btn-danger.btn-sm(ng-click="mailingLists.kpidaily.splice($index, 1)")
+														i.fa.fa-trash-o.fa-lg
+								
+
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self', ng-click='saveMailingList()', data-dismiss='modal') OK
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditKpiDailyMailingList').modal({show:true});
+			});

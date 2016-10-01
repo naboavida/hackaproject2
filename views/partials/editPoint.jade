@@ -1,0 +1,144 @@
+
+script
+	//mixpanel.track("Edit Point")
+style
+	.select2-choices { font-weight: 600; height: 38px!important; outline: none; border: 2px #c0c2c7 solid!important; border-radius: 3px; border-style: solid; background: #fff; appearance: normal; -moz-appearance: none; -webkit-appearance: none;  }
+	.select2-search-field input {font-family: 'Open Sans', sans-serif!important; font-size: 13px!important; padding: 10px!important;} 
+	.select2-container-multi .select2-choices .select2-search-choice { padding: 5px 5px 5px 18px!important; margin: 7px 0 3px 5px!important; }
+
+include sidebarData
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/data/{{pid}}') Dashboard
+			li
+				a(href='/dashboard/{{pid}}/{{pointid}}') {{pointname}}
+			li.active Edit point...
+	div#powerwidgets.row
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 
+							| Map
+							small Click on the map to choose a location
+				div.inner-spacer.nopadding
+					div
+						div#map
+							leaflet(center="madeira",height="550",markers="markers",layers="layers")
+		div.col-md-6.bootstrap-grid(ng-controller="EditPointCtrl")
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Edit Point on Project {{project.title}}
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							//- section
+							//- 		label.label Point type
+							//- 		label.input
+							//- 			i.icon-append.fa.fa-tachometer
+							//- 			input#phone(placeholder='Value for point type', name='type', ng-model='pointtype')
+							section(ng-repeat='param in pointAttributes')
+									label.label {{param}}
+									label.input
+										i.icon-append.fa.fa-tachometer
+										input#phone(placeholder='Value for {{param}}', name='{{param}}', ng-model='attrmodels[param]')
+						//- pre {{attrmodels | json}}
+						fieldset
+							section(style='margin-top: 10px;')
+								//- label.label Add new attribute
+								label.input
+									.input-group
+										input#users.form-control(type='text', placeholder='New attribute name', ng-model='newAttr')
+										span.input-group-btn
+											button.btn.btn-default(type='button', ng-click='addAttribute()')
+												i.fa.fa-plus
+												|  Add attribute 
+						fieldset
+							button.btn.btn-success(ng-click='submitEditPoint()') Edit Point
+							p(style='{{lastAddedMsgStyle}}margin-top:15px;') {{lastAddedMsg}}
+					p: a(href='/data/{{pid}}/{{pointid}}') Back
+		//- div.col-md-6.bootstrap-grid(ng-controller="EditPointController")
+			//- #point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+			//- 	header
+			//- 			h2 Edit Point on Project {{pid}}
+			//- 	div.inner-spacer
+			//- 		form#input-masking.orb-form(class='{{addForm}}')
+			//- 			fieldset
+			//- 				section
+			//- 					label.label Type
+			//- 					label.input
+			//- 						i.icon-append.fa.fa-star-o
+			//- 						input#template(type="hidden", ui-select2="select2Options", data-placeholder="Click and choose a point type. Do not input a new type", ng-model="addForm.template", style="width: 100%;")
+			//- 						//- select(ui-select2, ng-model="addForm.template", data-placeholder="Pick a number", ng-required="true", style='width:100%!important;')
+			//- 						//- 	option(value='')
+			//- 						//- 	option(value='1') Fountain
+			//- 						//- 	option(value='2') Lake
+
+			//- 						//- select.form-control(ng-model="addForm.template", ng-options="item as item.title for item in itemsPointTemplates", ng-change="onDropdownChange()")
+			//- 						//- //- select(ng-model="form", ng-options="item as item.title for item in items")
+			//- 						//- //- select(ng-model="selectedItem", ng-options="item as item.title for item in items")
+			//- 						//- i
+			//- 				section(ng-hide="addForm.template.length")
+			//- 					label.label Point Attributes
+			//- 					div.note No attributes to show. Select a point type above or insert a new one.
+			//- 				section(ng-show="addForm.template.length")
+			//- 					label.label Name
+			//- 					label.input
+			//- 						i.icon-append.fa.fa-star-o
+			//- 						input#date2(placeholder='A name for the point, e.g. "Fonte do Norte"', name='name', ng-model='addForm.attributes.name', value='')
+			//- 				section(ng-show="addForm.template.length")
+			//- 					label.label Observations
+			//- 					label.input
+			//- 						i.icon-append.fa.fa-tachometer
+			//- 						input#phone(placeholder='Miscellaneous information of the point', name='observations', ng-model='addForm.attributes.observations', value='')
+			//- 						//- input#phone(placeholder='Value', name='value', ng-model='addForm.value')
+			//- 				section(ng-repeat='param in parameters')
+			//- 					label.label {{param}}
+			//- 					label.input
+			//- 						i.icon-append.fa.fa-tachometer
+			//- 						input#phone(placeholder='Value for {{param}}', name='{{param}}', ng-model='models[param]')
+			//- 			fieldset(ng-show="addForm.template.length")
+			//- 				section(style='margin-top: 10px;')
+			//- 					//- label.label Add new attribute
+			//- 					label.input
+			//- 						.input-group
+			//- 							input#users.form-control(type='text', placeholder='New attribute name', ng-model='newAttr')
+			//- 							span.input-group-btn
+			//- 								button.btn.btn-default(type='button', ng-click='addAttribute()')
+			//- 									i.fa.fa-plus
+			//- 									|  Add attribute 
+												
+			//- 			//- pre {{models | json}}
+			//- 			fieldset
+			//- 				//- section
+			//- 				//- 	//- label.label Inherit Indicators
+			//- 				//- 	label.label Select indicators and parameters from project?
+			//- 				//- 	.margin-left
+			//- 				//- 		.inline-group
+			//- 				//- 			label.radio
+			//- 				//- 				input(type='radio', name='radio-inline', value='yes', ng-model='addForm.autoIndicators', checked)
+			//- 				//- 				i
+			//- 				//- 				| Yes
+			//- 				//- 			label.radio
+			//- 				//- 				input(type='radio', name='radio-inline', value='no', ng-model='addForm.autoIndicators')
+			//- 				//- 				i
+			//- 				//- 				| No
+			//- 				//- section(ng-show="addForm.autoIndicators == 'yes'")
+			//- 				//- 	label.label Indicators from Project
+			//- 				//- 	.margin-left
+			//- 				//- 		.inline-group
+			//- 				//- 			span(ng-repeat="indicator in indicators")
+			//- 				//- 				label.checkbox(for='{{indicator.iid}}')
+			//- 				//- 					input(type='checkbox', name='checkbox-inline', checked='',ng-model='addForm.indicators[indicator.iid]', id='{{indicator.iid}}')
+			//- 				//- 					i
+			//- 				//- 					| {{indicator.title}}
+
+			//- 				//- p {{form}}
+			//- 				//- p {{selectedItem}}
+			//- 				button.btn.btn-default(ng-click='submitEditPoint()') Edit Point
+			//- 				p(style='{{lastAddedMsgStyle}}margin-top:15px;') {{lastAddedMsg}}
+			//- 		p: a(href='/dashboard/{{pid}}/{{pointid}}') Back
+
+

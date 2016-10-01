@@ -1,0 +1,198 @@
+script
+	//mixpanel.track("Indicator")
+style
+	.noBefore::before{ content: ''; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/dashboard/{{pid}}') Dashboard
+			li.active Indicator {{indicator.title}}
+	div#powerwidgets.row
+		div.col-md-4.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-yellow.powerwidget-sortable(data-widget-editbutton='false')
+				header
+						h2
+							| Picture
+						//- .powerwidget-ctrls(role='menu')
+						//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 		i.fa.fa-share-alt
+						//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 		i.fa.fa-times-circle
+						//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+						//- 		i.fa.fa-arrows-alt
+						//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+						//- 		i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				div.inner-spacer.nopadding
+					img(src='pics/saotome.jpg',style='width:100%;height:150px;')
+		div.col-md-8.bootstrap-grid
+			#chartjsgraphs-index-2.powerwidget.dark-blue.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+					h2
+						| {{indicator.title}}
+						small All Points
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(href='#',target='_self', ng-click='toggleShowShareForm()')
+							i.fa.fa-share-alt.fa-lg(style='margin-right: 5px;')
+						a.button-icon.powerwidget-edit-btn(ng-click='toggleShowReadingsForm()', href='#',target='_self',eat-click)
+							i.fa.fa-lg(class='{{iconConfig}}')
+						//- a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 	i.fa.fa-times-circle
+						//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+						//- 	i.fa.fa-arrows-alt
+						//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+							i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div(role='content', style='min-height: 150px;')
+					.powerwidget-editbox(class='{{readingsFormClass}}')
+						ul.nav.nav-tabs
+							li.active
+								a(href='#one-normal', target='_self', data-toggle='tab')
+									i.entypo-droplet
+									|  Add single reading
+							li
+								a(href='#two-normal', target='_self', data-toggle='tab')
+									i.entypo-water
+									|  Add multiple readings
+						.tab-content
+							#one-normal.tab-pane.active
+								p: input(placeholder='Input one value', type='number', ng-model='readingForm.value')
+								p: input(placeholder='Date', type='date', ng-model='readingForm.timestamp')
+								//- p: input(placeholder='Observations (optional)', rows='2', ng-model='readingForm.observations')
+								p: button(ng-click='submitNewPointReading()') Add
+							#two-normal.tab-pane
+								p: textarea(placeholder='Paste values from Excel. The required format of each row is 2 columns with Date and Value. Example: 15/05/2014	23', ng-model='sentence',rows='5', style='width:85%;')
+								p: button(ng-click='submitNewPointMultipleReadings()') Add
+					.powerwidget-editbox(class='{{shareFormClass}}')
+						.big-icons-buttons
+							.btn-group
+								a.btn.btn-info
+									i.fa.entypo-facebook-squared
+									| Facebook
+								a.btn.btn-info
+									i.fa.entypo-twitter
+									| Twitter
+								a.btn.btn-info
+									i.fa.entypo-gplus
+									| Google+
+								a.btn.btn-info
+									i.fa.entypo-linkedin
+									| LinkedIn
+								a.btn.btn-info
+									i.fa.entypo-mail
+									| Email
+						//- .big-icons-buttons
+						//- 	.btn-group
+						//- 		a.btn.btn-info
+						//- 			i.fa-3x.entypo-facebook-squared
+						//- 				| Facebook
+					.inner-spacer
+						.row
+							.col-md-12.text-center
+								//- div.semaphoreChart
+								//- 	svg(width="150px", height="60px")
+								//- 		path(d="M 1 1 L 149 1 L 149 59 L 1 59 L 1 1", 
+								//- 			stroke="rgba(170, 170, 51, 0.5)", fill="#ee9", 
+								//- 			stroke-width="1")
+								//- 		circle(style='stroke-width:5;stroke:rgba(55,55,55,0.25)', cx="40", cy="30", r="20", fill="grey")
+								//- 		circle(style='stroke-width:5;stroke:rgba(55,255,55,0.25)', cx="110", cy="30", r="20", fill="green")
+								h1.colossal
+									i.fa.fa-tachometer(style='color:#c4c5c5;')
+									|  {{indicator.value}}
+									small {{indicator.unit}}
+									i.fa.fa-caret-down(style='color:#82b964;')
+							.col-md-4.col-sm-4.col-xs-4.text-center.margin-bottom(ng-repeat='parameter in parameters|limitTo:3')
+								h3.margin-0px.margin-top(style='margin-bottom:5px!important;') {{parameter.value}}
+									small {{parameter.unit}}
+								span.label.bg-orange(style='font-size:12px;')
+									strong {{parameter.title}} 
+									i.fa.fa-chevron-circle-right
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Map
+						//- .powerwidget-ctrls(role='menu')
+						//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 		i.fa.fa-share-alt
+						//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 		i.fa.fa-times-circle
+						//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+						//- 		i.fa.fa-arrows-alt
+						//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+						//- 		i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				div.inner-spacer.nopadding
+					div(ng-controller="DemoController")
+						div#map
+							leaflet(center="madeira",height="550",markers="markers",layers="layers")
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget',ng-controller="ExampleCtrl")
+				header
+					h2
+						| {{parameter.title}} History
+						small All Points
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-edit-btn(href='readings/{{pid}}/{{iid}}')
+							i.fa.fa-lg.fa-pencil
+						a.button-icon.powerwidget-refresh-btn(ng-click='refreshChart()',href='#',target='_self',eat-click)
+							i.fa.fa-refresh.fa-lg
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.text-center
+					div(style='width:90%; height:200px; margin-left:auto; margin-right:auto;')
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking",ng-model="exampleDataRanking",color="colorFunction()",width='600', height='300',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						nvd3-line-chart(data="exampleData",ng-model="exampleData",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()")
+		div.col-md-3.bootstrap-grid(ng-repeat='parameter in parameters')
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+						h2 {{parameter.title}}
+						.powerwidget-ctrls(role='menu')
+							//- a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+							//- 	i.fa.fa-share-alt
+							a.button-icon.powerwidget-edit-btn(href='/editParameter/{{pid}}/{{iid}}/{{parameter.parmid}}')
+								i.fa.fa-cog.fa-lg
+							a.button-icon.powerwidget-delete-btn(ng-click='deleteParameter(parameter.parmid)', href='#', target='_self',eat-click)
+								i.fa.fa-times-circle.fa-lg
+							//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+							//- 	i.fa.fa-arrows-alt
+							//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+							//- 	i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h2
+								| {{parameter.value}}
+								small {{parameter.unit}}
+						.col-md-2.col-sm-2.col-xs-2
+							div.pull-right.pull-down
+								//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+								h2
+									a(href='/parameter/{{pid}}/{{iid}}/{{parameter.parmid}}')
+										i.fa.fa-folder-open
+		div.col-md-3.bootstrap-grid
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				a.btn(href='/addParameter/{{pid}}/{{iid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Parameter
+
+
+	//- div(ng-controller="ExampleCtrl2")
+	//- 	//- nvd3-line-chart(data="exampleData2",showXAxis="true",showYAxis="true",width="600",height="400",tooltips="true",useInteractiveGuideline="true",showLegend="true",legendColor="legendColorFunction()",xAxisTickFormat="xAxisTickFormatFunction()")
+	//- 	nvd3-line-chart(data="exampleData",id="exampleId",height="400",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",useInteractiveGuideline="true",toolTipContent="toolTipContentFunction()",xAxisTickFormat="xAxisTickFormat()")

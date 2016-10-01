@@ -1,0 +1,923 @@
+//- include leftMenu
+script
+	//mixpanel.track("Config")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+	.list-group .list-group-item:not(:first-child) { margin-top: -2px; }
+	.list-group .list-group-item .item:not(:last-child) { margin-right: 10px; }
+	.list-group .list-group-item .item { margin-top: -3px; }
+	.list-group .list-group-item input.item { height: 22px; width: 5em; margin-top: 0px; 
+			border-color: #c0c2c7; font-weight: 600; outline: none; border-width: 2px; border-radius: 3px; border-style: solid; 
+			background: #fff; appearance: normal; -moz-appearance: none; -webkit-appearance: none; }
+	.btn-icon-holder { border: 1px solid #ddd; border-radius: 3px; height: 16px; background-color: white; padding-left: 5px; padding-right: 5px; }
+	.btn-icon-holder img, .btn-icon-holder i { height: 16px; width: 16px; margin-top: -1px; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div#powerwidgets.row
+		include modals/addEditStore
+		include modals/addEditMailingList
+
+		#myModalDeleteIcon.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content.modal-content-caution
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Confirm delete
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						p Are you sure you want to delete the Custom Icon
+							| {{ iconToDelete.title }} ?
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteIcon()')
+							i.fa.fa-exclamation-triangle
+							|  Delete
+		script
+			$('#openBtn').click(function(){
+				$('#myModalDeleteIcon').modal({show:true});
+			});
+
+		#myModalEditIcon.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Custom Icon
+					.modal-body
+						form.orb-form
+							fieldset
+								div.row
+									section.col.col-6
+										label.label Custom Icon Name
+										label.input
+											input(placeholder="", name="iconname", ng-model="iconToEdit.title")
+									section.col.col-4
+										label.label Data Source
+											.margin-left
+												.inline-group
+													label.radio
+														input(type='radio', name='radio-inline', value='pointindicator', ng-model='iconToEdit.source')
+														i
+														| Point Indicator
+													label.radio
+														input(type='radio', name='radio-inline', value='pointattribute', ng-model='iconToEdit.source')
+														i
+														| Point Attribute
+									section.col.col-2
+										label.label Position
+										label.select
+											//- select(ng-model="iconToEdit.position", ng-options="pos for pos in positions")
+											select(ng-model="iconToEdit.position", ng-options="pos for pos in positions | unselectedIconPositions:selectedPositions:pos")
+											i
+								div.row
+									section.col.col-5(ng-show="iconToEdit.source == 'pointindicator'")
+										label.label Indicator
+										label.select
+											select(ng-model="iconToEdit.name", ng-options="indic for indic in indicatorNames")
+											i
+									section.col.col-5(ng-show="iconToEdit.source == 'pointattribute'")
+										label.label Attribute
+										label.select
+											select(ng-model="iconToEdit.name", ng-options="attr for attr in attributeNames")
+											i
+									section.col.col-5
+										label.label Scale Type
+										label.select
+											select(ng-model="iconToEdit.type", ng-options="scale for scale in scaleTypes")
+											i
+									section.col.col-2
+										label.label OLAP?
+										label.checkbox
+											input(ng-model="iconToEdit.source_olap", type="checkbox")
+											i
+								div.row(ng-show="iconToEdit.type == 'Intervals'")
+									.col.col-sm-12
+										label.label Minimum {{minMaxVals[iconToEdit.name].min}} / Maximum {{minMaxVals[iconToEdit.name].max}}
+								div.row(ng-show="iconToEdit.type == 'Percentage'")
+									.col.col-sm-12
+										label.label Choose percentage below objective (e.g. 10 - 25%)
+								div.row
+									.col.col-12(ng-show="iconToEdit.type == 'Percentage'")
+										ul.list-group
+											li.list-group-item(ng-repeat="bucket in iconToEdit.buckets")
+												button.btn.btn-danger.btn-sm.item(ng-click="iconToEdit.buckets.splice($index, 1)")
+													i.fa.fa-times-circle.fa-lg
+												input.item(type="number", ng-model="bucket.bottomPerc")
+												input.item(type="number", ng-model="bucket.topPerc")
+												button.btn.btn-sm.btn-icon-holder.item( data-toggle='modal', target='_self', href='#myModalEditIconImage',  ng-click="setCurrentIconImage(bucket, $index)")
+													img(ng-show="bucket.icon.length > 0", src="{{bucket.icon}}")
+													//- button.btn.btn-primary.btn-sm(ng-show="bucket.icon.length == 0") ADD
+													i.fa.fa-question.fa-lg(ng-show="bucket.icon.length == 0")
+												label.item
+													label.checkbox Occurrences?
+														input(type="checkbox", name="occurencesCheck", ng-model="bucket.occCheck")
+														i	
+												label.select(ng-show="bucket.occCheck") Choose Task List:
+													select(ng-model="bucket.occ", ng-options="type.title for type in tasklists")
+
+										button.btn.btn-success.btn-sm(ng-click="iconToEdit.buckets.push({icon: ''})")
+											i.fa.fa-plus-circle.fa-lg
+									.col.col-12(ng-show="iconToEdit.type == 'Intervals'")
+										ul.list-group
+											li.list-group-item(ng-repeat="bucket in iconToEdit.buckets")
+												button.btn.btn-danger.btn-sm.item(ng-click="iconToEdit.buckets.splice($index, 1)")
+													i.fa.fa-times-circle.fa-lg
+												input.item(type="number", ng-model="bucket.bottomVal")
+												input.item(type="number", ng-model="bucket.topVal")
+												button.btn.btn-sm.btn-icon-holder.item( data-toggle='modal', target='_self', href='#myModalEditIconImage',  ng-click="setCurrentIconImage(bucket, $index)")
+													img(ng-show="bucket.icon.length > 0", src="{{bucket.icon}}")
+													//- button.btn.btn-primary.btn-sm(ng-show="bucket.icon.length == 0") ADD
+													i.fa.fa-question.fa-lg(ng-show="bucket.icon.length == 0")
+												label.item
+													label.checkbox Occurrences?
+														input(type="checkbox", name="occurencesCheck", ng-model="bucket.occCheck")
+														i	
+												label.select(ng-show="bucket.occCheck") Choose Task List:
+													select(ng-model="bucket.occ", ng-options="type.title for type in tasklists")
+																							
+										button.btn.btn-success.btn-sm(ng-click="iconToEdit.buckets.push({icon: ''})")
+											i.fa.fa-plus-circle.fa-lg
+									//- p(ng-show="iconToEdit.type == 'TrueOrFalse'") TrueOrFalse
+									.col.col-12(ng-show="iconToEdit.type == 'EmptyOrNot'")
+										ul.list-group
+											li.list-group-item
+												//- input.item(type="number", ng-model="iconToEdit.buckets[0].val")
+												span.item If variable "{{ iconToEdit.name }}" is {{ translateEmptyOrNotVal(iconToEdit.buckets[0].val) }}, show icon: 
+												button.btn.btn-sm.btn-icon-holder.item( data-toggle='modal', target='_self', href='#myModalEditIconImage',  ng-click="setCurrentIconImage(iconToEdit.buckets[0], 0)")
+													img(ng-show="iconToEdit.buckets[0].icon.length > 0", src="{{iconToEdit.buckets[0].icon}}")
+													//- button.btn.btn-primary.btn-sm(ng-show="bucket.icon.length == 0") ADD
+													i.fa.fa-question.fa-lg(ng-show="iconToEdit.buckets[0].icon.length == 0")
+											li.list-group-item
+												//- input.item(type="number", ng-model="iconToEdit.buckets[1].val")
+												span.item If variable "{{ iconToEdit.name }}" is {{ translateEmptyOrNotVal(iconToEdit.buckets[1].val) }}, show icon: 
+												button.btn.btn-sm.btn-icon-holder.item( data-toggle='modal', target='_self', href='#myModalEditIconImage',  ng-click="setCurrentIconImage(iconToEdit.buckets[1], 1)")
+													img(ng-show="iconToEdit.buckets[1].icon.length > 0", src="{{iconToEdit.buckets[1].icon}}")
+													//- button.btn.btn-primary.btn-sm(ng-show="bucket.icon.length == 0") ADD
+													i.fa.fa-question.fa-lg(ng-show="iconToEdit.buckets[1].icon.length == 0")
+												label.item
+													label.checkbox Occurrences?
+														input(type="checkbox", name="occurencesCheck", ng-model="bucket.occCheck")
+														i	
+												label.select(ng-show="bucket.occCheck") Choose Task List:
+													select(ng-model="bucket.occ", ng-options="type.title for type in tasklists")
+									
+
+									//-p(ng-show="iconToEdit.type == 'AroundZero'") AroundZero
+
+								//- section.col.col-12(ng-show="{{iconToEdit.source == 'pointattribute'}}")
+								//- 	label.label Attribute
+								//- 		label.select
+								//- 			select(ng-model="iconToEditNameObj", ng-options="indic.name for indic in indicatorNames")
+								
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-primary.left(href="#", target='_self', ng-click="toEditIcon()") Reset Changes
+						a.btn.btn-success(href='#', target='_self', ng-click='editIcon()', data-dismiss='modal') Edit Custom Icon
+						p(style='{{statusStyle}}margin-top:15px;') {{statusMessage}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditIcon').modal({show:true});
+			});
+		
+		#myModalEditTaskList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Edit Task List for {{editingTaskList.title}}
+					.modal-body
+						form.orb-form
+							fieldset
+								div.row
+									section.col.col-6
+										label.label Task List Title
+										div
+											div(style="float: left;")
+												label.input
+													input(placeholder="", name="title", ng-model="editingTaskList.title")
+								div.row
+									.col.col-12
+										ul.list-group
+											li.list-group-item(ng-show="!editingTaskList.tasks.length", style="min-width: 350px; min-height: 35px;")
+												div(style="float: left; width: calc(100%-50px);")
+													p No tasks
+										ul.list-group
+											li.list-group-item(ng-repeat="task in editingTaskList.tasks", style="min-width: 350px; min-height: 35px;")
+												div(style="float: left; width: calc(100%-50px);")
+													p {{task.title}}
+												div(style="float: right; width: 50px;")
+													button.btn.btn-danger.btn-sm(ng-click="editingTaskList.tasks.splice($index, 1)")
+														i.fa.fa-trash-o.fa-lg
+								div.row
+									section.col.col-6
+										label.label Add task title
+										div
+											div(style="float: left;")
+												label.input
+													input(placeholder="", name="toaddtasktitle", ng-model="toaddtasktitle")
+											div(style="float: left;")
+												button.btn.btn-success.btn-sm(ng-click="addTaskToTaskList()", ng-disabled="!toaddtasktitle.length")
+													i.fa.fa-plus-circle.fa-lg
+
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self', ng-click='saveTaskList()', data-dismiss='modal') Edit Task List
+						p(style='{{statusStyle}}margin-top:15px;') {{statusMessage}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditTaskList').modal({show:true});
+			});
+
+		
+		#myModalDeleteTaskList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content.modal-content-caution
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Confirm delete
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						p Are you sure you want to delete the Task List
+							| {{ toDelTaskList.title }} ?
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteTaskList()')
+							i.fa.fa-exclamation-triangle
+							|  Delete
+		script
+			$('#openBtn').click(function(){
+				$('#myModalDeleteTaskList').modal({show:true});
+			});
+
+
+		#myModalEditAlarmList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Add/Edit Alarm: {{occCfg.title}}
+					.modal-body
+						form.orb-form
+							fieldset
+								div.row
+									section.col.col-12(style="float: left;")
+										label.label(style="float: left;") Alarm Title
+										label.input(style="float: left;")
+										input(placeholder="Insert a title", name="title", ng-model="occCfg.title")
+								div.row
+									section.col.col-6(style="float: left;")
+										label.label 1) Choose store(s):
+										div
+											div(style="float: left;")
+												label.checkbox.filterCheckbox(ng-repeat="store in stores")
+													input(type="checkbox", ng-model="occCfg.storeBox[store.pointkey]") 
+													i
+													| {{store.name}}
+									section.col.col-6(style="float: left;")
+										label.label 2) Choose Indicator:
+										div
+											div(style="float: left;")
+												select(ng-options="widget.title for widget in widgets", ng-model="occCfg.widgetBox")
+												p(ng-show="selectedwidgettitle != ''") {{selectedwidgettitle}}
+								
+								div.row
+									section.col.col-6(style="float: left;")
+										label.label 3) Choose frequency:
+										label.checkbox(style="float: left") Hourly
+											input(ng-disabled="occCfg.dailyBox==true",type="checkbox", ng-model="occCfg.hourlyBox")
+											i(ng-disabled="occCfg.dailyBox==true", style= "margin-left: 5px")
+										label.checkbox(style="float: left") Daily
+											input(ng-disabled="occCfg.hourlyBox==true",type="checkbox", ng-model="occCfg.dailyBox")
+											i(ng-disabled="occCfg.hourlyBox==true", style= "margin-left: 5px")
+									
+									section.col.col-6(style="float: left;")
+										label.label 4) With repetition?
+										label.checkbox(style="float: left") Yes
+											input(ng-disabled="occCfg.noRepBox==true", type="checkbox", ng-model="occCfg.repetitionBox")
+											i(ng-disabled="occCfg.noRepBox==true", style= "margin-left: 5px")
+										label.checkbox(style="float: left") No
+											input(ng-disabled = "occCfg.repetitionBox==true", type="checkbox", ng-model="occCfg.noRepBox")
+											i(ng-disabled="occCfg.repetitionBox==true", style= "margin-left: 5px")
+
+													
+								div.row
+									section.col.col-12
+										label.label(style="float: left") 5) Evaluate rule against:
+										label.checkbox(style="float: left") Objective/Budget
+											input(ng-disabled="occCfg.absBox==true", type="checkbox", ng-model="occCfg.objBox")
+											i(ng-disabled="occCfg.absBox==true", style= "margin-left: 5px")
+										label.checkbox(style="float: left") Absolute value of indicator
+											input(ng-disabled = "occCfg.objBox==true", type="checkbox", ng-model="occCfg.absBox")
+											i(ng-disabled="occCfg.objBox==true", style= "margin-left: 5px")
+										p(ng-show="occCfg.objBox", style="color: blue")
+												| For example, Sales are 80% below hourly objective
+										p(ng-show="occCfg.absBox", style="color: blue")
+												| For example, Daily Sales should be greater than 10,000 $
+									
+
+								div.row
+									section.col.col-12(style="float: left;")
+										label.label 6) Compare with absolute value or with time cumulative value
+										label.checkbox(style="float: left") Absolute
+											input(ng-disabled="occCfg.cumulative==true", type="checkbox", ng-model="occCfg.absolute")
+											i(ng-disabled="occCfg.cumulative==true", style= "margin-left: 5px")
+										label.checkbox(style="float: left") Cumulative
+											input(ng-disabled = "occCfg.absolute==true", type="checkbox", ng-model="occCfg.cumulative")
+											i(ng-disabled="occCfg.absolute==true", style= "margin-left: 5px")
+
+								div.row
+									section.col.col-12
+										label.label(style="float: left") 7) Define rule:
+								div.row(style="float: left")					
+									section.col.col-12(style="float: left")		
+										select(style="margin-right: 20px", ng-model="occCfg.rule")
+											option Equal to
+											option Less than
+											option Greater than
+											option Less than or equal to
+											option Greater than or equal to
+											option Not equal to
+										input(style="margin-left: 20px", style="width: 50px",type="number", placeholder="", name="alarmValue", ng-model = "occCfg.value")
+								div.row(style="float: left")
+									section.col.col-12(style="float: left")
+										p(style="margin-left: 20px", ng-show="occCfg.repetitionBox == true && (occCfg.dailyBox == true || occCfg.hourlyBox == true)") for
+									section.col.col-12(style="float: left")	
+										input(style="width: 50px",type="number", placeholder="", ng-show="occCfg.repetitionBox == true && (occCfg.dailyBox == true || occCfg.hourlyBox == true)", ng-model = "occCfg.repvalue")
+									section.col.col-12(style="float: left")		
+										p(ng-show="occCfg.repetitionBox == true && occCfg.hourlyBox == true") hours in a row
+										p(ng-show="occCfg.repetitionBox == true && occCfg.dailyBox == true") days in a row
+
+								div.row			
+								div.row(style="float: left;")
+									section.col.col-12
+										label.label 8) Associate Task List:
+											select(style = "margin-left: 20px", ng-model="occCfg.tasklist" , ng-options="type.title for type in tasklists")
+											p(ng-show="selectedwidgettitle != ''") {{selectedtasklisttitle}}
+
+									section.col.col-12(style="float: left;")
+										label.label 9) Maximum time to action:
+										input(style="width: 50px; margin-left: 10px",type="number", placeholder="", ng-model = "occCfg.actionValue")
+										label.checkbox(style="float: left") Hours
+											input(ng-disabled="occCfg.daysBox==true",type="checkbox", ng-model="occCfg.hoursBox")
+											i(ng-disabled="occCfg.daysBox==true", style= "margin-left: 5px")
+										label.checkbox(style="float: left") Days
+											input(ng-disabled="occCfg.hoursBox==true",type="checkbox", ng-model="occCfg.daysBox")
+											i(ng-disabled="occCfg.hoursBox==true", style= "margin-left: 5px")
+	
+
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self', ng-click='saveAlarmList()', data-dismiss='modal') Add Alarm
+						p(style='{{statusStyle}}margin-top:15px;') {{statusMessage}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditAlarmList').modal({show:true});
+			});
+
+		
+		#myModalDeleteAlarmList.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content.modal-content-caution
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Confirm delete
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						p Are you sure you want to delete the Alarm
+							| {{ toDelAlarm.title }} ?
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteAlarm()')
+							i.fa.fa-exclamation-triangle
+							|  Delete
+		script
+			$('#openBtn').click(function(){
+				$('#myModalDeleteAlarmList').modal({show:true});
+			});
+
+
+
+
+
+		#myModalEditIconImage.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Select new icon image
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						div.row
+							div.col-md-6
+								h4 Current icon image:
+								img(src="{{currIconBucket.icon}}")
+							div.col-md-6
+								h4 New icon image:
+								img(src="{{newIconImage}}")
+						hr
+						div.row
+							div.col-md-12
+								h4 Available images:
+								img(ng-repeat="image in allImages", src="{{image.icon}}", ng-click="setNewIconImage(image)")
+						//- div.row
+						//- 	div.col-md-12
+						//- 		pre {{currIconBucket | json}}
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-success(href='#', target='_self',, data-dismiss='modal', ng-click='setImageOnCurrentIcon()') Select Image
+						//- a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteIcon()')
+						//- 	i.fa.fa-exclamation-triangle
+						//- 	|  Delete
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEditIconImage').modal({show:true});
+			});
+
+		#myModal1.modal
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Add new data type
+					.modal-body
+						div.inner-spacer
+							form#input-masking.orb-form(class='{{addForm}}')
+								fieldset
+									row
+										section.col.col-6
+											label.label Title
+											label.input
+												input#date2(placeholder='Title', name='title', ng-model='form.title')
+										section.col.col-6(style='margin-bottom:15px;')
+											label.label Unit
+											label.input
+												input#card(placeholder='Unit', name='unit', ng-model='form.unit')
+									row
+										section.col.col-4
+											label.label Alarm
+											.margin-left
+												.inline-group
+													label.radio
+														input(type='radio', name='radio-inline', value='no', ng-model='form.alarm', checked)
+														i
+														| No
+													label.radio
+														input(type='radio', name='radio-inline', value='yes', ng-model='form.alarm')
+														i
+														| Yes
+											//- label.input
+											//- 	//- i.icon-append.fa.fa-crosshairs
+											//- 	i.icon-append.fa.fa-bell-o
+											//- 	input#serial(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+									row
+										section.col.col-4(ng-show="form.alarm == 'yes'")
+											label.label Minimum Value
+											label.input
+												input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+										section.col.col-4(ng-show="form.alarm == 'yes'")
+											label.label Maximum Value
+											label.input
+												input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+										section.overflow-hidden.col.col-4(ng-show="form.alarm == 'no'")
+											label.label Minimum Value
+											label.input
+												input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+										section.overflow-hidden.col.col-4(ng-show="form.alarm == 'no'")
+											label.label Maximum Value
+											label.input
+												input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+									row
+										section.col.col-12
+											label.label Global Data Type
+											.margin-left
+												.inline-group
+													label.radio
+														input(type='radio', name='radio-inline2', value='no', ng-model='form.global', checked)
+														i
+														| No
+													label.radio
+														input(type='radio', name='radio-inline2', value='yes', ng-model='form.global')
+														i
+														| Yes
+											div.note(ng-show="form.global == 'yes'")
+												strong Note:
+												|  Data type will be accessible to all projects.
+											div.note(ng-show="form.global == 'no'")
+												strong Note:
+												|  Data type will only be accessible to the current project.
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Close
+						a.btn.btn-success(href='#', target='_self', ng-click='addNewDataType()') Add Data Type
+						p(style='{{statusStyle}}margin-top:15px;') {{statusMessage}}
+						//- pre {{form | json}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModal1').modal({show:true});
+			});
+		#myModalDelete.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content.modal-content-caution
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Confirm delete
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						p {{deleteMessage}}
+						p(ng-hide='datatypeToDelete.global == "no"') 
+							i.fa.fa-exclamation-triangle
+							|  Warning: this data type is global to this project. Removing it will delete its access to all projects.
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteDataType()')
+							i.fa.fa-exclamation-triangle
+							|  Delete
+		script
+			$('#openBtn').click(function(){
+				$('#myModalDelete').modal({show:true});
+			});
+		#myModalEdit.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Edit data type 
+					.modal-body
+						div.inner-spacer
+							form#input-masking.orb-form(class='{{addForm}}')
+								fieldset
+									row
+										section.col.col-6
+											label.label Title
+											label.input
+												input#date2(placeholder='Title', name='title', ng-model='formEdit.title')
+										section.col.col-6(style='margin-bottom:15px;')
+											label.label Unit
+											label.input
+												input#card(placeholder='Unit', name='unit', ng-model='formEdit.unit')
+									row
+										section.col.col-4
+											label.label Alarm
+											.margin-left
+												.inline-group
+													label.radio
+														input(type='radio', name='radio-inline', value='no', ng-model='formEdit.alarm', checked)
+														i
+														| No
+													label.radio
+														input(type='radio', name='radio-inline', value='yes', ng-model='formEdit.alarm')
+														i
+														| Yes
+											//- label.input
+											//- 	//- i.icon-append.fa.fa-crosshairs
+											//- 	i.icon-append.fa.fa-bell-o
+											//- 	input#serial(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+									row
+										section.col.col-4(ng-show="formEdit.alarm == 'yes'")
+											label.label Minimum Value
+											label.input
+												input#card(placeholder='Minimum Value', name='min', ng-model='formEdit.min')
+										section.col.col-4(ng-show="formEdit.alarm == 'yes'")
+											label.label Maximum Value
+											label.input
+												input#card(placeholder='Maximum Value', name='max', ng-model='formEdit.max')
+										section.overflow-hidden.col.col-4(ng-show="formEdit.alarm == 'no'")
+											label.label Minimum Value
+											label.input
+												input#card(placeholder='Minimum Value', name='min', ng-model='formEdit.min')
+										section.overflow-hidden.col.col-4(ng-show="formEdit.alarm == 'no'")
+											label.label Maximum Value
+											label.input
+												input#card(placeholder='Maximum Value', name='max', ng-model='formEdit.max')
+									row
+										section.col.col-12
+											label.label Global Data Type
+											.margin-left
+												.inline-group
+													label.radio
+														input(type='radio', name='radio-inline2', value='no', ng-model='formEdit.global', checked)
+														i
+														| No
+													label.radio
+														input(type='radio', name='radio-inline2', value='yes', ng-model='formEdit.global')
+														i
+														| Yes
+											div.note(ng-show="formEdit.global == 'yes'")
+												strong Note:
+												|  Data type will be accessible to all projects.
+											div.note(ng-show="formEdit.global == 'no'")
+												strong Note:
+												|  Data type will only be accessible to the current project.
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Close
+						a.btn.btn-success(href='#', target='_self', ng-click='editDataType()') Edit Data Type
+						p(style='{{statusStyle}}margin-top:15px;') {{statusMessage}}
+						//- pre {{formEdit | json}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModalEdit').modal({show:true});
+			});
+		div.col-md-12.bootstrap-grid(ng-hide='userProfile.datTypeMF')
+			div.page-header
+				h2 Data Types
+					small Define your indicators' title, alarm and unit
+		div.col-md-12.bootstrap-grid(ng-hide='userProfile.datTypeMF')
+			div.row(ng-show='datatypes.length == 0')
+				div.col-md-12
+					.callout.callout-info.callout-info-new-icon(style='background: white; margin-top: 0px;')
+						h4 Define your data types
+						h6.lead(style='font-size: 16px;') Please insert your first data type definition so that you can use its information when adding a new indicator.
+		div.col-md-3.bootstrap-grid(ng-repeat='datatype in datatypes')
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2(ng-show='datatype.global == "no"') {{datatype.title}}
+					h2(ng-show='datatype.global == "yes"') {{datatype.title}} (g)
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEdit', ng-click='toEditDataType(datatype)')
+							i.fa.fa-pencil-square-o.fa-lg
+						//- a.button-icon.powerwidget-delete-btn(ng-click='deleteDataType(datatype.dtid)', href='#', target='_self')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDelete', ng-click='toDeleteDataType(datatype)')
+							i.fa.fa-times-circle.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h5 Unit: 
+								small {{datatype.unit}}
+							h5 Alarm: 
+								small {{datatype.alarm}}
+							h5 Minimum:
+								small(ng-show="datatype.alarm == 'yes'") {{datatype.min}}
+							h5 Maximum: 
+								small(ng-show="datatype.alarm == 'yes'") {{datatype.max}}
+							hr
+							h5 Global data type: 
+								small {{datatype.global}}
+		div.col-md-3.bootstrap-grid(ng-hide='userProfile.datTypeMF')
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				//- a.btn(href='/addWidget/{{pid}}/{{pointid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+				a.btn(data-toggle='modal', target='_self', href='#myModal1', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Data Type
+
+		div.col-md-12.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.page-header
+				h2 Stores
+					small Configure new or existing stores (attributes, objectives and seasonality)
+		div.col-md-3.bootstrap-grid(ng-repeat='store in stores', ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2 {{store.name}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#addEditStoreModal', ng-click='toAddEditStore(store, $index)')
+							i.fa.fa-pencil-square-o.fa-lg
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#deleteStoreModal', ng-click='toDeleteStore(store, $index)')
+							i.fa.fa-times-circle.fa-lg
+				.inner-spacer
+					.row
+						.col-md-12.col-sm-12.col-xs-12
+							div(ng-repeat="level in config.buckets", style="float: left; display: inline-block;")
+								img(src="{{level.icon}}")
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				//- a.btn(href='/addWidget/{{pid}}/{{pointid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+				a.btn(data-toggle='modal', target='_self', href='#addEditStoreModal', ng-click='toAddEditStore(null, -1)', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Store
+
+
+
+		div.col-md-12.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.page-header
+				h2 Map Custom Icons
+					small Config indicators to show with a custom image icon on the map
+		div.col-md-3.bootstrap-grid(ng-repeat='config in iconconfigs', ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2 {{config.title}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditIcon', ng-click='toEditIcon(config, $index)')
+							i.fa.fa-pencil-square-o.fa-lg
+						//- a.button-icon.powerwidget-delete-btn(ng-click='deleteDataType(datatype.dtid)', href='#', target='_self')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDeleteIcon', ng-click='toDeleteIcon(config, $index)')
+							i.fa.fa-times-circle.fa-lg
+				.inner-spacer
+					.row
+						.col-md-12.col-sm-12.col-xs-12
+							div(ng-repeat="level in config.buckets", style="float: left; display: inline-block;")
+								img(src="{{level.icon}}")
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				//- a.btn(href='/addWidget/{{pid}}/{{pointid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+				a.btn(data-toggle='modal', target='_self', href='#myModalEditIcon', ng-click='toEditIcon(null, -1)', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Custom Icon
+		div.col-md-12.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.page-header
+				h2 Occurrences' Task Lists
+					small Configure the lists of tasks assigned to type of Occurrences
+		div.col-md-3.bootstrap-grid(ng-repeat='tasklist in tasklists', ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false',id='tasklist{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2 {{tasklist.title}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditTaskList', ng-click='toEditTaskList(tasklist)')
+							i.fa.fa-pencil-square-o.fa-lg
+						//- a.button-icon.powerwidget-delete-btn(ng-click='deleteDataType(datatype.dtid)', href='#', target='_self')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDeleteTaskList', ng-click='toDeleteTaskList($index)')
+							i.fa.fa-times-circle.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h5 Number of tasks: 
+								small {{tasklist.tasks.length}}
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				a.btn(data-toggle='modal', target='_self', href='#myModalEditTaskList', ng-click='toEditTaskList(null)', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Task List
+
+		div.col-md-12.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.page-header
+				h2 Set Up Alarms
+					small Configure the alarms that trigger Occurrences
+		div.col-md-3.bootstrap-grid(ng-repeat='alarm in alarms', ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false',id='')
+				header
+					h2 {{alarm.config.title}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditAlarmList', ng-click='toEditAlarmList(alarm)')
+							i.fa.fa-pencil-square-o.fa-lg
+						//- a.button-icon.powerwidget-delete-btn(ng-click='deleteDataType(datatype.dtid)', href='#', target='_self')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDeleteAlarmList', ng-click='toDeleteAlarm($index)')
+							i.fa.fa-times-circle.fa-lg
+				.inner-spacer
+					.row
+						//- .col-md-10.col-sm-10.col-xs-10
+						//- 	h5 Alarms: 
+						//- 		small {{alarm.alarms.length}}
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				a.btn(data-toggle='modal', target='_self', href='#myModalEditAlarmList', ng-click='toEditAlarmList(null)', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Alarm
+
+		div.col-md-12.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.page-header
+				h2 Set Up E-mails
+					small Configure e-mail notifications
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false')
+				header
+					h2 Immediately
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditImmediateMailingList', ng-click='toEditImmediateMailingList()')
+							i.fa.fa-pencil-square-o.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h5 E-mails: 
+								small {{emailsList}}
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false')
+				header
+					h2 Daily Summary
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditDailyMailingList', ng-click='toEditDailyMailingList()')
+							i.fa.fa-pencil-square-o.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h5 E-mails: 
+								small {{emailsList2}}
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false')
+				header
+					h2 Lack of Action
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditActionMailingList', ng-click='toEditActionMailingList()')
+							i.fa.fa-pencil-square-o.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h5 E-mails: 
+								small {{emailsList3}}
+		div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			div.powerwidget.blue(data-widget-editbutton='false')
+				header
+					h2 KPI Daily Summary
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditKpiDailyMailingList', ng-click='toEditKpiDailyMailingList()')
+							i.fa.fa-pencil-square-o.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h5 E-mails: 
+								small {{emailsList4}}
+
+		div.col-md-12.bootstrap-grid(ng-show='userProfile.admin')
+			div.page-header
+				h2 Mail
+			div.row
+				div.col-md-12
+					button.btn.btn-default(ng-click="sendMail('dummy')") Send Dummy Mail
+					button.btn.btn-default(ng-click="sendMail('htmldummy')") Send Html Dummy Mail
+					button.btn.btn-default(ng-click="sendDailyMail()") Force Daily Email
+					button.btn.btn-default(ng-click="sendDailyOverdueOccurrencesMail()") Force Overdue Occurrences Email
+					label.input
+						input(placeholder="Date", name="forcedailymaildate", ng-model="forceddailyobj.forcedailymaildate")
+						input(placeholder="Pid", name="forcedpid", ng-model="forceddailyobj.forcedpid")
+					//- button.btn.btn-default(ng-click="generateSummary()") Gen Summary
+					button.btn.btn-default(ng-click="generateSummaryTemail()") Gen Summary Temail
+
+		div.col-md-12.bootstrap-grid(ng-show="project.name == 'earthindicators'")
+			div.page-header
+				h2 Set Up Data Sources
+					small Configure your KPI data sources for this project
+		//- div.col-md-3.bootstrap-grid(ng-repeat='alarm in alarms', ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+		//- 	div.powerwidget.blue(data-widget-editbutton='false',id='')
+		//- 		header
+		//- 			h2 {{alarm.config.title}}
+		//- 			.powerwidget-ctrls(role='menu')
+		//- 				a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalEditAlarmList', ng-click='toEditAlarmList(alarm)')
+		//- 					i.fa.fa-pencil-square-o.fa-lg
+		//- 				//- a.button-icon.powerwidget-delete-btn(ng-click='deleteDataType(datatype.dtid)', href='#', target='_self')
+		//- 				a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDeleteAlarmList', ng-click='toDeleteAlarm($index)')
+		//- 					i.fa.fa-times-circle.fa-lg
+		//- 		.inner-spacer
+		//- 			.row
+		//- 				//- .col-md-10.col-sm-10.col-xs-10
+		//- 				//- 	h5 Alarms: 
+		//- 				//- 		small {{alarm.alarms.length}}
+		div(ng-controller="DataSourcesCtrl")
+			include modals/dataSources
+			div.col-md-3.bootstrap-grid(ng-repeat='datasource in datasources', ng-show="project.name == 'earthindicators'")
+				div.powerwidget.blue(data-widget-editbutton='false',id='tasklist{{pid}}-{{pointiid}}-{{pointiid}}')
+					header
+						h2 {{datasource.curr_store_name}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDataSources', ng-click='bootstrapModalDataSources(datasource)')
+								i.fa.fa-pencil-square-o.fa-lg
+							//- a.button-icon.powerwidget-delete-btn(ng-click='deleteDataType(datatype.dtid)', href='#', target='_self')
+							a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDeleteDataSource', ng-click='toDeleteDataSource($index)')
+								i.fa.fa-times-circle.fa-lg
+					.inner-spacer
+						.row
+							.col-md-10.col-sm-10.col-xs-10
+								h5 Dropbox 
+									small .xlsx
+			div.col-md-3.bootstrap-grid(ng-show="project.name == 'earthindicators'")
+				div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+					a.btn(data-toggle='modal', target='_self', href='#myModalDataSources', ng-click='bootstrapModalDataSources(null)', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+						header	
+						.inner-spacer(style='background-color: #f0f0ed;')
+							h2
+								small.noBefore(style='color: #949fb2; font-weight: normal;')
+									i.fa.fa-plus-circle
+									|  Add Data Source
+
+						

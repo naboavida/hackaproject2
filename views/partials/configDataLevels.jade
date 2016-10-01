@@ -1,0 +1,42 @@
+//- include leftMenu
+script
+	//mixpanel.track("Config")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	
+
+include sidebarDashboard
+
+script(type="text/ng-template", id="tree_item_renderer.html")
+	{{data.title}}
+	//- button(ng-click="add(data)") Add node
+	//- button(ng-click="delete(data)", ng-show="data.childs.length > 0") Delete childs
+	div.btn-group.btn-group-xs.no-left-navigation
+		button.btn.btn-default(type="button", ng-disabled="findParent(data, 0) == null", ng-click="moveDown(findParent(data, 0), 0)") Move Up
+		button.btn.btn-default(type="button", ng-disabled="data.childs.length == 0", ng-click="moveDown(data, 0)") Move Down
+	ul
+		li(ng-repeat="data in data.childs", ng-include="'tree_item_renderer.html'")
+
+
+div.content-wrapper
+	div#powerwidgets.row
+		div.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+			div.powerwidget.green.powerwidget-sortable(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2 Data Levels
+						small Existing levels in your data
+				.inner-spacer
+					.row
+						.col-md-12.col-sm-12.col-xs-12
+							div.tree.well
+								ul
+									li.parent_li(ng-repeat="data in tree", ng-include="'tree_item_renderer.html'")
+							//- div.tree.well
+							//- 	pre {{tree | json}}
+							button.btn.btn-primary(ng-click="saveLevels()", ng-disabled="saving") {{savingText}}
+							|  {{savingStatusText}}

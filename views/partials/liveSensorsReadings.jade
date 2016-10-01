@@ -1,0 +1,46 @@
+div.wrap
+	ul.breadcrumb
+		li
+			a(href='/') Home
+		li
+			a(href='/projects') Projects
+		li
+			a(href='/dashboard/{{pid}}') Dashboard
+		li
+			a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+		li
+			a(href='') Parameter
+div.mainDiv
+	div.leftDiv
+		div.leftDivContent
+			div.areaInfo
+				div.leftInfoDiv
+					img.thumbnail(src='pics/saotome.jpg')
+				div.rightInfoDiv
+					div
+						h2(style='margin-left:25px;') {{project.title}}
+					div
+						div.leftBarDiv
+							h4 {{project.location}}
+							h2 Point {{pointid}}
+						div.rightBarDiv
+							h4 {{project.area}} km2
+			div(ng-controller="DemoController")
+				div
+					button(ng-click='addPoint()') Add Point
+					p {{addPointMode}}
+				div#map
+					leaflet(center="madeira",width="450",height="400",markers="markers",leafletMap="leafletMap",layers="layers")
+					//- leaflet(center="madeira",width="500",height="400",markers="markers",event-broadcast="events")
+	div.rightDiv(ng-controller="Hello")
+		h2(style='text-align:center;margin-bottom:25px;') Environmental Sensors in Realtime
+		div.topCenteredButtons.largeTopCenteredButtons
+			p: a(href='/liveSensors/{{pid}}/{{pointid}}') Current Readings
+			//- /parameter/{{pid}}/{{pointiid}}/{{parameter.pointparmid}}/{{pointid}}
+			p History Readings
+		div(style='width:600px; margin-left:auto; margin-right:auto;margin-top: 75px;')
+			h4 Temperature
+			nvd3-line-chart(data="temperatureData",ng-model="temperatureData",xAxisTickFormat="xAxisTickFormatFunction()",width='600', height='400',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+		div(style='width:600px; margin-left:auto; margin-right:auto;')
+			h4 Humidity
+			nvd3-line-chart(data="humidityData",ng-model="humidityData",xAxisTickFormat="xAxisTickFormatFunction()",width='600', height='400',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")

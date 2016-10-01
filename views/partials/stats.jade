@@ -1,0 +1,201 @@
+//- include sidebarData
+//-         li
+//-           a.active(href='/stats', title='Add Readings')
+//-             i.entypo-book
+//-             span  Stats
+
+div.content-wrapper.no-left-navigation
+  div.breadcrumb.clearfix
+    ul
+      li
+        a(href='/')
+          i.fa.fa-home.fa-2x
+      li.active Stats
+
+  div#powerwidgets.row(id="intervalreads", ng-controller="IntervalReadsCtrl")
+    div.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+      #point-image.powerwidget.powerwidget-as-portlet.green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Vanity Metrics
+        div(role='content')
+          div.inner-spacer
+            .row(style='margin-top:15px;')
+              .col-md-3.col-sm-3.col-xs-3.text-center
+                h4 Total Users
+                h2 {{totalUsers}}
+              .col-md-3.col-sm-3.col-xs-3.text-center
+                h4 Total Projects
+                h2 {{totalProjects}}
+              .col-md-3.col-sm-3.col-xs-3.text-center
+                h4 Total Points
+                h2 {{totalPoints}}
+              .col-md-3.col-sm-3.col-xs-3.text-center
+                h4 Total Indicators
+                h2 {{totalIndicators}}
+              //- .col-md-3.col-sm-3.col-xs-3.text-center
+              //-   h4 Total Parameters
+              //-   h2 {{totalParameters}}
+    div.col-sm-4
+      #point-image.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Organizations and Projects
+        div.inner-spacer(role='content')
+          table.table.table-striped.table-hover.margin-0px
+            thead
+              tr
+                th Organization
+                th Number of Projects
+            tbody
+              tr(ng-repeat='org in organizationsProjectsCount')
+                td {{org.name}}
+                td {{org.count}}
+              tr
+                td 
+                td 
+              tr(style="font-weight: bold;")
+                td TOTAL
+                td {{totalProjects}}
+    div.col-sm-4
+      #point-image.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Organizations and Points
+        div.inner-spacer(role='content')
+          table.table.table-striped.table-hover.margin-0px
+            thead
+              tr
+                th Organization
+                th Number of Points
+            tbody
+              tr(ng-repeat='org in organizationsPointsCount')
+                td {{org.name}}
+                td {{org.count}}
+              tr
+                td 
+                td 
+              tr(style="font-weight: bold;")
+                td TOTAL
+                td {{totalPoints}}
+    div.col-sm-4
+      #point-image.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Organizations and Indicators
+        div.inner-spacer(role='content')
+          table.table.table-striped.table-hover.margin-0px
+            thead
+              tr
+                th Organization
+                th Number of Indicators
+            tbody
+              tr(ng-repeat='org in projectsIndicatorsCount')
+                td {{org.name}}
+                td {{org.count}}
+              tr
+                td 
+                td 
+              tr(style="font-weight: bold;")
+                td TOTAL
+                td {{totalIndicators}}
+    
+    div.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+      #point-image.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Users
+        div.inner-spacer(role='content')
+          table.table.table-striped.table-hover.margin-0px
+            thead
+              tr
+                th Username
+                th Organization
+                th Log In
+                th Log out
+                th Status
+            tbody
+              tr(ng-repeat='user in allUsersOrganizations')
+                td {{user.username}}
+                td {{user.name}}
+                td {{user.login}}
+                td {{user.logout}}
+                td
+                  span.label(class='{{user.statusClass}}') {{user.status}}
+    div.col-md-6.bootstrap-grid(id="newuserform")
+      #newuserformwidget.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Users
+        div.inner-spacer(role='content')
+          .col.col-sm-12
+            form.orb-form
+              fieldset
+                section
+                  label.label Username
+                  label.input
+                    i.icon-append.fa.fa-user
+                    input(placeholder="The username (try not to add an existing one, check list above)", name="username", ng-model="addForm.username", type="text", required)
+                section
+                  label.label Password
+                  label.input
+                    i.icon-append.fa.fa-lock
+                    input(placeholder="The password for this username", name="password", ng-model="addForm.password", type="password", required)
+                section
+                  label.label Email
+                  label.input
+                    i.icon-append.fa.fa-envelope
+                    input(placeholder="The email of this user", name="email", ng-model="addForm.email", type="email", required)
+                section
+                  label.label Organization
+                  label.input
+                    i.icon-append.fa.fa-building
+                    input(placeholder="Input the exact name as seen above for an existing organization, or a new name for a new one", name="organization", ng-model="addForm.organization", type="text", required)
+                section
+                  label.label Client Cohort Tag
+                  label.input
+                    i.icon-append.fa.fa-tag
+                    input(placeholder="A tag to classify when the client was signed up into the platform. E.g. ClientsQ1_2015", name="code", ng-model="addForm.code", type="text", required)
+                section
+                  button.btn.btn-success(ng-click='submitNewUser()') Add New User
+                  p(style='{{lastAddedMsgStyle}}margin-top:15px;') {{lastAddedMsg}}
+    div.col-md-6.bootstrap-grid
+      #intervalreadss.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Interval Reads
+        div.inner-spacer(role='content')
+          .col.col-sm-12
+            form.orb-form
+              fieldset
+                section
+                  label.label Interval
+                  label.input.col.col-4
+                    input(placeholder="interval value", name="intervalValue", ng-model="intervalValue", type="number")
+              fieldset
+                section
+                  label.label Project ID
+                  label.input.col.col-4
+                    input(placeholder="Project ID", name="projectid", ng-model="projectid", type="number")
+              fieldset
+                section.col.col-8
+                    button.btn.btn-default(ng-click="changeIntervalValue()", style="float:left;") Set
+                    button.btn.btn-success(ng-click="startInterval()", style="float:left;", ng-hide="startStopInterval") Start
+                    button.btn.btn-danger(ng-click="stopInterval()", style="float:left;", ng-show="startStopInterval") Stop
+                    p(style="float:left;") {{changeIntervalValueMsg}}
+
+          .col.col-sm-12
+            p READINGS
+            div(ng-repeat="read in reads")
+              p [ {{read.id}} ] Read {{read.count}} new reads in {{read.date | date:'yyyy-MM-dd HH:mm:ss Z'}}
+    div.col-md-12.bootstrap-grid
+      #intervalreadss.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Today Last Values
+        div.inner-spacer(role='content')
+          .col.col-sm-12
+            button(ng-click="addTodayLastValue()") Add reading
+            button(ng-click="clearBackendReadings()") Clear backend readings
+          .col.col-sm-12
+            .col.col-sm-2(ng-repeat="kpi in kpis_list")
+              p {{kpi}}
+          .col.col-sm-12(ng-repeat="point in todayLastValues")
+            p {{point.PointKey}}
+            .col.col-sm-12
+              .col.col-sm-2(ng-repeat="kpi in kpis_list")
+                p(ng-repeat="read in point.reads[kpi]") {{read.hour}} {{read.value}}
+
+          pre {{lastBackendReads | json}}

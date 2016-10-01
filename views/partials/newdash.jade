@@ -1,0 +1,524 @@
+//- include leftMenu
+script
+	//mixpanel.track("Widget")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div.row						
+		div.col-md-12
+			//- alert
+			div.alert.alert-danger.alert-dismissable.text-center(ng-show="openOcc > 0")
+				button(type="button" ,class="close" ,data-dismiss="alert", aria-hidden="true")
+					i(class="fa fa-times-circle")
+				strong
+					span.fa.fa-exclamation-circle
+					|  {{openOcc}} Occurrences
+
+	div.row
+		div.col-md-12
+
+			div.breadcrumb
+
+				
+
+						div.pull-right.active
+
+
+							div.relative
+					
+
+								div.pointer(ng-click="toggleDatepicker()")
+
+									div.d-inline-block(style="margin-right:10px;")
+
+										div(ng-show="!filterSpec.dates.state")
+											p.uppercase(style="margin:0") {{widget.date | date:"longDate"}}
+
+										div(ng-show="filterSpec.dates.state")
+
+											div.uppercase
+												p.inline(ng-if="filterSpec.dates.startdate == filterSpec.dates.finishdate", style="margin:0")  {{filterSpec.dates.startdate | date:"longDate"}}
+												p.inline(ng-if="filterSpec.dates.startdate != filterSpec.dates.finishdate", style="margin:0") {{filterSpec.dates.startdate | date:"longDate"}} - {{filterSpec.dates.finishdate | date:"longDate"}}
+									i.fa.fa-calendar-o
+
+
+								div.absolute.datepicker(style="top:35px; right:0; z-index:2;", ng-show="datepicker")
+									div
+										div
+											div.d-inline-block.text-center
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('today')") Today
+													
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('yesterday')") Yesterday
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('thisWeek')") This Week
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('lastWeek')") Last Week
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('last15')") Last 15 days
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('thisMonth')") This Month
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('lastMonth')") Last Month
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('trimester')") Trimester
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('quarter')") Quarter
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('semester')") Semester
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('thisYear')") This Year
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('lastYear')") Last Year
+											div.d-inline-block
+												div(date-range, start="dt1", end="dt2")
+												button.btn.btn-success.btn-sm(ng-click="toggleDateFilter('true')") OK
+
+	//- indicator badges
+	div.row	
+		div.col-xs-12.bootstrap-grid	
+			//- kpis summary
+			div.powerwidget.powerwidget-sortable(role='widget', ng-controller="xDashCtrl")
+				div.nopadding.text-center.relative(style="background-color:#F0F0ED;")
+
+					div.arrow-left
+						a(ng-click="moveKpi('left')")
+							i.glyphicon.glyphicon-chevron-left
+					
+					div.spinner-icon(ng-show="isLoading")
+							i(class="fa fa-spinner fa-spin fa-4x")
+
+					div#inner.block-kpis(ng-show="!isLoading")
+
+						a.text-center.relative(
+							ng-repeat="widget in widgets | orderBy: 'title'", 
+							ng-show='widgets.length', 
+							ng-href='/newdash/{{pid}}/{{widget.wid}}',
+							ng-style="{left:pos}")
+
+							button.btn.btn-kpi(type="button", ng-class="{'btn-primary': isActive('/newdash/{{pid}}/{{widget.wid}}', widget)}")
+								
+								span.btn-kpi-title
+									i(ng-class="widget.icon")
+									strong(ng-if="widget.unit == 'customers'")  Customers
+									strong(ng-hide="widget.unit == 'customers'")  {{widget.title}}
+
+								h4  {{ (widget.unit  == '%') ? (widget.value |number:2) : (widget.value | number:0)}}
+									span(ng-hide="widget.unit == 'customers'")
+										h6.inline  {{widget.unit}}
+									div.spinner-icon(ng-show="widget.isLoading")
+										i(class="fa fa-spinner fa-spin")
+								span(class="label {{getVariationClass(calculateVariation(widget.value, widget.homologousValue)).label}}")
+									i(class="fa {{getVariationClass(calculateVariation(widget.value, widget.homologousValue)).caret}}")
+									|  {{ calculateVariation(widget.value, widget.homologousValue) | numberEx:0}} %
+								p.variation-title Last Period
+								//- span(class="label bg-red", data-tooltip="Year-1", style="margin-left:5px;")
+								//- 	i(class="fa fa-caret-down")
+								//- 	|  5%
+
+					div.arrow-right
+						a(ng-click="moveKpi('right')")
+							i.glyphicon.glyphicon-chevron-right
+
+	//- graphs and statitics
+	div.row
+		div.col-md-12
+			
+			div.powerwidget.powerwidget-as-portlet-white(role='widget', style="height:100%!important")
+				header
+					h2.uppercase(style="color: #31759D") {{widget.title}}
+						small(ng-hide="filterSpec.dates.state || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="filterSpec.dates.state && userProfile.annualGM == undefined") From {{filterSpec.dates.startdate | date:"dd/MM/yyyy"}} to {{filterSpec.dates.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					div.powerwidget-ctrls(role="menu", style="line-height: 0px")
+						//- select.drop-graph(ng-model="chartSelectOptions.selectedChartOption", ng-change="setSelectedChart(chartSelectOptions.selectedChartOption, true);")
+						div.d-inline-block
+							i.fa.fa-lg.fa-bar-chart-o.header-select-icon
+
+							//- i.entypo-chart-pie.header-select-icon
+							select.drop-graph.header-select(ng-model="chartSelectOptions.selectedChartOption", ng-change="setSelectedChart(chartSelectOptions.selectedChartOption, true);")
+								option(ng-repeat="option in chartSelectOptions.chartOptions", value="{{option}}") {{option}}
+							i
+							//- input(ng-model="rightMarginIn", style="color: black; height: 25px; line-height: 25px;")
+							//- button.btn.btn-info(ng-click="setSelectedChart(chartSelectOptions.selectedChartOption, true);")
+
+						//-div.d-inline-block.datepicker-header
+
+							//-div.d-inline-block(style="margin-right:10px;")
+								div(ng-show="!filterSpec.dates.state")
+									p{{widget.date | date:"longDate"}}
+				
+
+								div(ng-show="filterSpec.dates.state")
+
+									div
+										p.inline(ng-if="filterSpec.dates.startdate == filterSpec.dates.finishdate")  {{filterSpec.dates.startdate | date:"longDate"}}
+										p.inline(ng-if="filterSpec.dates.startdate != filterSpec.dates.finishdate") {{filterSpec.dates.startdate | date:"longDate"}} - {{filterSpec.dates.finishdate | date:"longDate"}}
+
+							div.relative.d-inline-block
+								//button.btn.btn-default.btn-xs
+								//i.pointer.fa.fa-filter(ng-click="toggleDatepicker()")
+
+								div.pointer(ng-click="toggleDatepicker()")
+
+									div.d-inline-block(style="margin-right:10px;")
+										div(ng-show="!filterSpec.dates.state")
+											p{{widget.date | date:"longDate"}}
+						
+
+										div(ng-show="filterSpec.dates.state")
+
+											div
+												p.inline(ng-if="filterSpec.dates.startdate == filterSpec.dates.finishdate")  {{filterSpec.dates.startdate | date:"longDate"}}
+												p.inline(ng-if="filterSpec.dates.startdate != filterSpec.dates.finishdate") {{filterSpec.dates.startdate | date:"longDate"}} - {{filterSpec.dates.finishdate | date:"longDate"}}
+									i.fa.fa-filter
+
+
+								div.absolute.datepicker(style="top:35px; right:0; z-index:2;", ng-show="datepicker")
+									div
+										div
+											div.d-inline-block.text-center
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('today')") Today
+													
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('yesterday')") Yesterday
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('thisWeek')") This Week
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('lastWeek')") Last Week
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('last15')") Last 15 days
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('thisMonth')") This Month
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('lastMonth')") Last Month
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('trimester')") Trimester
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('quarter')") Quarter
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('semester')") Semester
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('thisYear')") This Year
+												button.btn.btn-default.btn-sm(type="button", ng-click="preDatesFilter('lastYear')") Last Year
+											div.d-inline-block
+												div(date-range, start="dt1", end="dt2")
+												button.btn.btn-success.btn-sm(ng-click="toggleDateFilter('true')") OK
+					
+
+							//-div.btn-group
+								div.relative.btn-group
+									button(class="btn btn-default btn-sm" ,ng-click="toggleDatepicker()") Choose Dates 
+										i.fa.fa-plus-circle
+
+									div.absolute.datepicker(style="top:30px; right:0; z-index:2;", ng-show="datepicker")
+										div(date-range, start="dt1", end="dt2")
+										button.btn.btn-success.btn-sm(ng-click="toggleDateFilter('true')") OK
+								
+								div.btn-group
+									button(type="button" ,class="btn btn-default dropdown-toggle btn-sm" ,data-toggle="dropdown") Time Period 
+										span.caret
+									ul.dropdown-menu.dropdown-menu-right(style="text-transform:none")
+										li
+											a(ng-click="preDatesFilter('today')") Today
+										li
+											a(ng-click="preDatesFilter('yesterday')") Yesterday
+										li 
+											a(ng-click="preDatesFilter('thisWeek')") This Week
+										li
+											a(ng-click="preDatesFilter('lastWeek')") Last Week
+										li
+											a(ng-click="preDatesFilter('last15')") Last 15 days
+										li
+											a(ng-click="preDatesFilter('thisMonth')") This Month
+										li
+											a(ng-click="preDatesFilter('lastMonth')") Last Month
+										li
+											a(ng-click="preDatesFilter('trimester')") Trimester
+										li
+											a(ng-click="preDatesFilter('quarter')") Quarter
+										li
+											a(ng-click="preDatesFilter('semester')") Semester
+										li
+											a(ng-click="preDatesFilter('thisYear')") This Year
+										li
+											a(ng-click="preDatesFilter('lastYear')") Last Year
+				div.inner-spacer
+					div.row(ng-show="isLoading")
+						div.col-md-10
+							div.spinner-icon
+								i(class="fa fa-spinner fa-spin fa-4x")
+
+					div.row
+						div.col-md-10
+							div(ng-show="!isLoading")
+								
+									highchart(id="chart1", config="highchartsNG", class="span10")
+						div.col-md-2
+							div.padding-0(style="margin-top: 15px;", ng-show="!isLoading")
+								div.statistics
+									table
+										thead.text-center
+											td(colspan="2") 
+												strong STATISTICS
+										tr
+											td Stores
+											td 
+												span(class="label bg-blue") {{ nPoints }}
+										tr
+											td Average
+											td
+												span(class="label bg-blue") {{ ((sum/nPoints) % 1 ==0 )? (parseFloat(sum/nPoints,2) | number:0) : (parseFloat(sum/nPoints,2) | number:2) }} 
+										tr
+											td Minimum
+											td
+												span(class="label bg-blue") {{ (minimum % 1 == 0) ? (minimum |number:0) : (minimum | number:2)}}
+										tr
+											td Maximum
+											td
+												span(class="label bg-blue") {{ (maximum % 1 == 0) ? (maximum |number:0) : (maximum | number:2)}}
+										tr(ng-hide="standardError == null ")
+											td Standard Error
+											td
+												span(class="label bg-blue") {{ (standardError % 1 == 0) ? (standardError |number:0) : (standardError | number:2)}}
+										
+		//- filter
+			div.col-xs-3.bootstrap-grid
+				
+				div.powerwidget.powerwidget-sortable(role='widget')
+					header
+						h2 Filter
+
+						//-div.filter-icons(class="powerwidget-ctrls" ,role="menu")
+
+							a(href="#", class="button-icon powerwidget-edit-btn",ng-click="filterBoxFunction('place')", style="margin-right:3px")
+								i.fa-lg(class="fa fa-map-marker", data-tooltip="Store")
+
+							a(href="#", class="button-icon powerwidget-edit-btn",ng-click="filterBoxFunction('cat')", style="margin-right:3px")
+								i.fa-lg(class="fa fa-tags", data-tooltip="Category")
+
+							a(href="#", class="button-icon powerwidget-edit-btn",ng-click="filterBoxFunction('prod')")
+								i.fa-lg(class="fa fa-shopping-cart", data-tooltip="Product")
+						
+					div
+						div(class="{{filterBoxClass}}")
+							div(class="{{filterBoxClassInnerPlace}}")
+								div(style="position: relative; display: inline-block;")
+									form.orb-form.custom-filter
+										fieldset
+											label.label.toggle
+												| Filter by Point
+												input(type="checkbox", name="checkbox-points-filter", ng-model="pointFilter.state",ng-change="procPointsFilter(false)")
+												i(class="{{toggleClassPoints}}")
+
+											//label.checkbox.filterCheckbox
+												input(type="checkbox", name="checkbox-all", checked="{{check}}", ng-click="togglePointsFilterAll(pointsFilteredBox)")
+												i
+												| {{toggleAll}}
+
+											label.checkbox.filterCheckbox(ng-repeat="marker in markers")
+												input(type="checkbox", name="checkbox-{{marker.name}}", ng-model="pointsFilteredBox[marker.pointid]", ng-change="togglePointsFilter()")
+												i 
+												| {{marker.name}}
+
+							div(class="{{filterBoxClassInnerCat}}")
+								div(style="position: relative; display: inline-block;")
+									form.orb-form.custom-filter
+										fieldset
+											label.label.toggle
+												|Filter by Category
+												input(type="checkbox", name="checkbox-category-filter", ng-model="catFilter.state", ng-change="procCategoryFilter(false)")
+												i(class="{{toggleClassCat}}")
+
+											//label.checkbox.filterCheckbox
+												input(type="checkbox", name="checkbox-all", checked="{{check}}", ng-click="togglePointsFilterAll(cat)")
+												i
+												| {{toggleAll}}
+
+											div(ng-hide="Objectsize(catFilters)==1")
+												label.checkbox.filterCheckbox(ng-repeat="(category, enabled) in catFilters")
+													input(type="checkbox", ng-model="catFilters[category]", ng-change="toggleCatFilter()")
+													i 
+													| {{category}}
+														
+							div(class="{{filterBoxClassInnerProd}}")
+								div(style="position: relative; display: inline-block;")
+									form.orb-form.custom-filter
+										fieldset
+											label.label.toggle
+												| Filter by Product
+												input(type="checkbox", name="checkbox-product-filter", ng-model="prodFilter.state", ng-change="procProductFilter(false)")
+												i(class="{{toggleClassProd}}")
+											div(ng-hide="Objectsize(prodFilters)==1")
+												label.checkbox.filterCheckbox(ng-repeat="(product, enabled) in prodFilters")
+													input(type="checkbox", ng-model="prodFilters[product]", ng-change="toggleProdFilter()")
+													i 
+													| {{product}}
+						
+						//- dates
+						div.inner-spacer.text-center
+			
+							div.alert.alert-danger.alert-dismissable.date-warn(class="{{dateWarn}}")
+								button(type="button" ,class="close" ,data-dismiss="alert", aria-hidden="true")
+									i(class="fa fa-times-circle")
+								|  {{dateMessage}}
+
+							div(class="calendar-day-block")
+
+								div
+
+									div(ng-show="!filterSpec.dates.state")
+										p{{widget.date | date:"longDate"}}
+					
+
+									div(ng-show="filterSpec.dates.state")
+
+										div
+											p  {{filterSpec.dates.startdate | date:"longDate"}}
+											p  {{filterSpec.dates.finishdate | date:"longDate"}}
+							
+
+									div.btn-group
+										div.relative.btn-group
+											button(class="btn btn-default btn-sm" ,ng-click="toggleDatepicker()") Choose Dates 
+												i.fa.fa-plus-circle
+
+											div.absolute.datepicker(style="top:30px; right:0; z-index:2;", ng-show="datepicker")
+												div(date-range, start="dt1", end="dt2")
+												button.btn.btn-success.btn-sm(ng-click="toggleDateFilter('true')") OK
+										
+										div.btn-group
+											button(type="button" ,class="btn btn-default dropdown-toggle btn-sm" ,data-toggle="dropdown") Time Period 
+												span.caret
+											ul.dropdown-menu.dropdown-menu-right(style="text-transform:none")
+												li
+													a(ng-click="preDatesFilter('today')") Today
+												li
+													a(ng-click="preDatesFilter('yesterday')") Yesterday
+												li 
+													a(ng-click="preDatesFilter('thisWeek')") This Week
+												li
+													a(ng-click="preDatesFilter('lastWeek')") Last Week
+												li
+													a(ng-click="preDatesFilter('last15')") Last 15 days
+												li
+													a(ng-click="preDatesFilter('thisMonth')") This Month
+												li
+													a(ng-click="preDatesFilter('lastMonth')") Last Month
+												li
+													a(ng-click="preDatesFilter('trimester')") Trimester
+												li
+													a(ng-click="preDatesFilter('quarter')") Quarter
+												li
+													a(ng-click="preDatesFilter('semester')") Semester
+												li
+													a(ng-click="preDatesFilter('thisYear')") This Year
+												li
+													a(ng-click="preDatesFilter('lastYear')") Last Year
+	
+	include michael
+	
+	//- table
+	div.row
+		div.col-md-12(ng-controller="xTableCtrl")
+			div.powerwidget.powerwidget-as-portlet-white(role="widget")
+				header(role="heading")
+
+					h2.uppercase(style="color: #31759D") Store Indicators
+						small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") From {{filterSpec.dates.startdate | date:"dd/MM/yyyy"}} to {{filterSpec.dates.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+				div(role="content")
+					div#table.col-md-12
+						
+						//-div(id="table-2_length", class="dataTables_length")
+							form.orb-form
+								label
+									select(size="1", name="table-2_length", aria-controls="table-2") 
+										option(value="10", selected="selected") 10
+										option(value="25") 25
+										option(value="50") 50
+										option(value="100") 100
+									| Stores
+						div.inner-spacer
+							div.spinner-icon(ng-show="isLoading", style="padding-top: 50px;")
+								i(class="fa fa-spinner fa-spin fa-4x")
+
+							div(class="dataTables_filter", ng-show="!isLoading")
+								label 
+									input(type="text", aria-controls="table-2", placeholder="Search all columns ", ng-model="search.$")
+
+							//-div.relative(style="overflow-x:scroll", ng-show="!isLoading")
+								table( class="table table-striped table-hover margin-0px airtable", id="table-2", aria-describedby="table-2_info")
+									thead
+										tr(ng-repeat="header in points" ,ng-if="$index == 0")
+											th.pointer(ng-class="{'sorting_asc': order === 'A', 'sorting': order != key}", role="columnheader" ,tabindex="0", ng-if="$index == 0", ng-click="setOrder(key)") Store
+											th.pointer(ng-class="{'sorting_asc': order === key, 'sorting': order != key}", role="columnheader" ,tabindex="0", ng-repeat="(key, value) in header", ng-if="$index > 0", ng-click="setOrder(key)") {{ key }}
+
+									tbody(role="alert" ,aria-live="polite" ,aria-relevant="all")
+										tr(ng-repeat="row in points | filter:search | orderBy:predicate", ng-click="rowClicked(row)")
+											td(ng-repeat="(key, value) in row") {{ (value % 1 == 0) || isString(value) ? (isString(value) ? value:(value |number:0)) : (value | number:2)}}
+
+							div.relative(style="overflow-x:scroll", ng-show="!isLoading")
+								table(class="table table-striped table-hover margin-0px airtable")
+									thead
+										tr
+											th.pointer(ng-repeat="(key, value) in points[0] track by $index", ng-if="key == 'label'", ng-class="{'sorting_asc': order == key, 'sorting': order != key}", ng-click="setOrder(key)") Store
+											th.pointer(ng-repeat="(key, value) in points[0] track by $index", ng-if="key != 'label'", ng-class="{'sorting_asc': order == key, 'sorting': order != key}", ng-click="setOrder(key)") {{key}}
+									tbody
+										tr(ng-repeat="row in points | filter:search | orderBy:predicate:reverse", ng-click="rowClicked(row)")
+											td
+												h5 {{row.label}}
+											td(ng-repeat="(key, value) in row", ng-if="key !='label'") {{ value | number:0}}				
+	
+	//-map
+	div.row(ng-hide="userProfile.map")
+		div.col-md-12(ng-controller="xMapCtrl")	
+
+			div.powerwidget.powerwidget-as-portlet-white(role="widget")
+
+				header(role="heading")
+					h2.uppercase(style="color: #31759D") Map
+						small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") From {{filterSpec.dates.startdate | date:"dd/MM/yyyy"}} to {{filterSpec.dates.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					div(class="powerwidget-ctrls" ,role="menu")
+						a(class="button-icon powerwidget-edit-btn",ng-click="configBoxFunction()")
+							i(class="fa fa-cog", data-tooltip="Heat Map Settings")
+
+				div(role="content")
+
+					//- config heatmap
+					div.powerwidget-editbox.inner-spacer.heatmap-config(class="{{configBoxClass}}", style="color:white")
+						
+							form.orb-form.inline-block
+								fieldset						
+									section
+										label.label(class="toggle")
+											| Use Local Extreme
+											input(type="checkbox", checked, name="localextreme", ng-model="localextreme")
+											i
+						
+							form.orb-form.inline-block
+								fieldset						
+									section
+										label.label Choose Heatmap Radius
+										label.select
+											select(ng-model="heatmapradius")
+												option(value="Tiny") Tiny
+												option(value="Small") Small
+												option(value="Medium") Medium
+												option(value="Big") Big
+												option(value="Giant") Giant
+												option(value="Fixed0.005") Fixed 0.005
+												option(value="Fixed0.01") Fixed 0.01
+												option(value="Fixed0.1") Fixed 0.1
+												option(value="Fixed0.5") Fixed 0.5
+												option(value="Fixed1") Fixed 1
+												option(value="Average") Average
+											i
+							button.pull-right.btn.btn-success(type="button", ng-click="applyConfig()", ng-disabled="{{applyConfigButtonDisabled}}") {{applyConfigButtonText}}
+					
+					div
+						div#map.relative.inner-spacer
+							div.info.country(ng-show="hoveredGeometry != ''")
+								| {{hoveredGeometry}}
+							
+							div.check-heatmap.orb-form
+								label.toggle
+									input(type="checkbox", name="heat-map-check", ng-model="heatmapcheck")
+									i 
+									| Heat Map
+
+							div(ng-style="{'height':'350px'}")
+								leaflet(center="madeira",markers="markers",layers="layers",geojson="geojson")

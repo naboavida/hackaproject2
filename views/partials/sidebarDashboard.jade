@@ -1,0 +1,79 @@
+div.responsive-admin-menu(ng-controller="MenuCtrl")
+	div.tabs-offcanvas
+		div.main-info(style='border-bottom: 1px solid rgba(255,255,255,.1);')
+			div.user-img
+				//-div(ng-show="project.title != 'General Mills'")
+				//-	img(src='images/project{{pid % 9}}.png', alt='Project Picture')
+
+				//- div(ng-show="userProfile.logoGM")
+				//- 	img( src='images/generalmills-bw.jpg', alt='Project Picture')
+				//- div(ng-hide="userProfile.logoGM")
+				//- 	img( src='{{ (userProfile.logoMF && "images/moja2.png" || !userProfile.logoMF && "images/project5.png") }}', alt='Project Picture')
+
+				div
+					img(src='images/{{project.image || project.image_org || "project5.png"}}', alt='Project Picture')
+			h1(ng-cloak, style='margin-top:20px;')
+				| {{project.title}}
+				small(style='margin-top:15px;') {{project.location}}
+				//- small(style='margin-top:10px;') {{project.area}} ha
+	
+	ul#menu
+		li(ng-show="userProfile.warRoom")
+			a(href='/map/{{pid}}', title='Map', ng-class="{'active': location.indexOf('/map') >= 0}")
+				i.entypo-map
+				//-span(ng-hide='userProfile.warMF')  Map
+				span  War Room
+				span(class = "powerwidget-loader", style = "display: inline;  float: right; margin-right: 5px; margin-top: 3px;", ng-show="loading")
+
+		li(ng-show="userProfile.occurrences")
+			a(href="/occurrences/{{pid}}", title="Occurrences", ng-class="{'active': location.indexOf('/occurrences') >= 0}")
+				i.entypo-list
+				span(style = "margin-right: 5px") Occurrences 
+				span(ng-show = "showOpenOcc", style = "color: red") ({{openOcc}})
+				span(class = "powerwidget-loader", style = "display: inline; float: right; margin-right: 2x; margin-top: 3px;", ng-show="occLoading")
+
+		li(ng-show="userProfile.oldDashboard")
+			a(href='/dashboard/{{pid}}', title='Dashboard', ng-class="{'active': location.indexOf('/dashboard') >= 0}")
+				i.entypo-layout
+				span  Dashboard
+
+		li(ng-show="userProfile.compare")
+			a(href='/compare/{{pid}}', title='Compare', ng-class="{'active': location.indexOf('/compare') >= 0 || location.indexOf('/scatterplot') >= 0 }")
+				i.entypo-docs
+				span  Compare
+			ul(ng-class="{'display-block': location.indexOf('/compare') >= 0 || location.indexOf('/scatterplot') >= 0}")
+				li(ng-hide="userProfile.mapGM")
+					a(href="/scatterplot/{{pid}}", title="Scatter Plot")
+						i.entypo-chart-line
+						span  Scatter Plot
+
+		li(ng-show='userProfile.manageData')
+			a(href='/data/{{pid}}', title='Manage Data', ng-class="{'active': location.indexOf('/data') >= 0}")
+				i.entypo-book-open
+				span  Manage Data
+
+		li(ng-show="userProfile.settings")
+			a(href='/config/{{pid}}', title='Settings', , ng-class="{'active': location.indexOf('/config') >= 0}")
+				i.entypo-cog
+				span  Settings
+
+		li(ng-show="userProfile.dashboard")
+			a(href='/newdash/{{pid}}', title='dashboard', ng-class="{'active': location.indexOf('/newdash') >= 0}")
+				i.entypo-layout
+				span  Dashboard
+
+		li(ng-show="userProfile.reports")
+			a(href='/report/{{pid}}', title='report', ng-class="{'active': location.indexOf('/report') >= 0}")
+				i.entypo-newspaper
+				span  Reports
+			//-ul(id="maps-sub", ng-class="{'display-block': location.indexOf('/report') >= 0}")
+				li
+					a(href="/report/create/{{pid}}" , title="Create Report")
+						i(class="entypo-location")
+						span Create Report
+
+	//- .row(style='position:absolute; bottom: 0;')
+	//- 	.col-md-12.text-center
+	//- 		a.btn.btn-danger.btn-sm
+	//- 			i.fa.fa-times-circle
+	//- 			span  Delete Project

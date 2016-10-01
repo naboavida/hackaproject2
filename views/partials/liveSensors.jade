@@ -1,0 +1,161 @@
+include leftMenu
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/')
+					i.fa.fa-home.fa-2x
+			li
+				a(href='/projects') Projects
+			li
+				a(href='/dashboard/{{pid}}') Dashboard
+			li
+				a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+			li
+				li.active Environment Live Readings
+	div#powerwidgets.row(ng-controller="Hello")
+		div.col-md-4.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2
+							| Map
+							small Point {{pointid}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+									i.fa.fa-share-alt
+							a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+								i.fa.fa-times-circle
+							a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+								i.fa.fa-arrows-alt
+							a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+								i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				div.inner-spacer.nopadding
+					div(ng-controller="DemoController")
+						div#map
+							leaflet(center="madeira",height="250",markers="markers",leafletMap="leafletMap",layers="layers")
+		div.col-md-8.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Live Readings on Point {{pointid}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+									i.fa.fa-share-alt
+							a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+								i.fa.fa-times-circle
+							a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+								i.fa.fa-arrows-alt
+							a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+								i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				div.inner-spacer
+					.row(style='margin-top:15px;')
+						.col-md-4.col-sm-4.col-xs-4.text-center
+							i.fa.fa-adjust.fa-4x(style='color:#c4c5c5;')
+							h2
+								| {{greeting[0].TEMPS1}}
+								small º
+							h4 Temperature
+						.col-md-4.col-sm-4.col-xs-4.text-center
+							i.fa.fa-asterisk.fa-4x(style='color:#c4c5c5;')
+							h2 
+								| {{greeting[0].RH}}
+								small %
+							h4 Relative Humidity
+						.col-md-4.col-sm-4.col-xs-4.text-center
+							i.fa.fa-database.fa-4x(style='color:#c4c5c5;')
+							h2 
+								| High
+								small m3
+							h4 Water Level
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Live Readings History on Point {{pointid}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+									i.fa.fa-share-alt
+							a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+								i.fa.fa-times-circle
+							a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+								i.fa.fa-arrows-alt
+							a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+								i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				div.inner-spacer
+					.row(style='margin-top:15px;')
+						.col-md-6.col-sm-6.col-xs-6.text-center
+							div(style='width:90%; margin-left:auto; margin-right:auto;')
+								h4 Temperature
+								nvd3-line-chart(data="temperatureData",ng-model="temperatureData",xAxisTickFormat="xAxisTickFormatFunction()", height='400',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						.col-md-6.col-sm-6.col-xs-6.text-center
+							div(style='width:90%; margin-left:auto; margin-right:auto;')
+								h4 Humidity
+								nvd3-line-chart(data="humidityData",ng-model="humidityData",xAxisTickFormat="xAxisTickFormatFunction()", height='400',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+							
+
+
+
+
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='/projects') Projects
+//- 		li
+//- 			a(href='/dashboard/{{pid}}') Dashboard
+//- 		li
+//- 			a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+//- 		li
+//- 			a(href='') Parameter
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') {{project.title}}
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 {{project.location}}
+//- 							h2 Point {{pointid}}
+//- 						div.rightBarDiv
+//- 							h4 {{project.area}} km2
+//- 			div(ng-controller="DemoController")
+//- 				div
+//- 					button(ng-click='addPoint()') Add Point
+//- 					p {{addPointMode}}
+//- 				div#map
+//- 					leaflet(center="madeira",width="450",height="400",markers="markers",leafletMap="leafletMap")
+//- 					//- leaflet(center="madeira",width="500",height="400",markers="markers",event-broadcast="events")
+//- 	div.rightDiv(ng-controller="Hello")
+//- 		h2(style='text-align:center;margin-bottom:25px;') Environmental Sensors in Realtime
+//- 		div.topCenteredButtons.largeTopCenteredButtons
+//- 			p Current Readings
+//- 			//- /parameter/{{pid}}/{{pointiid}}/{{parameter.pointparmid}}/{{pointid}}
+//- 			p: a(href='/liveSensorsReadings/{{pid}}/{{pointid}}') History Readings
+//- 		div(style='width:630px; margin-left:auto; margin-right:auto;margin-top:150px;')
+//- 			ul.list-item
+//- 				li.item
+//- 					div.widgetContent
+//- 						h3.widgetTitle Temperature
+//- 						div.line
+//- 							div.line-item.value 22
+//- 							div.line-item.unit º
+//- 				li.item
+//- 					div.widgetContent
+//- 						h3.widgetTitle Relative Humidity
+//- 						div.line
+//- 							div.line-item.value {{greeting[0].RH}}
+//- 							div.line-item.unit %
+//- 						div.line.bottomRow(style='width:100%;')
+//- 							div {{rhPos}}{{rh}}
+//- 				li.item
+//- 					div.widgetContent
+//- 						h3.widgetTitle Water Level
+//- 						div.line
+//- 							div.line-item.value High
