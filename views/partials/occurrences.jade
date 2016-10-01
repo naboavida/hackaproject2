@@ -1,0 +1,168 @@
+//- include leftMenu
+script
+	//mixpanel.track("Map")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+	.leaflet-popup-content { width: 500px!important; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div#powerwidgets.row
+	
+		div.col-sm-12.bootstrap-grid
+			#occurences-list.powerwidget.green.powerwidget-sortable(data-widget-editbutton='false',role='widget', ng-show="!occurrences.length")
+				header
+					h2 Occurrences on Project {{project.title}}
+				div.inner-spacer(role="content")
+					div(style="margin-bottom:0.5rem")
+						div.callout.callout-info
+							h3 No occurrences exist
+							h5 No alarm was triggered to generate an occurrence.
+			#occurences-list.powerwidget.green.powerwidget-sortable(data-widget-editbutton='false',role='widget', ng-hide="!occurrences.length")
+				header
+					h2 Occurrences on Project {{project.title}}
+				div.col-md-12.inner-spacer(role="content")
+					div.filterOcc.inner-spacer
+						div.d-inline-block
+							p(style="display:inline") Filter by Status 
+							select(style="display:inline; margin-left:5px", ng-model="filterStatus")
+									option(value="") All
+									option Open
+									option Assigned
+									option Ongoing
+									option Closed
+						//div.d-inline-block
+							p(style="display:inline") Indicator 
+							select(style="display:inline; margin-left:5px", ng-model="filterIndicator")
+									option(value="") All
+									option Basket
+									option Customers
+									option Net Margin
+									option Net Sales
+									option Net Promotor Score
+									
+						div.d-inline-block(style="margin-left: 20px")
+							i.fa.fa-search.fa-lg(style="margin-right:5px;")
+							input(type='text', data-provide='typeahead', placeholder='Filter', ng-model='query')
+
+					div.occurrences
+						//- div.list-group-item(ng-repeat="occurrence in occurrences | filter : filteredState ", ng-click="setCurrOccurrence($index)", class="{{occurrence.selectedClass}}")
+						table.table.table-hover(style="text-align: top")
+							thead
+								tr
+									td
+										h5 Status
+									td
+										h5 Store
+									td
+										h5 Indicator
+									td
+										h5 Occurrence
+									td
+										h5 Observed
+										h5 Value
+									td
+										h5 Planned
+										h5 Value
+									td
+										h5 Severity
+									td
+										h5 Created
+									td
+										h5 Updated
+									td
+										h5 Owner
+									td
+										h5(data-tooltip="Green: time until deadline; \n Red: time since deadline") Due Date
+							tbody(ng-repeat="occurrence in occurrences | filter:query | filter:filterStatus | filter: filterIndicator", class="{{occurrence.selectedClass}}")
+								tr(ng-click="setCurrOccurrence(occurrence)", class="{{occurrence.liveupdateclass}}")
+									td.status
+										div(ng-hide="occurrence.statusMenu")
+											span.label.label-danger(ng-show="occurrence.status == 'Open' ") {{occurrence.status}}
+											span.label.label-warning(ng-show="occurrence.status == 'Assigned' ") {{occurrence.status}}
+											span.label.label-info(ng-show="occurrence.status == 'Ongoing' ") {{occurrence.status}}
+											span.label.label-success(ng-show="occurrence.status == 'Closed' ") {{occurrence.status}}
+										div.selectStateBox(ng-show="occurrence.statusMenu", ng-click="$event.stopPropagation()")
+											select(ng-change= "changeStatus(occurrence.status, '{{occurrence.status}}')",ng-model="occurrence.status", style="background-color: {{currColorClass}};")
+												option(style="background-color: #d24d33;") Open
+												option(style="background-color: #f0ad4e;") Assigned
+												option(style="background-color: #5bc0de;") Ongoing
+												option(style="background-color: #82b964;") Closed
+
+										//p small {{occurrence.statusdate | date:"dd/MM/yyyy"}}
+									td
+										p {{occurrence.pointname}}
+									td
+										p {{occurrence.kpi}}
+									td
+										p {{occurrence.title}}
+									td
+										p {{occurrence.value | number: 2}} {{occurrence.unit}}
+									td
+										p(ng-show="occurrence.title.indexOf('bove the maximum value') >= 0") {{occurrence.max | number: 2}}
+										p(ng-show="occurrence.title.indexOf('elow the minimum value') >= 0") {{occurrence.min | number: 2}}
+										p(ng-show="occurrence.title.indexOf('bove the maximum value') == -1 && occurrence.title.indexOf('elow the minimum value') == -1") {{occurrence.plannedvalue | number: 2}} {{occurrence.unit}}
+									td
+										p {{ (occurrence.value - occurrence.plannedvalue) / occurrence.plannedvalue * 100 | numberEx: 2 }} %
+										//- p {{ (parseFloat(occurrence.value) - parseFloat(occurrence.value) ) / (parseFloat(occurrence.value)) * 100 }}
+									td
+										p {{occurrence.date | date:"dd/MM/yyyy"}} {{occurrence.time}}
+									td
+										p {{occurrence.statusdate | date:"dd/MM/yyyy"}} {{occurrence.statusdate | date:"H:mm"}}
+									td
+										p Marianna
+									td.relative
+										p(ng-show="occurrence.hasOwnProperty('duedate') && occurrence.countdowncol && occurrence.status != 'Closed'", style="color: red") {{occurrence.countdown}}
+										p(ng-show="occurrence.hasOwnProperty('duedate') && !occurrence.countdowncol && occurrence.status != 'Closed'", style="color: green") {{occurrence.countdown}}
+										a(ng-show="occurrence.status == 'Closed'")
+											i.fa.fa-check
+										//{{occurrence.duedate | date:"dd/MM/yyyy"}} {{occurrence.duehour}}:00
+										span.newOcc.label.label-warning(ng-show="occurrence.new") New
+										
+								tr(ng-show="occurrence.showTasks")
+									td(colspan="11")
+										div
+											h5(style="margin-bottom:10px") Tasks
+											div.task-item.relative(ng-repeat="task in occurrence.tasks", style=" margin-bottom: 1%;")
+
+												div.inline
+													input(type="checkbox", ng-model="task.done", ng-change="checkedTask($index)")
+													h5(style="margin:0 5px", class="done-{{task.done}}") {{task.title}}
+													a(ng-click="toggleEdit($index, false)", ng-show="task.obs == ''", data-tooltip="Add Note", style="margin-left:5px")
+														i.fa.fa-pencil
+												//button.btn.btn-primary.btn-xs.absolute(ng-click="toggleEdit($index, false)", ng-show="task.obs == ''", style="right:10px") Add Note
+												//button.btn.btn-primary.btn-xs.absolute(ng-click="toggleEdit($index, false)", ng-show="task.obs != ''", style="right:10px") Edit Note
+
+												div.note
+													p(ng-click="toggleEdit($index, false)", ng-hide="task.obs == '' || editing[$index]", style="margin:0 5px")
+														i.fa.fa-comment-o
+														|  {{task.obs}}
+													a(ng-click="toggleEdit($index, false)", ng-hide="task.obs == '' || editing[$index]", data-tooltip="Edit", style="margin-left:5px")
+														i.fa.fa-pencil
+													a(ng-click="removeNote($index)", ng-hide="task.obs == '' || editing[$index]", data-tooltip="Delete", style="margin-left:5px")
+														i.fa.fa-times-circle
+													em.small(ng-hide="task.modifieddate == undefined|| task.modifieddate == '' || editing[$index]", style="margin:0 5px") modified in {{task.modifieddate | date:"dd/MM/yyyy 'at' HH:mm" }} by {{task.username}}
+
+
+
+												div.note
+													textarea(ng-show="editing[$index]", ng-model="task.obs", placeholder="Write your note...")
+													div
+														button.btn.btn-danger.btn-xs(ng-click="cancelNote($index)", ng-show="editing[$index]") Cancel
+														button.btn.btn-success.btn-xs(ng-click="toggleEdit($index, true)", ng-show="editing[$index]") Save
+						div(ng-hide="hideLoadMoreButton", style='margin: 0 auto; width: 130px;')
+							div.big-icons-buttons
+								a.btn.btn-info-outline(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', target='_self', href='', ng-click="loadRemainingOccurrences()")
+									i.fa.fa-plus-circle(class="{{loadMoreClass}}")
+									| {{loadMoreMessage}}

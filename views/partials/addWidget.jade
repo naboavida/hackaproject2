@@ -1,0 +1,173 @@
+script
+	//mixpanel.track("Add Indicator")
+include sidebarDashboard
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/dashboard/{{pid}}') Dashboard
+				//- a(href='/dashboard/{{pid}}') Dashboard "{{project.title}}"
+			li.active Add Indicator...
+	div#powerwidgets.row
+		div.col-md-6.bootstrap-grid(ng-controller="DemoController")
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Map
+				div.inner-spacer.nopadding
+					div
+						div#map
+							leaflet(center="madeira",height="550",markers="markers",layers="layers")
+		div.col-md-6.bootstrap-grid(ng-controller="DemoController")
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Add Indicator Data
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							section
+								label.label Title
+								label.input
+									i.icon-append.fa.fa-star-o
+									input#date2(placeholder='Title', name='title', ng-model='form.title')
+							section
+								label.label Start Value
+								label.input
+									i.icon-append.fa.fa-tachometer
+									input#phone(placeholder='Value', name='value', ng-model='form.value')
+							section
+								label.label Unit
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Unit', name='unit', ng-model='form.unit')
+							section
+								label.label Alarm
+								.margin-left
+									.inline-group
+										label.radio
+											input(type='radio', name='radio-inline', value='no', ng-model='form.alarm', checked)
+											i
+											| No
+										label.radio
+											input(type='radio', name='radio-inline', value='yes', ng-model='form.alarm')
+											i
+											| Yes
+								//- label.input
+								//- 	//- i.icon-append.fa.fa-crosshairs
+								//- 	i.icon-append.fa.fa-bell-o
+								//- 	input#serial(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+							section(ng-show="form.alarm == 'yes'")
+								label.label Minimum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+							section(ng-show="form.alarm == 'yes'")
+								label.label Maximum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+							section.overflow-hidden(ng-show="form.alarm == 'no'")
+								label.label Minimum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+							section.overflow-hidden(ng-show="form.alarm == 'no'")
+								label.label Maximum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+							
+							button.btn.btn-default(ng-click='submitNewWidget()') Add Indicator
+							p(style='{{lastAddedMsgStyle}};margin-top:15px;') {{lastAddedMsg}}
+					p: a(href='/dashboard/{{pid}}') Back
+
+
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') {{project.title}}
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 {{project.location}}
+//- 						div.rightBarDiv
+//- 							h4 {{project.area}} km2
+//- 			div(ng-controller="DemoController")
+//- 				div
+//- 					button(ng-click='addPoint()') Add Point
+//- 					p {{addPointMode}}
+//- 				div#map
+//- 					leaflet(center="madeira",width="450",height="400",markers="markers")
+//- 					//- leaflet(center="madeira",width="500",height="400",markers="markers",event-broadcast="events")
+//- 	div.rightDiv
+//- 		ul.list-item
+//- 			li.item(ng-repeat='indicator in indicators')
+//- 				div.widgetContent
+//- 					h3.widgetTitle {{indicator.title}}
+//- 					div.line
+//- 						div.line-item.value {{indicator.value}}
+//- 						div.line-item.unit {{indicator.unit}}
+//- 					div.widgetChart(ng-controller='BulletCtrl')
+//- 						nvd3-bullet-chart(data='bulletData', width='100', height='10', showXAxis="false", margin="{left:5,top:0,bottom:0,right:5}", showYAxis="false", tooltips="true", interactive="false")
+//- 					//- div.line
+//- 					//- 	a(href='/indicator/{{pid}}/{{indicator.iid}}') Open
+//- 					div.bottomRow
+//- 						//- div(class='{{indicator.alarm}}')
+//- 						div(class='{{indicator.alarm}}')
+//- 							a.smallButton(href='project/readPost/{{post.id}}')
+//- 								img(src='img/alarm.png')
+//- 			li.item(ng-controller="CalendarCtrl")
+//- 				div.widgetContent
+//- 					h3.widgetTitle Next Activity
+//- 					div.line
+//- 						div.line-item.value {{nextActivity.day}}
+//- 						div.line-item.unit {{nextActivity.month}} {{nextActivity.year}}
+//- 					div.bottomRow(style='width:100%;')
+//- 						div.line-item.unit {{nextActivity.title}}
+//- 						img.line-item(src='pics/cal.png',style='width:50px;height:50px;')
+//- 					//- div.line.bottomRow(style='width:100%;')
+//- 					//- 	a(href='/calendar/{{pid}}') Open
+//- 		div(style='width:800px;margin-left:auto;margin-right:auto;margin-top:100px;')
+			
+//- 				//- div(style='width:50%;margin-left:auto;margin-right:auto;')
+//- 				//- 	div.itemBox
+//- 				//- 		h4 Current Indicators
+//- 				//- 		div.itemBoxInner
+//- 				//- 			li(ng-repeat='indicator in indicators')
+//- 				//- 				p {{indicator.title}} {{indicator.value}} {{indicator.unit}}
+
+//- 				div(style='width:50%;margin-left:auto;margin-right:auto;margin-top:50px;')
+//- 					div.itemBox
+//- 						h4 Indicator to Add
+//- 						div.itemBoxInner
+//- 							p: input(placeholder='Title', name='title', ng-model='form.title')
+//- 							p: input(placeholder='Value', name='value', ng-model='form.value')
+//- 							p: input(placeholder='Unit', name='unit', ng-model='form.unit')
+//- 							p: input(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+//- 							p: button(ng-click='submitNewWidget()') Add
+//- 						p: a(href='/dashboard/{{pid}}') Back
+
+				
+	
+//- div(style='width:400px;margin-left:auto;margin-right:auto;margin-top:100px;')
+//- 	div.itemBox
+//- 		h1 Add Indicator
+//- 		div(style='width:200px;margin-left:auto;margin-right:auto;')
+//- 			div.itemBox.itemBoxInner
+//- 				h4 Current Indicators
+//- 				li(ng-repeat='indicator in indicators')
+//- 					p {{indicator.title}} {{indicator.value}} {{indicator.unit}}
+//- 				//- form(action='/addProject', method='post')
+//- 		div(style='width:200px;margin-left:auto;margin-right:auto;')
+//- 			div.itemBox.itemBoxInner
+//- 				h4 Indicator to Add
+//- 				p: input(placeholder='Title', name='title', ng-model='form.title')
+//- 				p: input(placeholder='Value', name='value', ng-model='form.value')
+//- 				p: input(placeholder='Unit', name='unit', ng-model='form.unit')
+//- 				p: input(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+//- 				p: button(ng-click='submitNewWidget()') Add
+//- 		p: a(href='/dashboard/{{pid}}') Back
+//- 		p: a(href='/') Home

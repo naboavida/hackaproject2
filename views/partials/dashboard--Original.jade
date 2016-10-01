@@ -1,0 +1,176 @@
+include leftMenu
+script
+	//mixpanel.track("Dashboard")
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/')
+					i.fa.fa-home.fa-2x
+			li
+				a(href='/projects') Projects
+			li.active Dashboard {{project.location}}
+	div#powerwidgets.row
+		div.col-md-6.bootstrap-grid(ng-controller="DemoController")
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+						h2
+							| Map
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-edit-btn(ng-click='toggleConfigClass()',href='#', target='_self', title='Hide/show the points control panel')
+								i.fa.fa-lg(class='{{iconConfig}}')
+				div(role='content')
+					.powerwidget-editbox(class='{{configClass}}')
+						//- div
+						//- 	a.addPointButton(ng-click='addPoint()',class='{{addingPointClass}}')
+						//- 		small ADD POINT
+						//- 	a.addPointButton(ng-click='deletePoint()',class='{{deletingPointClass}}')
+						//- 		small DELETE POINT
+						//- 	a.addPointButton(ng-click='setPoint()',class='{{settingPointClass}}')
+						//- 		small SET POINT
+						.btn-group.btn-group-justified
+							.btn-group
+								a.btn.btn-default.btn-sm(href='/addPoint/{{pid}}') ADD POINT
+								//- a.btn.btn-default.btn-sm(ng-click='addPoint()',class='{{addingPointClass}}') ADD POINT
+							.btn-group
+								a.btn.btn-default.btn-sm(ng-click='deletePoint()',class='{{deletingPointClass}}') DELETE POINT
+							.btn-group
+								a.btn.btn-default.btn-sm(ng-click='setPoint()',class='{{settingPointClass}}') SET PROJECT CENTER
+					.powerwidget-editbox(class='{{dropdownClass}}')
+						div
+							label(style='width:25%;') Template
+							select.form-control(ng-model="form", ng-options="item as item.title for item in itemsPointTemplates", style='color:#333;width:75%;', ng-change="onDropdownChange()")
+										//- 		i
+
+
+										//- section
+
+										//- 	label.select
+					div.inner-spacer.nopadding
+						div
+							div#map
+								leaflet(center="madeira",height="550",markers="markers",layers="layers")
+		div.col-md-3.bootstrap-grid(ng-repeat='indicator in indicators')
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2 {{indicator.title}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-edit-btn(href='#',target='_self', eat-click, class='{{indicator.alarm}}ShowAlarm')
+							i.fa.fa-bell.fa-lg(style='font-size: 1.166666666666666em;')
+						a.button-icon.powerwidget-edit-btn(href='/editIndicator/{{pid}}/{{indicator.iid}}')
+							i.fa.fa-cog.fa-lg
+						a.button-icon.powerwidget-delete-btn(ng-click='deleteIndicator(indicator.iid)', href='#', target='_self',eat-click)
+							i.fa.fa-times-circle.fa-lg
+						//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+						//- 	i.fa.fa-arrows-alt
+						//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+						//- 	i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h2
+								| {{indicator.value}}
+								small {{indicator.unit}}
+						.col-md-2.col-sm-2.col-xs-2
+							div.pull-right.pull-down
+								//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+								h2
+									a(href='/indicator/{{pid}}/{{indicator.iid}}')
+										i.fa.fa-folder-open
+		div.col-md-3.bootstrap-grid(ng-controller="CalendarCtrl")
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+						h2 Next Activity
+						//- .powerwidget-ctrls(role='menu')
+						//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 		i.fa.fa-times-circle
+						//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+						//- 		i.fa.fa-arrows-alt
+						//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+						//- 		i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h2 
+								| {{nextActivity.day}}
+								sup {{nextActivity.daySuffix}}
+								small {{nextActivity.month}}
+						.col-md-2.col-sm-2.col-xs-2
+							div.pull-right.pull-down
+								//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+								h2
+									a(href='/calendar/{{pid}}')
+										i.fa.fa-calendar-o
+		div.col-md-3.bootstrap-grid
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+						h2 Add Indicator
+				.inner-spacer
+					a(href='/addWidget/{{pid}}')
+						div.pull-right.pull-down
+							h2
+								i.fa.fa-plus
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='/projects') Projects
+//- 		li
+//- 			a(href='') Dashboard {{project.location}}
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') {{project.title}}
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 {{project.location}}
+//- 						div.rightBarDiv
+//- 							h4 {{project.area}} km2
+//- 			div(ng-controller="DemoController")
+//- 				div
+//- 					button(ng-click='addPoint()') Add Point
+//- 					p {{addPointMode}}
+//- 				div#map
+//- 					leaflet(center="madeira",width="450",height="400",markers="markers")
+//- 					//- leaflet(center="madeira",width="500",height="400",markers="markers",event-broadcast="events")
+//- 	div.rightDiv
+//- 		ul.list-item
+//- 			li.item(ng-repeat='indicator in indicators')
+//- 				div.widgetContent
+//- 					h3.widgetTitle {{indicator.title}}
+//- 					div.line
+//- 						div.line-item.value {{indicator.value}}
+//- 						div.line-item.unit {{indicator.unit}}
+//- 					div.widgetChart(ng-controller='BulletCtrl')
+//- 						nvd3-bullet-chart(data='bulletData', width='100', height='10', showXAxis="false", margin="{left:5,top:0,bottom:0,right:5}", showYAxis="false", tooltips="true", interactive="false")
+//- 					div.line
+//- 						a(href='/indicator/{{pid}}/{{indicator.iid}}') Open
+//- 					div.bottomRow
+//- 						//- div(class='{{indicator.alarm}}')
+//- 						div(class='{{indicator.alarm}}')
+//- 							a.smallButton(href='project/readPost/{{post.id}}')
+//- 								img(src='img/alarm.png')
+//- 			li.item(ng-controller="CalendarCtrl")
+//- 				div.widgetContent
+//- 					h3.widgetTitle Next Activity
+//- 					div.line
+//- 						div.line-item.value {{nextActivity.day}}
+//- 						div.line-item.unit {{nextActivity.month}} {{nextActivity.year}}
+//- 					div.bottomRow(style='width:100%;')
+//- 						div.line-item.unit {{nextActivity.title}}
+//- 						img.line-item(src='pics/cal.png',style='width:50px;height:50px;')
+//- 					div.line.bottomRow(style='width:100%;')
+//- 						a(href='/calendar/{{pid}}') Open
+//- 			li.item.item-to-add
+//- 				a(href='/addWidget/{{pid}}')
+//- 					div.widgetContent
+//- 						h3.widgetTitle Add Widget
+					.powerwidget-ctrls(role='menu')

@@ -1,0 +1,136 @@
+#addEditStoreModal.modal
+	//- .modal-dialog.modal-sm
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+				h4.modal-title Add / Edit Store
+			.modal-body
+				//- p
+				//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+
+				ul.nav.nav-tabs
+					li.active
+						a(href='#one-normal', target='_self', data-toggle='tab')
+							i.entypo-droplet
+							|  Settings
+					li
+						a(href='#two-normal', target='_self', data-toggle='tab')
+							i.entypo-water
+							|  Budget
+					li
+						a(href='#three-normal', target='_self', data-toggle='tab')
+							i.entypo-water
+							|  Seasonality (week)
+					li
+						a(href='#four-normal', target='_self', data-toggle='tab')
+							i.entypo-water
+							|  Seasonality (day)
+				.tab-content
+					#one-normal.tab-pane.active
+						form.orb-form
+							fieldset
+								div.row
+									section.col.col-6
+										label.label Store Name
+										label.input
+											input(placeholder="", name="storename", ng-model="storeToEdit.name")
+									section.col.col-6
+										label.label Store PointKey
+										label.input
+											input(placeholder="", name="storepointkey", ng-model="storeToEdit.pointkey")
+					#two-normal.tab-pane
+						div.row
+							.col.col-12
+								table.storeObjectives(style="margin-left: auto; margin-right: auto;")
+									tr
+										td.kpiCol 
+										td(ng-repeat="column in objectivesMonths") {{column}}
+									tr(ng-repeat='row in objectivesKpis')
+										td.kpiCol {{row}}
+										td(ng-repeat='column in objectivesMonths')
+											div
+												input.objectivesCell(ng-model='cells[calcCellPos(column,row)]', type="number")
+					#three-normal.tab-pane
+						form.orb-form
+							fieldset
+								div.row
+									section.col.col-6
+										label.label Weekly Work Days
+										label.input
+											input(placeholder="", name="storename", ng-model="storeToEdit.weekndays", type="number")
+								div.row
+									section.col.col-12
+										label.label Weekly Map (Daily Factors)
+										//- p Por aqui a grelha da semana (scope.weekdays)
+										table.storeObjectives(style="margin-left: auto; margin-right: auto;")
+											tr
+												td.kpiColDay
+												td(ng-repeat="column in weekdays") {{column}}
+											tr(ng-repeat='row in objectivesKpis')
+												td.kpiColDay {{row}}
+												td(ng-repeat='column in weekdays')
+													div
+														input.objectivesCellDay(ng-model='weeklyfactors[calcCellPos(column,row)]', type="number")
+					#four-normal.tab-pane
+						form.orb-form
+							fieldset
+								div.row
+									section.col.col-4
+										label.label Daily Work Hours
+										label.input
+											input(placeholder="", name="daynhours", ng-model="storeToEdit.daynhours", type="number")
+									section.col.col-4
+										label.label Saturday Work Hours
+										label.input
+											input(placeholder="", name="saturdaynhours", ng-model="storeToEdit.saturdaynhours", type="number")
+									section.col.col-4
+										label.label Sunday Work Hours
+										label.input
+											input(placeholder="", name="sundaynhours", ng-model="storeToEdit.sundaynhours", type="number")
+								div.row
+									section.col.col-6
+										label.label Daily Map (Hourly Factors)
+
+										table.storeObjectives(style="margin-left: auto; margin-right: auto;")
+											tr
+												td.kpiColHour
+												td(ng-repeat="column in dayhours") {{column}}
+											tr(ng-repeat='row in objectivesKpis')
+												td.kpiColHour {{row}}
+												td(ng-repeat='column in dayhours')
+													div
+														input.objectivesCellHour(ng-model='dailyfactors[calcCellPos(column,row)]', type="number")
+								
+
+				
+			.modal-footer
+				a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+				//- a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='saveStore()')
+				a.btn.btn-success(href='#', target='_self', ng-click='saveStore()') Save
+				p(style='{{statusStyle}};margin-top:10px;') {{statusMessage}}
+script
+	$('#openBtn').click(function(){
+		$('#addEditStoreModal').modal({show:true});
+	});
+#deleteStoreModal.modal
+	//- .modal-dialog.modal-sm
+	.modal-dialog
+		.modal-content.modal-content-caution
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+				h4.modal-title Confirm delete
+			.modal-body
+				//- p
+				//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+				p Are you sure you want to delete the Store OLAP configuration
+					| {{ storeToDelete.name }} ?
+			.modal-footer
+				a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+				a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteStore()')
+					i.fa.fa-exclamation-triangle
+					|  Delete
+script
+	$('#openBtn').click(function(){
+		$('#deleteStoreModal').modal({show:true});
+	});

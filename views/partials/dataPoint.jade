@@ -1,0 +1,267 @@
+script
+	//mixpanel.track("DataPoint")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+include sidebarData
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/data/{{pid}}') All points
+			li.active {{pointname}}
+
+	div#powerwidgets.row(ng-controller="DemoController")
+		#myModal1.modal
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Select the type of data insertion
+					.modal-body
+						p
+							i.fa.fa-lg.fa-info-circle
+							|  If you have data in spreadsheet format (.xls, .xlsx), you can copy-paste it into Earthindicators and quickly add your data. Otherwise, you can manually input your data.
+						div(style='margin: 0 auto; width: 275px;')
+							div.big-icons-buttons
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', data-toggle='modal', target='_self', href='#myModal')
+									i.fa.fa-file-excel-o
+									| Spreadsheet
+								a.btn.btn-info(style='margin: 5px 15px; width: 100px; padding: 15px 5px;', data-dismiss='modal', aria-hidden='true', href='/addWidget/{{pid}}/{{pointid}}')
+									i.fa.fa-pencil
+									| Manual
+					.modal-footer
+						a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+		script
+			$('#openBtn').click(function(){
+				$('#myModal1').modal({show:true});
+			});
+		#myModal.modal(ng-controller='AddIndicatorSpreadsheetCtrl')
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Insert indicators from spreadsheet
+					.modal-body
+						p Copy your indicators from a spreadsheet and paste them here. Also include their corresponding readings if you want to. 
+							a(href='misc/template-indicators.xlsx', target='_self') Download and use our template
+							|  to follow our format (instructions inside).
+						p: textarea(placeholder='Title	Unit	Alarm (Y/N)	Minimum	Maximum	ReadingDate	ReadingValue', ng-model='sentence',rows='10', style='width:100%;')
+					.modal-footer
+						a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+						a.btn.btn-success(style='{{addPointsButtonStyle}}', href='#', target='_self', ng-click='saveSpreadsheet()') Add indicators
+						a.btn.btn-danger(style='{{cancelAddPointsButtonStyle}}', href='#', target='_self', ng-click='cancelAddSpreadsheet()') Cancel
+						p(style='{{addMessageStyle}};margin-top:10px;') {{addMessage}}
+						p(style='{{addMessageStyle2}};margin-top:10px;') {{addMessage2}}
+		script
+			$('#openBtn').click(function(){
+				$('#myModal').modal({show:true});
+			});
+		#myModalDelete.modal
+			//- .modal-dialog.modal-sm
+			.modal-dialog
+				.modal-content.modal-content-caution
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Confirm delete
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						p {{deleteMessage}}
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteIndicator()')
+							i.fa.fa-exclamation-triangle
+							|  Delete
+		script
+			$('#openBtn').click(function(){
+				$('#myModalDelete').modal({show:true});
+			});
+		
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2
+							| Map
+							small Point {{pointid}}
+				div.inner-spacer.nopadding
+						div#map(style="height: calc(100vh - 48px - 40px - 30px - 62px)")
+							div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+							leaflet(center="madeira",markers="markers",leafletMap="leafletMap",layers="layers",geojson="geojson")
+		div.col-md-6.bootstrap-grid
+			#point-attributes.powerwidget.orange(data-widget-editbutton='false')
+				header
+						h2 {{pointname}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-edit-btn(href='/editPoint/{{pid}}/{{pointid}}')
+								i.fa.fa-pencil.fa-lg
+						//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+						//- 		i.fa.fa-times-circle
+						//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+						//- 		i.fa.fa-arrows-alt
+						//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+						//- 		i.fa.fa-chevron-circle-up
+						//- span.powerwidget-loader
+				div.inner-spacer
+					.row
+						.col-md-12.col-sm-12.col-xs-12
+							.row
+								.col-md-6.col-sm-6.col-xs-6
+									p
+										strong(style='margin-right:5px;') Latitude
+										| {{latitude}}
+								.col-md-6.col-sm-6.col-xs-6
+									p
+										strong(style='margin-right:5px;') Longitude
+										| {{longitude}}
+							hr(style='margin-top: 5px; margin-bottom: 15px;')
+						.col-md-12.col-sm-12.col-xs-12
+							p(ng-repeat='attribute in attributes')
+								strong(style='margin-right:5px;') {{attribute.name}}
+								| {{attribute.value}}
+							p(ng-hide='attributes.length') No attributes defined for this point
+		div.col-md-6.bootstrap-grid
+			div.row(ng-show='showDashboardHelp')
+				div.col-md-12
+					.callout.callout-info.callout-info-new-icon(style='background: white; margin-top: 0px;')
+						h4 Insert your indicators
+						h6.lead(style='font-size: 16px;') Please insert your first indicator to this point by pressing the button "Add Indicator" below.
+		div.col-md-3.bootstrap-grid(ng-repeat='indicator in indicators')
+			div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				header
+					h2 {{indicator.title}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-edit-btn(href='/editIndicator/{{pid}}/{{indicator.iid}}/{{pointid}}')
+							i.fa.fa-cog.fa-lg
+						//- a.button-icon.powerwidget-delete-btn(ng-click='deleteIndicator(indicator.iid)', href='#', target='_self',eat-click)
+						a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalDelete', ng-click='toDeleteIndicator(indicator)')
+							i.fa.fa-times-circle.fa-lg
+				.inner-spacer
+					.row
+						.col-md-10.col-sm-10.col-xs-10
+							h2(ng-if="indicator.value >= 1000 || indicator.title == 'NPS INDEX (HoN)' || indicator.title == 'Number of Customers'")
+								| {{indicator.value | numberEx:0}}
+								small {{indicator.unit}}
+							h2(ng-if="indicator.value < 1000 && indicator.title != 'NPS INDEX (HoN)'", ng-hide="indicator.title == 'Number of Customers'")
+								| {{indicator.value | numberEx:2}}
+								small {{indicator.unit}}
+							p.notedate {{indicator.lastdate}}
+						.col-md-2.col-sm-2.col-xs-2
+							div.pull-right.pull-down
+								//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+								h2
+									a(href='/indicator/{{pid}}/{{indicator.iid}}/{{pointid}}')
+										i.fa.fa-folder-open
+		div.col-md-3.bootstrap-grid
+			div.powerwidget.powerwidget-as-portlet-white.text-center(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+				//- a.btn(href='/addWidget/{{pid}}/{{pointid}}', style='width: 100%; padding-top: 18px; padding-bottom: 21px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+				a.btn(data-toggle='modal', target='_self', href='#myModal1', style='width: 100%; padding-top: 25px; padding-bottom: 28px; border: 1px dashed #949fb2; background-color: #f0f0ed;')
+					header	
+					.inner-spacer(style='background-color: #f0f0ed;')
+						h2
+							small.noBefore(style='color: #949fb2; font-weight: normal;')
+								i.fa.fa-plus-circle
+								|  Add Indicator
+		
+		//- div.col-md-6.bootstrap-grid
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-yellow.powerwidget-sortable(data-widget-editbutton='false')
+		//- 		header
+		//- 				h2
+		//- 					| Picture
+		//- 					small Point {{pointid}}
+		//- 		div.inner-spacer.nopadding
+		//- 			div(style='background:url("pics/saotome.jpg") no-repeat;background-position:center;width:100%;height:150px;')
+		//- 			//- img(src='pics/saotome.jpg',style='width:100%;height:157px;')
+
+		//- div.col-md-3.bootstrap-grid(ng-controller="CalendarCtrl")
+		//- 	div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 		header
+		//- 				h2 Next Activity
+		//- 				//- .powerwidget-ctrls(role='menu')
+		//- 				//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 				//- 		i.fa.fa-times-circle
+		//- 				//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 				//- 		i.fa.fa-arrows-alt
+		//- 				//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 				//- 		i.fa.fa-chevron-circle-up
+		//- 				span.powerwidget-loader
+		//- 		.inner-spacer
+		//- 			.row
+		//- 				.col-md-10.col-sm-10.col-xs-10
+		//- 					h2
+		//- 						| {{nextActivity.day}}
+		//- 						sup {{nextActivity.daySuffix}}
+		//- 						small {{nextActivity.month}}
+		//- 				.col-md-2.col-sm-2.col-xs-2
+		//- 					div.pull-right.pull-down
+		//- 						//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- 						h2
+		//- 							a(href='/calendar/{{pid}}/{{pointid}}')
+		//- 								i.fa.fa-calendar-o
+		//- div(ng-controller="Hello")
+		//- 	div.col-md-3.bootstrap-grid(class='{{sensorClass}}')
+		//- 		div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 			header
+		//- 					h2 Temperature (LIVE)
+		//- 					//- .powerwidget-ctrls(role='menu')
+		//- 					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 					//- 		i.fa.fa-times-circle
+		//- 					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 					//- 		i.fa.fa-arrows-alt
+		//- 					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 					//- 		i.fa.fa-chevron-circle-up
+		//- 					span.powerwidget-loader
+		//- 			.inner-spacer
+		//- 				.row
+		//- 					.col-md-10.col-sm-10.col-xs-10
+		//- 						h2
+		//- 							| {{greeting[0].TEMPS1}}
+		//- 							sup
+		//- 								small ºC
+		//- 						h6 {{tempPos}}{{temp}} % change
+		//- 					.col-md-2.col-sm-2.col-xs-2
+		//- 						div.pull-right.pull-down
+		//- 							//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- 							h2
+		//- 								a(href='/liveSensors/{{pid}}/{{pointid}}')
+		//- 									i.fa.fa-bar-chart-o
+		//- 	div.col-md-3.bootstrap-grid(class='{{sensorClass}}')
+		//- 		div.powerwidget.blue(data-widget-editbutton='false',id='{{pid}}-{{pointiid}}-{{pointiid}}')
+		//- 			header
+		//- 					h2 Humidity (LIVE)
+		//- 					//- .powerwidget-ctrls(role='menu')
+		//- 					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 					//- 		i.fa.fa-times-circle
+		//- 					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 					//- 		i.fa.fa-arrows-alt
+		//- 					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 					//- 		i.fa.fa-chevron-circle-up
+		//- 					span.powerwidget-loader
+		//- 			.inner-spacer
+		//- 				.row
+		//- 					.col-md-10.col-sm-10.col-xs-10
+		//- 						h2
+		//- 							| {{greeting[0].RH}} 
+		//- 							sup 
+		//- 								small %
+		//- 						h6 {{rhPos}}{{rh}} % change
+		//- 					.col-md-2.col-sm-2.col-xs-2
+		//- 						div.pull-right.pull-down
+		//- 							//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+		//- 							h2
+		//- 								a(href='/liveSensors/{{pid}}/{{pointid}}')
+		//- 									i.fa.fa-bar-chart-o
+		
+		

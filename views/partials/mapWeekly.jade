@@ -1,0 +1,84 @@
+//- include leftMenu
+script
+	//mixpanel.track("Map")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+	.leaflet-popup-content { width: 500px!important; }
+
+.responsive-admin-menu
+	.tabs-offcanvas
+		.main-info(style='border-bottom: 1px solid rgba(255,255,255,.1);')
+			.user-img
+				//-div(ng-hide="project.title == 'GenMills NB'")
+					img(src='images/project{{pid % 9}}.png', alt='Project Picture')
+				//-div(ng-show="project.title == 'GenMills NB'")
+					img( src='images/generalmills-bw.jpg', alt='Project Picture')
+				div
+					img( src='{{ (userProfile.logoMF && "images/moja2.png" || !userProfile.logoMF && "images/project5.png") }}', alt='Project Picture')
+			h1(style='margin-top:20px;')
+				| {{project.title}}
+				small(style='margin-top:15px;') {{project.location}}
+				//-small(style='margin-top:10px;') {{project.area}} ha
+	ul#menu(ng-controller="MenuCtrl")
+		li(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			a.active(href='/map/{{pid}}', title='Map')
+				i.entypo-map
+				span(ng-hide='userProfile.warMF')  Map
+				span(ng-show='userProfile.warMF')  War Room
+			//-ul.accordion(style="display: block;")
+		li(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			a(href="/occurrences/{{pid}}", title="Occurrences")
+				i.entypo-list
+				span(style = "margin-right: 5px") Occurrences 
+				span(ng-if = "showOpenOcc", style = "color: red") ({{openOcc}})
+				span(class = "powerwidget-loader", style = "display: inline; float: right; margin-right: 2px; margin-top: 3px;", ng-show="occLoading")
+		li
+			a(href='/dashboard/{{pid}}', title='Dashboard')
+				i.entypo-layout
+				span  Dashboard
+		li(ng-hide='userProfile.compareMF')
+			a(href='/compare/{{pid}}', title='Compare')
+				i.entypo-docs
+				span  Compare
+		li(ng-hide='userProfile.dataMF')
+			a(href='/data/{{pid}}', title='Manage Data')
+				i.entypo-book-open
+				span  Manage Data
+		li
+			a(href='/config/{{pid}}', title='Settings')
+				i.entypo-cog
+				span  Settings
+		//- li
+		//- 	a(href='#', target='_self', title='Delete', ng-click='deleteProject(project.pid)', style='background-color: red;')
+		//- 		i.fa.fa-times-circle
+		//- 		span  Delete Project
+
+div.content-wrapper
+	div#powerwidgets.row(ng-controller="OlapCubeCtrl")
+		div.col-sm-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+					h2
+						| Map
+						span(class = "powerwidget-loader", style = "display: inline; margin-left: 20px; float: right;", ng-show="loading") 
+					//- button.btn.btn-primary.btn-sm.pull-right
+					//- 	| Manage Icons
+					div.btn-group.pull-right(style="padding-right: 10px; padding-top: 6px;")
+						button.btn.btn-primary.btn-ei-greenprimary.btn-sm(type="button" ) Week
+						a.btn.btn-default.btn-ei-greendefault.btn-sm(type="button", href="/map/{{pid}}") Day
+				div(role='content')
+					div.inner-spacer.nopadding
+							div#map
+								div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+								leaflet(center="madeira",markers="complexmarkers",layers="layers",geojson="geojson",style="height: calc(100vh - 155px);")

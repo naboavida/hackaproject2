@@ -1,0 +1,63 @@
+//- include leftMenu
+script
+	//mixpanel.track("Map")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+	.leaflet-popup-content { width: 500px!important; }
+
+//- growl-notifications
+//- //- growl-notification Hello World!!!
+//- //- growl-notification.fading Hello World 2!!!
+//- //- growl-notification.fading(ng-if="showGrowl") Hello World 333!!!
+
+//- div(ng-repeat="(id, notification) in notifications track by id")
+//- 	growl-notification(ttl="{{notificationsTtl}}")
+//- 		div.row
+//- 			div.col-xs-12
+//- 				div.iconSequence
+//- 					img(ng-repeat="n in range(notification) track by $index", src="{{notification.icon}}")
+//- 				h5 {{notification.message}}
+//- 					small {{notification.messagerepetition}}   
+//- 					button.closeNotifButton.btn.btn-danger.btn-xs(ng-click="$growlNotification.remove()") Close
+//- 		div.row
+//- 			p.col-xs-4 Store: {{notification.store}}
+//- 			p.col-xs-4 Value: {{notification.readvalue}} {{notification.unit}}
+//- 			p.col-xs-4 Hour: {{notification.hour}}h00
+
+include sidebarDashboard
+
+div.content-wrapper
+	div#powerwidgets.row(ng-controller="OlapCubeCtrl")
+		div.col-sm-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+					h2
+						| Map
+						span(class = "powerwidget-loader", style = "display: inline; margin-left: 20px; float: right;", ng-show="loading") 
+					//- button.btn.btn-primary.btn-sm.pull-right
+					//- 	| Manage Icons
+					//- div.btn-group.pull-right(style="padding-right: 10px; padding-top: 6px;")
+					//- 	//- button.btn.btn-primary.btn-sm(ng-click="genNotif(null)") Gen Notif
+					//- 	button.btn.btn-primary.btn-sm(ng-click="callGetCustomIconsForce()") Force Refresh
+
+					div.btn-group.pull-right(style="padding-right: 10px; padding-top: 6px;")
+						a.btn.btn-default.btn-ei-greendefault.btn-sm(type="button", href="/map/{{pid}}/weekly") Week
+						button.btn.btn-primary.btn-ei-greenprimary.btn-sm(type="button") Day
+
+						
+				div(role='content')
+					div.inner-spacer.nopadding
+							div#map
+								div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+								leaflet(center="madeira",markers="complexmarkers",layers="layers",geojson="geojson",style="height: calc(100vh - 155px);")

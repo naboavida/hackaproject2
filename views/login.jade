@@ -1,0 +1,51 @@
+//- nav.main-header.clearfix(role='navigation')
+//- 	a.navbar-brand(href='/',style='margin:0;padding:0;width:250px;')
+//- 		img(src='img/logo.png')
+//- 	// Navigation Itself
+//- 	.navbar-content
+//- 		// Fullscreen Trigger
+//- 		button#toggle-fullscreen.btn.btn-default.hidden-xs.pull-right(type='button')
+//- 			i.entypo-popup
+//- 		// Log out button
+//- 		a.btn.btn-default.hidden-xs.pull-right.lockme(href='/logout', target='_self')
+//- 			i.entypo-logout
+div.colorful-page-wrapper(style='background-image: url(../images/gallery/1.png);')
+	div.center-block
+		div.login-block
+			form(action="/login", method="post", class='orb-form')
+				header
+					p Login to Earthindicators
+				fieldset
+					section
+						.row
+							label.label.col.col-4 Username
+							.col.col-8
+								label.input
+									i.icon-append.fa.fa-user
+									input(type='text', name='username')
+					section
+						.row
+							label.label.col.col-4 Password
+							.col.col-8
+								label.input
+									i.icon-append.fa.fa-lock
+									input(type='password', name='password')
+								p 
+									a(a href='mailto:contact@earthindicators.com?subject=EarthIndicators%20-%20Forgot%20Password')  Forgot your password? 
+				footer
+					button(type='submit', class='btn btn-success') Log in
+		div.copyrights
+			p(style='text-align:center; color:white;') Best viewed in Chrome
+			p 	Created and Maintained by 
+				a(href="http://www.earthindicators.com")  Earthindicators 
+				| © 2014
+
+
+			//- div
+			//- 	label Username:
+			//- 	input(type="text", name="username")
+			//- div
+			//- 	label Password:
+			//- 	input(type="password", name="password")
+			//- div
+			//- 	input(type="submit", value="Submit")

@@ -1,0 +1,177 @@
+//- include sidebarData
+//-         li
+//-           a.active(href='/stats', title='Add Readings')
+//-             i.entypo-book
+//-             span  Stats
+
+div.content-wrapper.no-left-navigation
+  div.breadcrumb.clearfix
+    ul
+      li
+        a(href='/')
+          i.fa.fa-home.fa-2x
+      li.active Live External Data
+
+  div#powerwidgets.row
+    div.col-md-12.bootstrap-grid
+      #intervalreadss.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Interval Reads
+        div.inner-spacer(role='content')
+          .col.col-sm-6
+            div.row
+              .col.col-sm-6
+                form.orb-form
+                  fieldset
+                    section
+                      label.label Date
+                      label.input.col.col-6
+                        input(placeholder="date", name="date", ng-model="forcedate", type="text")
+                  fieldset
+                    section
+                      label.label Project ID
+                      label.input.col.col-6
+                        input(placeholder="Project ID", name="projectid", ng-model="projectid", type="number")
+                  fieldset
+                    section.col.col-8
+                        button.btn.btn-default(ng-click="forceDateReadings()", style="float:left;") Force Date Readings
+                        p(style="float:left;") {{forceDateMessage}}
+              .col.col-sm-6
+                form.orb-form
+                  fieldset
+                    section
+                      label.label Interval
+                      label.input.col.col-6
+                        input(placeholder="interval value", name="intervalValue", ng-model="intervalValue", type="number")
+                  fieldset
+                    section
+                      label.label Project ID
+                      label.input.col.col-6
+                        input(placeholder="Project ID", name="projectid", ng-model="projectid", type="number")
+                  fieldset
+                    section.col.col-8
+                        button.btn.btn-default(ng-click="changeIntervalValue()", style="float:left;") Set
+                        button.btn.btn-success(ng-click="startInterval()", style="float:left;", ng-hide="startStopInterval") Start
+                        button.btn.btn-danger(ng-click="stopInterval()", style="float:left;", ng-show="startStopInterval") Stop
+                        p(style="float:left;") {{changeIntervalValueMsg}}
+
+          .col.col-sm-6
+            p READINGS
+            div(ng-repeat="read in reads")
+              p [ {{read.id}} ] Read {{read.count}} new reads in {{read.date | date:'yyyy-MM-dd HH:mm:ss Z'}}
+
+    div.col-md-12.bootstrap-grid
+      #dropboxexcelreads.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Excel from Dropbox Reads
+        div.inner-spacer(role='content')
+          .col.col-sm-6
+            div.row
+              .col.col-sm-6
+                form.orb-form
+                  fieldset
+                    section
+                      label.label Date
+                      label.input.col.col-6
+                        input(placeholder="date", name="date", ng-model="xlsxdropbox.date", type="text")
+                  fieldset
+                    section
+                      label.label Project ID
+                      label.input.col.col-6
+                        input(placeholder="Project ID", name="projectid", ng-model="xlsxdropbox.projectid", type="number")
+                  fieldset
+                    section.col.col-8
+                        button.btn.btn-default(ng-click="forceDateReadingsXlsxDropbox()", style="float:left;", ng-disabled="forceDateXlsxIsFetching") Force Date Readings
+                        p(style="float:left;") {{forceDateMessageXlsx}}
+              .col.col-sm-6
+                form.orb-form
+                  fieldset
+                    section
+                      label.label Trigger Time
+                      label.input.col.col-6
+                        input(placeholder="trigger time", name="triggerTime", ng-model="xlsxdropbox.triggerTime", type="text")
+                  fieldset
+                    section
+                      label.label Project ID
+                      label.input.col.col-6
+                        input(placeholder="Project ID", name="projectid", ng-model="xlsxdropbox.projectid", type="number")
+                  fieldset
+                    section.col.col-8
+                        button.btn.btn-default(ng-click="changeIntervalValueDropboxXlsx()", style="float:left;") Set
+                    //-     button.btn.btn-success(ng-click="startIntervalDropboxXlsx()", style="float:left;", ng-hide="startStopIntervalDropboxXlsx") Start
+                    //-     button.btn.btn-danger(ng-click="stopIntervalDropboxXlsx()", style="float:left;", ng-show="startStopIntervalDropboxXlsx") Stop
+                    //-     p(style="float:left;") {{changeIntervalValueMsgDropboxXlsx}}
+
+          .col.col-sm-6
+            p READINGS
+            div(ng-repeat="read in xlsxdropbox.reads")
+              p {{read}}
+              //- p [ {{read.id}} ] Read {{read.count}} new reads in {{read.date | date:'yyyy-MM-dd HH:mm:ss Z'}}
+
+    div.col-md-12.bootstrap-grid
+      #intervalreadss.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Delete data and bulk data add
+        div.inner-spacer(role='content')
+          .col.col-sm-6
+            div.row
+              .col.col-sm-6
+                form.orb-form
+                  fieldset
+                    section
+                      label.label Project ID
+                      label.input.col.col-6
+                        input(placeholder="Project ID", name="projectid", ng-model="projectid", type="number")
+                      button.btn.btn-default(ng-click="fetchDates()") Get Metadata
+                    //- section.col.col-6
+                form.orb-form
+                  fieldset
+                    select(size="4", id="myselection1", multiple, ng-multiple="true", ng-model="selectedKpis", ng-options="k.title + ' (' + k.unit + ')' for k in kpis")
+                  fieldset
+                    //- select(size="10", id="myselection", multiple, ng-multiple="true", ng-model="selectedDates", ng-options="c.name+' ('+c.shade+')' for c in colors")
+                    select(size="10", id="myselection", multiple, ng-multiple="true", ng-model="selectedDates", ng-options="d.date + ' (' + d.count + ')' for d in dates")
+              .col.col-sm-6
+                form.orb-form
+                  fieldset
+                    section
+                      label.label Dates to delete
+                      ul.list-group
+                        li.list-group-item(ng-repeat="d in selectedDates") {{d.date | date: 'yyyy-MM-dd'}} 
+                      p(ng-hide="selectedDates.length") Select dates from the left
+                      button.btn.btn-default(ng-show="selectedDates.length", ng-click="deleteReadingDates()") Delete dates
+
+                //- pre {{selectedDates}}
+
+    div.col-md-12.bootstrap-grid
+      #intervalreadss.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Today Last Values
+        div.inner-spacer(role='content')
+          .col.col-sm-12
+            button(ng-click="addTodayLastValue()") Add reading
+            button(ng-click="clearBackendReadings()") Clear backend readings
+          .col.col-sm-12
+            .col.col-sm-2(ng-repeat="kpi in kpis_list")
+              p {{kpi}}
+          .col.col-sm-12(ng-repeat="point in todayLastValues")
+            p {{point.PointKey}}
+            .col.col-sm-12
+              .col.col-sm-2(ng-repeat="kpi in kpis_list")
+                p(ng-repeat="read in point.reads[kpi]") {{read.hour}} {{read.value}}
+
+          pre {{lastBackendReads | json}}
+    div.col-md-12.bootstrap-grid
+      #intervalreadss2.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header
+          h2 Last Forced Values
+        div.inner-spacer(role='content')
+          .col.col-sm-12
+            .col.col-sm-2(ng-repeat="kpi in kpis_list")
+              p {{kpi}}
+          .col.col-sm-12(ng-repeat="point in lastForcedValues")
+            p {{point.PointKey}}
+            .col.col-sm-12
+              .col.col-sm-2(ng-repeat="kpi in kpis_list")
+                p(ng-repeat="read in point.reads[kpi]") {{read.hour}} {{read.value}}
+
+          pre {{lastForcedValues | json}}

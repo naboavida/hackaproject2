@@ -1,0 +1,100 @@
+script
+	//mixpanel.track("DashboardPoint")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/dashboard/{{pid}}') Dashboard
+			li.active {{pointname}}
+
+	div.row(ng-controller="DemoController")
+		
+		div.col-md-12.bootstrap-grid
+			div#map.total-map.bcrumb
+				div.info.country(ng-show="hoveredGeometry != ''")
+						| {{hoveredGeometry}}
+				leaflet(center="madeira",markers="markers",leafletMap="leafletMap",layers="layers",geojson="geojson")
+				div.col-md-6.widgets-div.orange-icon
+					div.col-md-6.bootstrap-grid(ng-repeat='widget in widgets', ng-show='widgets.length', ng-show="widget.value")
+						div.powerwidget.orange(data-widget-editbutton='false',id='{{widget.wid}')
+							header
+								h2 {{widget.title}}
+								
+								.powerwidget-ctrls(role='menu')
+									a.button-icon.powerwidget-edit-btn(ng-show="widget.hasAlarm")(href='/alerts/{{pid}}/{{widget.title}}')
+										i.entypo-megaphone(style='{{widget.newAlert}}',ng-click='{{widget.hideNewAlert}}')
+											span(ng-show="widget.alerts != 0")
+												| {{widget.alerts}}
+
+							.inner-spacer
+								.row
+									.col-md-10.col-sm-10.col-xs-10
+										h2(ng-if="widget.value >= 1000 || widget.title == 'NPS INDEX (HoN)' || widget.title == 'Number of Customers'"){{widget.value | number: 0}}
+											span
+												h5.inline  {{widget.unit}}
+										h2(ng-if="widget.value < 1000 && widget.title != 'NPS INDEX (HoN)'", ng-hide="widget.title == 'Number of Customers'") {{widget.value | number: 2}}
+											span
+												h5.inline  {{widget.unit}}
+												//h5(ng-hide="widget.title != 'NPS INDEX (HoN)'") index
+									.col-md-2.col-sm-2.col-xs-2
+										div.pull-right.pull-down
+											//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+											h2
+												a(href='/widget/{{pid}}/{{widget.wid}}/{{pointid}}')
+													i.fa.fa-folder-open.orange-icon-open
+								.row
+									.col-xs-6(ng-hide = "userProfile.annualGM")
+										p.notedate(ng-show="widget.aggrmethod == 'average'") Daily Average
+										p.notedate(ng-show="widget.aggrmethod != 'average'") Daily Total
+									.col-xs-6(ng-show = "userProfile.annualGM")
+										p.notedate(ng-show="widget.aggrmethod == 'average'") Annual Average
+										p.notedate(ng-show="widget.aggrmethod != 'average'") Annual Total
+									.col-xs-6
+										p.notedate.pull-right(ng-hide = "userProfile.annualGM") {{widget.date | date : "dd/MM/yyyy"}}
+										p.notedate.pull-right(ng-show = "userProfile.annualGM") {{widget.date | date : "yyyy"}}
+
+		div.col-md-12.bottom-widgets
+			div.col-xs-6.bootstrap-grid(ng-repeat='widget in widgets', ng-show='widgets.length', ng-show="widget.value")
+				div.powerwidget.orange(data-widget-editbutton='false',id='{{widget.wid}')
+					header
+						h2 {{widget.title}}
+						
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-edit-btn(ng-show="widget.hasAlarm")(href='/alerts/{{pid}}/{{widget.title}}')
+								i.entypo-megaphone(style='{{widget.newAlert}}',ng-click='{{widget.hideNewAlert}}')
+									span(ng-show="widget.alerts != 0")
+										| {{widget.alerts}}
+
+					.inner-spacer
+						.row
+							.col-md-10.col-sm-10.col-xs-10
+								h2
+									| {{widget.value | number}}
+									small {{widget.unit}}
+							.col-md-2.col-sm-2.col-xs-2
+								div.pull-right.pull-down
+									//- a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+									h2
+										a(href='/widget/{{pid}}/{{widget.wid}}/{{pointid}}')
+											i.fa.fa-folder-open.orange-icon-open
+						.row
+							.col-xs-6
+								p.notedate(ng-show="widget.aggrmethod == 'average'") Daily Average
+								p.notedate(ng-show="widget.aggrmethod != 'average'") Daily Total
+							.col-xs-6
+								p.notedate.pull-right {{widget.date | date : "dd/MM/yyyy"}}

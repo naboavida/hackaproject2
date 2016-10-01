@@ -1,0 +1,82 @@
+include leftMenuAlerts
+script
+  //mixpanel.track("Alerts")
+div.content-wrapper.no-left-navigation
+  div.breadcrumb.clearfix
+    ul
+      li
+        a(href='/')
+          i.fa.fa-home.fa-2x
+      li.active Alerts
+  div#powerwidgets.row
+    div.col-md-12.bootstrap-grid
+      #tablestyled.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-white.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+        header(role='heading')
+            h2
+              | List of alerts
+              small Real-time
+        div.inner-spacer(role='content')
+          table.table.table-striped.table-bordered.table-hover
+            thead
+                tr
+                  th(width='55%', colspan='2') Description
+                  th(width='7%') Project
+                  th(width='8%') Indicator
+                  th(width='8%') Category
+                  th(width='5%') Point
+                  th(width='5%') Date
+                  th 
+              tbody
+                tr(ng-repeat="alert in alerts")
+                  td(width='1%')
+                    span.num {{$index + 1}}
+                  td
+                    h5 {{alert.desc}}
+                    small
+                      i {{alert.timestamp}}
+                  td {{alert.ptitle}}
+                  td  {{alert.title}}
+                  td  {{alert.category}}
+                  td {{alert.pointname}}
+                  td {{alert.timestamp}}
+                  td.text-center
+                    a(href='{{alert.openUrl}}') Open
+              tfoot
+                tr
+                  th(colspan='2') Description
+                  th Project
+                  th Indicator
+                  th Category
+                  th Point
+                  th Date
+                  th 
+          //- ul.menuItem.menuItemLarge
+          //-   li.listItem.listItemLarge(ng-repeat="alert in alerts")
+          //-     div.innerItem.innerItemBig
+          //-       p.projectTitle(style='margin:5px;') {{alert.title}}
+          //-       a(href='/parameter/{{alert.pid}}/{{alert.iid}}/{{alert.parmid}}/{{alert.pointid}}') Open Parameter
+
+
+
+    //- div.col-md-12.bootstrap-grid
+    //-   div#tablestyled.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(data-widget-editbutton="false",role="widget")
+    //-     header(role='heading')
+    //-       h2
+    //-       | Table
+    //-       small Styled
+    //-     .powerwidget-ctrls(role='menu')
+    //-       a.button-icon.powerwidget-delete-btn(href='#')
+    //-         i.fa.fa-times-circle
+    //-       a.button-icon.powerwidget-fullscreen-btn(href='#')
+    //-         i.fa.fa-arrows-alt
+    //-       a.button-icon.powerwidget-toggle-btn(href='#')
+    //-         i.fa.fa-chevron-circle-up
+    //-     span.powerwidget-loader
+
+//- div
+//-   h2(style='text-align:center;margin-bottom:25px;') Alerts
+//-   ul.menuItem.menuItemLarge
+//-     li.listItem.listItemLarge(ng-repeat="alert in alerts")
+//-       div.innerItem.innerItemBig
+//-         p.projectTitle(style='margin:5px;') {{alert.title}}
+//-         a(href='/parameter/{{alert.pid}}/{{alert.iid}}/{{alert.parmid}}/{{alert.pointid}}') Open Parameter

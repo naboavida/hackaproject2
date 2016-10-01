@@ -1,0 +1,157 @@
+//- include leftMenu
+script
+	//mixpanel.track("Data")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div#powerwidgets.row
+		#myModal1.modal(ng-controller='ModalCompareTable')
+			//- .modal-dialog.modal-sm
+			.modal-dialog.modal-lg
+				.modal-content
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title Table view of comparison between {{pointNames[pointidLeft]}} and {{pointNames[pointidRight]}}
+					.modal-body
+						//- p
+						//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+						table.table.table-striped.table-hover.margin-0px
+							thead
+								tr
+									th Geometry
+									th(ng-repeat="kpi in kpilist") {{kpi}}
+							tbody
+								tr(ng-repeat="line in lines")
+									td {{line.pointid}}
+									td(ng-repeat="kpi in kpilist") {{line[kpi]}}
+					.modal-footer
+						a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+						a.btn.btn-danger(ng-click='export()')
+							i.fa.fa-file-excel-o
+							|  Export
+		script
+			$('#openBtn').click(function(){
+				$('#myModal1').modal({show:true});
+			});
+
+
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+						h2
+							| Map
+				div(role='content')
+					.powerwidget-editbox(class='{{dropdownClass}}')
+						div
+							label(style='width:25%;') Template
+							select.form-control(ng-model="form", ng-options="item as item.title for item in itemsPointTemplates", style='color:#333;width:75%;', ng-change="onDropdownChange()")
+										//- 		i
+
+
+										//- section
+
+										//- 	label.select
+					div.inner-spacer.nopadding
+						div
+							div#map
+								div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+								leaflet(center="madeira",height="550",markers="markers",layers="layers",geojson="geojson")
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-sortable(data-widget-editbutton='false',role='widget',style="background-color: transparent;", ng-show="listLeft.length && listRight.length")
+				div.text-center(style="background-color: transparent;")
+					a.btn.btn-primary.btn-lg(data-toggle='modal', target='_self', href='#myModal1', ng-click='setTableContent()')
+						i.glyphicon.glyphicon-th
+						|  View comparison as table
+		div.col-md-3.bootstrap-grid
+			div.powerwidget.orange
+				header
+					h2(ng-hide = "userProfile.regionGM") {{pointNames[pointidLeft] || 'Select a geometry'}}
+					h2(ng-show = "userProfile.regionGM") {{pointNames[pointidLeft] || 'Select a region'}}
+		div.col-md-3.bootstrap-grid
+			div.powerwidget.blue
+				header
+					h2(ng-hide = "userProfile.regionGM")  {{pointNames[pointidRight] || 'Select a geometry'}}
+					h2(ng-show = "userProfile.regionGM")  {{pointNames[pointidRight] || 'Select a region'}}
+		div.col-md-3.bootstrap-grid
+			div.row
+				div.col-md-12.bootstrap-grid(ng-repeat='widget in listLeft', ng-show='listLeft.length')
+					div.powerwidget.orange(data-widget-editbutton='false',id='{{widget.wid}')
+						header
+							h2 {{widget.title}}
+							
+							.powerwidget-ctrls(role='menu')
+								a.button-icon.powerwidget-edit-btn(ng-show="widget.hasAlarm")(href='/alerts/{{pid}}/{{widget.title}}')
+									i.entypo-megaphone(style='{{widget.newAlert}}',ng-click='{{widget.hideNewAlert}}')
+										span(ng-show="widget.alerts != 0")
+											| {{widget.alerts}}
+						.inner-spacer
+							.row
+								.col-md-12.col-sm-12.col-xs-12
+									h2
+										| {{widget.value | number:2}}
+										small {{widget.unit}}
+							.row
+								.col-xs-6(ng-hide = "userProfile.annualGM")
+									p.notedate(ng-show="widget.aggrmethod == 'average'") Daily Average
+									p.notedate(ng-show="widget.aggrmethod != 'average'") Daily Total
+								.col-xs-6(ng-show = "userProfile.annualGM")
+									p.notedate(ng-show="widget.aggrmethod == 'average'") Annual Average
+									p.notedate(ng-show="widget.aggrmethod != 'average'") Annual Total
+								.col-xs-6
+									p.notedate.pull-right(ng-hide = "userProfile.annualGM") {{widget.date | date : "dd/MM/yyyy"}}
+									p.notedate.pull-right(ng-show = "userProfile.annualGM") {{widget.date | date : "yyyy"}}
+		div.col-md-3.bootstrap-grid
+			div.row
+				div.col-md-12.bootstrap-grid(ng-repeat='widget in listRight', ng-show='listRight.length')
+					div.powerwidget.blue(data-widget-editbutton='false',id='{{widget.wid}')
+						header
+							h2 {{widget.title}}
+							
+							.powerwidget-ctrls(role='menu')
+								a.button-icon.powerwidget-edit-btn(ng-show="widget.hasAlarm")(href='/alerts/{{pid}}/{{widget.title}}')
+									i.entypo-megaphone(style='{{widget.newAlert}}',ng-click='{{widget.hideNewAlert}}')
+										span(ng-show="widget.alerts != 0")
+											| {{widget.alerts}}
+						.inner-spacer
+							.row
+								.col-md-12.col-sm-12.col-xs-12
+									h2
+										| {{widget.value | number:2}}
+										small {{widget.unit}}
+							.row
+								.col-xs-6(ng-hide = "userProfile.annualGM")
+									p.notedate(ng-show="widget.aggrmethod == 'average'") Daily Average
+									p.notedate(ng-show="widget.aggrmethod != 'average'") Daily Total
+								.col-xs-6(ng-show = "userProfile.annualGM")
+									p.notedate(ng-show="widget.aggrmethod == 'average'") Annual Average
+									p.notedate(ng-show="widget.aggrmethod != 'average'") Annual Total
+								.col-xs-6
+									p.notedate.pull-right(ng-hide = "userProfile.annualGM") {{widget.date | date : "dd/MM/yyyy"}}
+									p.notedate.pull-right(ng-show = "userProfile.annualGM") {{widget.date | date : "yyyy"}}
+		//- div.col-md-3.bootstrap-grid
+		//- 	pre
+		//- 		{{listLeft | json}}
+		//- div.col-md-3.bootstrap-grid
+		//- 	pre
+		//- 		{{listRight | json}}
+		div.bootstrap-grid.col-md-12(ng-repeat='widget in comparingWidgets')
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(class = "hide")
+					h2 History in {{widget.title}}
+				div.inner-spacer.text-center
+					div(style='width:99%; height:250px; margin-left:auto; margin-right:auto;')
+						nvd3-line-chart(data="histories[widget.wid]", id="exampleIdFocus{{widget.wid}}", color="catColorFunction()",legendColor="catColorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()", useInteractiveGuideLine="true", height2="50", margin="{left:80,top:50,bottom:30,right:50}", showLegend="true", forcey="[0]")
+						//- nvd3-line-with-focus-chart(data="widget.history", id="exampleIdFocus", color="catColorFunction()",legendColor="catColorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()",x2AxisTickFormat="xAxisTickFormatFunction()", useInteractiveGuideLine="true", height2="75", margin="{left:80,top:50,bottom:30,right:50}", showLegend="true")

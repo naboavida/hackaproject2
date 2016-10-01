@@ -1,0 +1,535 @@
+div.row(ng-show="userProfile.admin")
+	div(ng-show="widget.title == 'Estoque'")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3 
+							span
+								h5.inline  $
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3 24.8 
+							span
+								h5.inline  days
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   46.7 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  31.84
+							span
+								h5.inline  days
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   19.8 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  36.70 
+							span
+								h5.inline  days
+						
+						span.label.label-default
+							//-i.fa.fa-caret-down
+							|  N/A
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  39.08 
+							span
+								h5.inline  days
+						
+						span.label.label-default
+							//-i.fa.fa-caret-down
+							|  N/A
+	div(ng-show="widget.title == 'Numeric Dist.' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  14.75 
+							span
+								h5.inline  % 
+						
+						span.label.label-default
+							//-i.fa.fa-caret-down
+							|  0 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  15.35
+							span
+								h5.inline  %
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  10 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  15.25 
+							span
+								h5.inline  %
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  14 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  15.25 
+							span
+								h5.inline  %
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  16.1 %
+
+	div(ng-show="widget.title == 'Price Index' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  97.15 
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  18.5 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  97.42 
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  19.8 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  94.46
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  16.5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  93.09
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  15.1 %.
+
+	div(ng-show="widget.title == 'Sales (x1000)' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  134.5 
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   14.1 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  711.5
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  0.5 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  1 649
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  4.8 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  2 164 
+							span
+								h5.inline  R$ 
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  7.7 %
+
+	div(ng-show="widget.title == 'Quantity (x1000)' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  11.5
+							span
+								h5.inline  un
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   22 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  61
+							span
+								h5.inline  un
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  10.8 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  145.5
+							span
+								h5.inline  un 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   4.4 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  194 
+							span
+								h5.inline  un
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  0.3 %
+
+	div(ng-show="widget.title == 'QtdVenda' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  34 795
+							span
+								h5.inline  un 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   72.9 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  131 858
+							span
+								h5.inline  un
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   64.9 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  310 182
+							span
+								h5.inline  un
+						
+						span.label.label-default
+							//-i.fa.fa-caret-down
+							|  N/A
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  537 834
+							span
+								h5.inline  un
+						
+						span.label.label-default
+							//-i.fa.fa-caret-down
+							|  N/A
+
+	div(ng-show="widget.title == 'Volume (x1000)' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  0.7 
+							span
+								h5.inline  liters
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   26.3 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  3.65 
+							span
+								h5.inline  liters
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   16.1 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  8.65 
+							span
+								h5.inline  liters
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   10.8 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  11.6 
+							span
+								h5.inline  liters
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   6.5 %
+							
+	div(ng-show="widget.title == 'Weighted Dist.' ")
+		div.col-md-12
+			//-div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	CURRENT
+						h3  
+							span
+								h5.inline  $ 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|  5 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST MONTH
+						h3  30.75
+							span
+								h5.inline  %
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   10.2 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 3 MONTH
+						h3  32.15 
+							span
+								h5.inline  % 
+						
+						span.label.bg-red
+							i.fa.fa-caret-down
+							|   2.3 % 
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 6 MONTH
+						h3  32.19
+							span
+								h5.inline  %
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  2 %
+
+			div.col-md-3
+				div.powerwidget.powerwidget-as-portlet-white
+					div.inner-spacer.text-center(role="content")
+						small.display-block
+							strong 	LAST 12 MONTH
+						h3  32.42
+							span
+								h5.inline  %
+						
+						span.label.bg-green
+							i.fa.fa-caret-up
+							|  5.8 %

@@ -1,0 +1,27 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bcrypt": "*",
+    "connect-flash": "~0.1.0",
+    "dropbox": "^0.10.3",
+    "express": "~3.2.6",
+    "jade": "~0.31.2",
+    "mailgun-js": "0.5",
+    "moment": "^2.10.6",
+    "passport": ">= 0.0.0",
+    "passport-local": ">= 0.0.0",
+    "pg": "*",
+    "socket.io": "~0.9.16",
+    "xmla4js": "latest",
+    "mailcomposer": "latest",
+    "node-xlsx": "latest"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}

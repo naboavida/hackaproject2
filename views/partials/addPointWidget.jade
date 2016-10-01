@@ -1,0 +1,243 @@
+script
+	//mixpanel.track("Add IndicatorPoint")
+
+include sidebarData
+
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/data/{{pid}}') All points
+			li
+				a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+			li.active Add Indicator...
+	div#powerwidgets.row(ng-controller="DemoController")
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Map
+				div.inner-spacer.nopadding
+					div
+						div#map
+							leaflet(center="madeira",height="450",markers="markers",layers="layers")
+		//- div.col-md-8.bootstrap-grid
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header
+		//- 				h2 Indicators and Readings from Spreadsheet
+		//- 		div.inner-spacer
+		//- 			div.row
+		//- 				div.col-md-12
+		//- 					.callout.callout-info.callout-info-new-icon(style='background: white; margin-bottom: 0px;border-color: white;')
+		//- 						h4 Insert your indicators (with or without readings)
+		//- 						h6.lead(style='font-size: 16px;') Insert a collection of indicators, alongside with their corresponding readings, from a spreadsheet (press Add Spreadsheet).
+		//- 			a.btn.btn-info(data-toggle='modal', target='_self', href='#myModal') Add Spreadsheet
+		//- 			#myModal.modal(ng-controller='AddIndicatorSpreadsheetCtrl')
+		//- 				.modal-dialog.modal-lg
+		//- 					.modal-content
+		//- 						.modal-header
+		//- 							button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+		//- 							h4.modal-title Insert indicators from spreadsheet
+		//- 						.modal-body
+		//- 							p Copy your indicators from a spreadsheet and paste them here. Also include their corresponding readings if you want to. 
+		//- 								a(href='misc/template-indicators.xlsx', target='_self') Download and use our template
+		//- 								|  to follow our format (instructions inside).
+		//- 							p: textarea(placeholder='Title	Unit	Alarm (Y/N)	Minimum	Maximum	ReadingDate	ReadingValue', ng-model='sentence',rows='10', style='width:100%;')
+		//- 						.modal-footer
+		//- 							a.btn(href='#', target='_self', data-dismiss='modal', style='color: #82b964;') Close
+		//- 							a.btn.btn-success(style='{{addPointsButtonStyle}}', href='#', target='_self', ng-click='saveSpreadsheet()') Add points
+		//- 							a.btn.btn-danger(style='{{cancelAddPointsButtonStyle}}', href='#', target='_self', ng-click='cancelAddSpreadsheet()') Cancel
+		//- 							p(style='{{addMessageStyle}};margin-top:10px;') {{addMessage}}
+		//- 							p(style='{{addMessageStyle2}};margin-top:10px;') {{addMessage2}}
+		//- 			script
+		//- 				$('#openBtn').click(function(){
+		//- 					$('#myModal').modal({show:true});
+		//- 				});
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Add Indicator Data to Point {{pointid}}
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							section
+								label.label Choose from existing data type
+								label.select
+									select(ng-model="form", ng-options="datatype as datatype.titleG for datatype in datatypes")
+									//- select(ng-model="selectedItem", ng-options="item as item.title for item in items")
+									i
+						fieldset
+							section
+								label.label Title
+								label.input
+									i.icon-append.fa.fa-star-o
+									input#date2(placeholder='Title', name='title', ng-model='form.title')
+							section
+								label.label Start Value
+								label.input
+									i.icon-append.fa.fa-tachometer
+									input#phone(placeholder='Value', name='value', ng-model='form.value')
+							section
+								label.label Unit
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Unit', name='unit', ng-model='form.unit')
+							section
+								label.label Alarm
+								.margin-left
+									.inline-group
+										label.radio
+											input(type='radio', name='radio-inline', value='no', ng-model='form.alarm', checked)
+											i
+											| No
+										label.radio
+											input(type='radio', name='radio-inline', value='yes', ng-model='form.alarm')
+											i
+											| Yes
+								//- label.input
+								//- 	//- i.icon-append.fa.fa-crosshairs
+								//- 	i.icon-append.fa.fa-bell-o
+								//- 	input#serial(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+							section(ng-show="form.alarm == 'yes'")
+								label.label Minimum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+							section(ng-show="form.alarm == 'yes'")
+								label.label Maximum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+							section.overflow-hidden(ng-show="form.alarm == 'no'")
+								label.label Minimum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+							section.overflow-hidden(ng-show="form.alarm == 'no'")
+								label.label Maximum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+							//- p {{form}}
+							//- p {{selectedItem}}
+							button.btn.btn-default(ng-click='submitNewWidget()') Add Indicator
+							p(style='{{lastAddedMsgStyle}};margin-top:15px;') {{lastAddedMsg}}
+					p: a(href='/dashboard/{{pid}}/{{pointid}}') Back
+
+
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='/projects') Projects
+//- 		li
+//- 			a(href='/dashboard/{{pid}}') Dashboard
+//- 		li
+//- 			a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+//- 		li
+//- 			a(href='') Add Indicator...
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') {{project.title}}
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 {{project.location}}
+//- 							h2 Point {{pointid}}
+//- 						div.rightBarDiv
+//- 							h4 {{project.area}} km2
+//- 			div(ng-controller="DemoController")
+//- 				div
+//- 					button(ng-click='addPoint()') Add Point
+//- 					p {{addPointMode}}
+//- 				div#map
+//- 					leaflet(center="madeira",width="450",height="400",markers="markers",leafletMap="leafletMap")
+//- 					//- leaflet(center="madeira",width="500",height="400",markers="markers",event-broadcast="events")
+//- 	div.rightDiv
+//- 		ul.list-item
+//- 			li.item(ng-repeat='indicator in indicators')
+//- 				div.widgetContent
+//- 					h3.widgetTitle {{indicator.title}}
+//- 					div.line
+//- 						div.line-item.value {{indicator.value}}
+//- 						div.line-item.unit {{indicator.unit}}
+//- 					div.widgetChart(ng-controller='BulletCtrl')
+//- 						nvd3-bullet-chart(data='bulletData', width='100', height='10', showXAxis="false", margin="{left:5,top:0,bottom:0,right:5}", showYAxis="false", tooltips="true", interactive="false")
+//- 					//- div.line
+//- 					//- 	a(href='/indicator/{{pid}}/{{indicator.pointiid}}/{{pointid}}') Open
+//- 					div.bottomRow
+//- 						//- div(class='{{indicator.alarm}}')
+//- 						div(class='{{indicator.alarm}}')
+//- 							a.smallButton(href='project/readPost/{{post.id}}')
+//- 								img(src='img/alarm.png')
+//- 			li.item(ng-controller="CalendarCtrl")
+//- 				div.widgetContent
+//- 					h3.widgetTitle Next Activity
+//- 					div.line
+//- 						div.line-item.value {{nextActivity.day}}
+//- 						div.line-item.unit {{nextActivity.month}} {{nextActivity.year}}
+//- 					div.bottomRow(style='width:100%;')
+//- 						div.line-item.unit {{nextActivity.title}}
+//- 						img.line-item(src='pics/cal.png',style='width:50px;height:50px;')
+//- 					//- div.line.bottomRow(style='width:100%;')
+//- 					//- 	a(href='/calendar/{{pid}}') Open
+//- 			li.item(ng-controller="Hello")
+//- 				div.widgetContent
+//- 					h3.widgetTitle Relative Humidity
+//- 					div.line
+//- 						div.line-item.value {{greeting[0].RH}}
+//- 						div.line-item.unit %
+//- 					div.line.bottomRow(style='width:100%;')
+//- 						div {{rhPos}}{{rh}}
+//- 					//- div.line.bottomRow(style='width:100%;')
+//- 					//- 	a(href='/liveSensors/{{pid}}/{{pointid}}') Open
+//- 		div(style='width:800px;margin-left:auto;margin-right:auto;margin-top:100px;')
+			
+//- 				//- div(style='width:50%;margin-left:auto;margin-right:auto;')
+//- 				//- 	div.itemBox
+//- 				//- 		h4 Current Indicators
+//- 				//- 		div.itemBoxInner
+//- 				//- 			li(ng-repeat='indicator in indicators')
+//- 				//- 				p {{indicator.title}} {{indicator.value}} {{indicator.unit}}
+
+//- 				div(style='width:50%;margin-left:auto;margin-right:auto;margin-top:50px;')
+//- 					div.itemBox
+//- 						h4 Add Indicator to Point {{pointid}}
+//- 						div.itemBoxInner
+//- 							p: input(placeholder='Title', name='title', ng-model='form.title')
+//- 							p: input(placeholder='Value', name='value', ng-model='form.value')
+//- 							p: input(placeholder='Unit', name='unit', ng-model='form.unit')
+//- 							p: input(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+//- 							p: button(ng-click='submitNewWidget()') Add
+//- 						p: a(href='/dashboard/{{pid}}/{{pointid}}') Back
+//- 		//- div(style='width:400px;margin-left:auto;margin-right:auto;margin-top:100px;')
+//- 		//- 	h1 Add Indicator to Point {{pointid}}
+//- 		//- 	div
+//- 		//- 		li(ng-repeat='indicator in indicators')
+//- 		//- 			p {{indicator.title}} {{indicator.value}} {{indicator.unit}}
+//- 		//- 		//- form(action='/addProject', method='post')
+//- 		//- 		div
+//- 		//- 			p: input(placeholder='Title', name='title', ng-model='form.title')
+//- 		//- 			p: input(placeholder='Value', name='value', ng-model='form.value')
+//- 		//- 			p: input(placeholder='Unit', name='unit', ng-model='form.unit')
+//- 		//- 			p: input(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+//- 		//- 			p: button(ng-click='submitNewWidget()') Add
+//- 		//- 	p: a(href='/dashboard/{{pid}}/{{pointid}}') Back
+//- 		//- 	p: a(href='/') Home

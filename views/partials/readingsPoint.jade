@@ -1,0 +1,74 @@
+script
+	//mixpanel.track("Indicator Readings Point")
+include sidebarData
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			//- li
+			//- 	a(href='/') Home
+			//- li
+			//- 	a(href='/projects') Projects
+			//- li
+			//- 	a(href='/dashboard/{{pid}}') Dashboard
+			li
+				a(href='/data/{{pid}}') All points
+			li
+				a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+			li
+				a(href='/indicator/{{pid}}/{{iid}}/{{pointid}}') Indicator {{indicator.title}}
+			li.active Edit readings...
+	div#powerwidgets.row(ng-controller="ExampleCtrl")
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2
+						| {{parameter.title}} History
+						small All Points
+					.powerwidget-ctrls(role='menu')
+						//- a.button-icon.powerwidget-edit-btn(href='readings/{{iid}}')
+						//- 	i.fa.fa-lg(class='{{iconConfig}}')
+						a.button-icon.powerwidget-refresh-btn(ng-click='refreshChart()',href='#',target='_self',eat-click)
+							i.fa.fa-refresh.fa-lg
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.text-center
+					div(style='width:90%; height:200px; margin-left:auto; margin-right:auto;')
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking",ng-model="exampleDataRanking",color="colorFunction()",width='600', height='300',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						nvd3-line-chart(data="exampleData",ng-model="exampleData",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()")
+		.col-md-12.bootstrap-grid.sortable-grid.ui-sortable
+			#table1.powerwidget.green.powerwidget-sortable(data-widget-editbutton='false', role='widget', style='')
+				header(role='heading')
+					h2
+						| Table
+						small Striped, Hovered
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#')
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#')
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#')
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				.inner-spacer(role='content')
+					table.table.table-striped.table-hover.margin-0px
+						thead
+							tr
+								th Date
+								th Value
+								th Actions
+						tbody
+							tr(ng-repeat='reading in readings')
+								td {{reading.rawDate}}
+								td {{reading.value}}
+								td
+									.btn-group.btn-group-xs
+										//- button(type='button', class='btn btn-default') Edit
+										button(type='button', class='btn btn-default', ng-click='deleteReading(reading.rawDate)') Delete

@@ -1,0 +1,353 @@
+//- include leftMenu
+script
+	//mixpanel.track("Widget")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+
+include sidebarDashboard
+
+div.content-wrapper
+	div.row						
+		div.col-xs-12.bootstrap-grid
+
+			//- alert
+			div.alert.alert-danger.alert-dismissable.text-center
+				button(type="button" ,class="close" ,data-dismiss="alert", aria-hidden="true")
+					i(class="fa fa-times-circle")
+				strong
+					span.fa.fa-exclamation-circle
+					|  {{openOcc}} Occurrences
+	div.row	
+		div.col-xs-12.bootstrap-grid	
+			//- kpis summary
+			div.powerwidget.powerwidget-sortable(role='widget', ng-controller="xDashCtrl")
+				div.nopadding.text-center.relative(style="background-color:#F0F0ED;")
+
+					div.arrow-left
+						a(ng-click="moveKpi('left')")
+							i.glyphicon.glyphicon-chevron-left
+					
+					div#inner.block-kpis
+
+						a.text-center.relative(
+							ng-repeat='widget in widgets', 
+							ng-show='widgets.length', 
+							ng-href='/newdash2/{{pid}}/{{widget.wid}}',
+							ng-style="{left:pos}")
+
+							button.btn.btn-kpi(type="button", ng-class="{'btn-primary': isActive('/newdash2/{{pid}}/{{widget.wid}}', widget)}")
+								
+								span.btn-kpi-title
+									i(ng-class="widget.icon")
+									strong(ng-if="widget.unit == 'customers'")  Customers
+									strong(ng-hide="widget.unit == 'customers'")  {{widget.title}}
+
+								h4  {{ (widget.value % 1 == 0) ? (widget.value |numberEx:0) : (widget.value | numberEx:2)}}
+									span(ng-hide="widget.unit == 'customers'")
+										h6.inline  {{widget.unit}}
+								span(class="label {{getVariationClass(calculateVariation(widget.value, widget.homologousValue)).label}}")
+									i(class="fa {{getVariationClass(calculateVariation(widget.value, widget.homologousValue)).caret}}")
+									|  {{ calculateVariation(widget.value, widget.homologousValue) | numberEx:0}} %
+								//- span(class="label bg-red", data-tooltip="Year-1", style="margin-left:5px;")
+								//- 	i(class="fa fa-caret-down")
+								//- 	|  5%
+
+					div.arrow-right
+						a(ng-click="moveKpi('right')")
+							i.glyphicon.glyphicon-chevron-right
+
+	div.row
+		div.col-xs-9.bootstrap-grid.d-inline-block
+
+			//- graphs and statitics
+			div.powerwidget.dark-blue.powerwidget-sortable(role='widget', style="height:100%!important")
+				header
+					h2 {{widget.title}}
+						small(ng-hide="filterSpec.dates.state || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="filterSpec.dates.state && userProfile.annualGM == undefined") From {{filterSpec.dates.startdate | date:"dd/MM/yyyy"}} to {{filterSpec.dates.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					div.powerwidget-ctrls(role="menu")
+						select.drop-graph(ng-model="chartSelectOptions.selectedChartOption")
+							option(ng-repeat="option in chartSelectOptions.chartOptions", value="{{option}}") {{option}}
+						i
+
+				div.inner-spacer(style="height:279px")
+				
+					div.col-xs-9.padding-0(style="margin-top: 15px;")
+						//- div(style='width:100%;height:235px; margin: 0 auto')
+						div(style='width:100%; margin: 0 auto')
+							highchart(id="chart1", config="highchartsNG", class="span10")
+							//- nvd3-line-chart(ng-show="graph == 'historyStores' || graph == 'historyTotal'", data="exampleData", id="exampleIdFocus", color="catColorFunction()",legendColor="catColorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()", useInteractiveGuideLine="true", showLegend="true", forcey="[0]")
+							//- nvd3-discrete-bar-chart(ng-show="graph == 'ranking'", data="exampleDataRanking", id='exampleRanka', color="catColorFunction()", showXAxis="true",showYAxis="true",showValues="false", tooltips="true",interactive="true",objectequality="true", rotateLabels="17", margin="{left:70,right:20}")
+					
+					div.col-xs-3.padding-0(style="margin-top: 15px;")
+						div.statistics
+							table
+								thead.text-center
+									td(colspan="2") 
+										strong STATISTICS
+								tr
+									td Stores
+									td 
+										span(class="label bg-blue") {{ nPoints }}
+								tr
+									td Average
+									td
+										span(class="label bg-blue") {{ ((sum/nPoints) % 1 ==0 )? (parseFloat(sum/nPoints,2) | number:0) : (parseFloat(sum/nPoints,2) | number:2) }} 
+								tr
+									td Minimum
+									td
+										span(class="label bg-blue") {{ (minimum % 1 == 0) ? (minimum |number:0) : (minimum | number:2)}}
+								tr
+									td Maximum
+									td
+										span(class="label bg-blue") {{ (maximum % 1 == 0) ? (maximum |number:0) : (maximum | number:2)}}
+								tr(ng-hide="standardError == null ")
+									td Standard Error
+									td
+										span(class="label bg-blue") {{ (standardError % 1 == 0) ? (standardError |number:0) : (standardError | number:2)}}
+										
+		//- filter
+		div.col-xs-3.bootstrap-grid
+			
+			div.powerwidget.powerwidget-sortable(role='widget')
+				header
+					h2 Filter
+
+					div.filter-icons(class="powerwidget-ctrls" ,role="menu")
+
+						a(href="#", class="button-icon powerwidget-edit-btn",ng-click="filterBoxFunction('place')", style="margin-right:3px")
+							i.fa-lg(class="fa fa-map-marker", data-tooltip="Store")
+
+						a(href="#", class="button-icon powerwidget-edit-btn",ng-click="filterBoxFunction('cat')", style="margin-right:3px")
+							i.fa-lg(class="fa fa-tags", data-tooltip="Category")
+
+						a(href="#", class="button-icon powerwidget-edit-btn",ng-click="filterBoxFunction('prod')")
+							i.fa-lg(class="fa fa-shopping-cart", data-tooltip="Product")
+					
+				div
+					div(class="{{filterBoxClass}}")
+						div(class="{{filterBoxClassInnerPlace}}")
+							div(style="position: relative; display: inline-block;")
+								form.orb-form.custom-filter
+									fieldset
+										label.label.toggle
+											| Filter by Point
+											input(type="checkbox", name="checkbox-points-filter", ng-model="pointFilter.state",ng-change="procPointsFilter(false)")
+											i(class="{{toggleClassPoints}}")
+
+										//label.checkbox.filterCheckbox
+											input(type="checkbox", name="checkbox-all", checked="{{check}}", ng-click="togglePointsFilterAll(pointsFilteredBox)")
+											i
+											| {{toggleAll}}
+
+										label.checkbox.filterCheckbox(ng-repeat="marker in markers")
+											input(type="checkbox", name="checkbox-{{marker.name}}", ng-model="pointsFilteredBox[marker.pointid]", ng-change="togglePointsFilter()")
+											i 
+											| {{marker.name}}
+
+						div(class="{{filterBoxClassInnerCat}}")
+							div(style="position: relative; display: inline-block;")
+								form.orb-form.custom-filter
+									fieldset
+										label.label.toggle
+											|Filter by Category
+											input(type="checkbox", name="checkbox-category-filter", ng-model="catFilter.state", ng-change="procCategoryFilter(false)")
+											i(class="{{toggleClassCat}}")
+
+										//label.checkbox.filterCheckbox
+											input(type="checkbox", name="checkbox-all", checked="{{check}}", ng-click="togglePointsFilterAll(cat)")
+											i
+											| {{toggleAll}}
+
+										div(ng-hide="Objectsize(catFilters)==1")
+											label.checkbox.filterCheckbox(ng-repeat="(category, enabled) in catFilters")
+												input(type="checkbox", ng-model="catFilters[category]", ng-change="toggleCatFilter()")
+												i 
+												| {{category}}
+													
+						div(class="{{filterBoxClassInnerProd}}")
+							div(style="position: relative; display: inline-block;")
+								form.orb-form.custom-filter
+									fieldset
+										label.label.toggle
+											| Filter by Product
+											input(type="checkbox", name="checkbox-product-filter", ng-model="prodFilter.state", ng-change="procProductFilter(false)")
+											i(class="{{toggleClassProd}}")
+										div(ng-hide="Objectsize(prodFilters)==1")
+											label.checkbox.filterCheckbox(ng-repeat="(product, enabled) in prodFilters")
+												input(type="checkbox", ng-model="prodFilters[product]", ng-change="toggleProdFilter()")
+												i 
+												| {{product}}
+					
+					//- dates
+					div.inner-spacer.text-center
+		
+						div.alert.alert-danger.alert-dismissable.date-warn(class="{{dateWarn}}")
+							button(type="button" ,class="close" ,data-dismiss="alert", aria-hidden="true")
+								i(class="fa fa-times-circle")
+							|  {{dateMessage}}
+
+						div(class="calendar-day-block")
+
+							div(class="day-block")
+
+								div(ng-show="!filterSpec.dates.state")
+									p(class="week-day") {{widget.date | date:"EEEE"}}
+									p(class="day") {{widget.date | date:"d"}}
+									p(class="month-year") {{widget.date | date:"MMMM y"}}
+
+								div(ng-show="filterSpec.dates.state")
+							
+									div.d-inline-block(style="width:45%;")
+										p(class="week-day", style="font-size:1em") {{filterSpec.dates.startdate | date:"EEEE"}}
+										p(class="day", style="font-size:4em; padding-right:10px; border-right:2px solid #969fa1") {{filterSpec.dates.startdate | date:"d"}}
+										p(class="month-year") {{filterSpec.dates.startdate | date:"MMM y"}}
+									
+									div.d-inline-block(style="width:45%;")
+										p(class="week-day", style="font-size:1em") {{filterSpec.dates.finishdate | date:"EEEE"}}
+										p(class="day", style="font-size:4em") {{filterSpec.dates.finishdate | date:"d"}}
+										p(class="month-year") {{filterSpec.dates.finishdate | date:"MMM y"}}
+
+								div.relative.btn-group
+									button(class="btn btn-default btn-sm" ,ng-click="toggleDatepickerStart()")
+										i.fa.fa-plus-circle
+										|  Start Date
+									div.absolute(style="top:30px; right:0; z-index:2", ng-show="datepickerStart")
+										datepicker(ng-model='dt1', ng-change="toggleDateFilter()",style="background-color:#c0c2c7;", min-date='minDate',starting-day="1", show-weeks='false', custom-class='getDayClass(date, mode)')
+							
+									button(class="btn btn-default btn-sm",ng-click="toggleDatepickerEnd()")
+										i.fa.fa-plus-circle
+										|  End Date
+									div.absolute(style="top:30px; right:0; z-index:2;", ng-show="datepickerEnd")
+										datepicker(ng-model='dt2', ng-change="toggleDateFilter()",style="background-color:#c0c2c7;", min-date='minDate',starting-day="1", show-weeks='false', custom-class='getDayClass(date, mode)')
+						
+								div.btn-group
+									button(type="button" ,class="btn btn-default btn-sm" ,data-toggle="dropdown") Time Period 
+										span.caret
+									ul.dropdown-menu.dropdown-menu-right(style="text-transform:none")
+										li
+											a(ng-click="preDatesFilter('lastSample')") Yesterday
+										li 
+											a(ng-click="preDatesFilter('thisWeek')") This Week
+										li
+											a(ng-click="preDatesFilter('lastWeek')") Last Week
+										li
+											a(ng-click="preDatesFilter('last15')") Last 15 days
+										li
+											a(ng-click="preDatesFilter('thisMonth')") This Month
+										li
+											a(ng-click="preDatesFilter('lastMonth')") Last Month
+										li
+											a(ng-click="preDatesFilter('trimester')") Trimester
+										li
+											a(ng-click="preDatesFilter('quarter')") Quarter
+										li
+											a(ng-click="preDatesFilter('semester')") Semester
+										li
+											a(ng-click="preDatesFilter('thisYear')") This Year
+										li
+											a(ng-click="preDatesFilter('lastYear')") Last Year
+
+	div.row
+		//- table and map			
+		div.col-xs-12.bootstrap-grid
+
+			div.powerwidget.cold-grey-powerwidget-sortable(role="widget", ng-controller="xMapCtrl")
+
+				header(role="heading")
+					h2 Store Indicators
+						small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") From {{filterSpec.dates.startdate | date:"dd/MM/yyyy"}} to {{filterSpec.dates.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					div(class="powerwidget-ctrls" ,role="menu")
+						a(class="button-icon powerwidget-edit-btn",ng-click="configBoxFunction()")
+							i(class="fa fa-cog", data-tooltip="Heat Map Settings")
+
+				div(role="content")
+
+					//- config heatmap
+					div.powerwidget-editbox.inner-spacer.heatmap-config(class="{{configBoxClass}}", style="color:white")
+						
+							form.orb-form.inline-block
+								fieldset						
+									section
+										label.label(class="toggle")
+											| Use Local Extreme
+											input(type="checkbox", checked, name="localextreme", ng-model="localextreme")
+											i
+						
+							form.orb-form.inline-block
+								fieldset						
+									section
+										label.label Choose Heatmap Radius
+										label.select
+											select(ng-model="heatmapradius")
+												option(value="Tiny") Tiny
+												option(value="Small") Small
+												option(value="Medium") Medium
+												option(value="Big") Big
+												option(value="Giant") Giant
+												option(value="Fixed0.005") Fixed 0.005
+												option(value="Fixed0.01") Fixed 0.01
+												option(value="Fixed0.1") Fixed 0.1
+												option(value="Fixed0.5") Fixed 0.5
+												option(value="Fixed1") Fixed 1
+												option(value="Average") Average
+											i
+							button.pull-right.btn.btn-success(type="button", ng-click="applyConfig()", ng-disabled="{{applyConfigButtonDisabled}}") {{applyConfigButtonText}}
+					
+					div.row.inner-spacer
+
+						//- table
+						div#table.col-md-6(ng-controller="xTableCtrl")
+							
+							//-div(id="table-2_length", class="dataTables_length")
+								form.orb-form
+									label
+										select(size="1", name="table-2_length", aria-controls="table-2") 
+											option(value="10", selected="selected") 10
+											option(value="25") 25
+											option(value="50") 50
+											option(value="100") 100
+										| Stores
+						
+							div(class="dataTables_filter")
+								label 
+									input(type="text", aria-controls="table-2", placeholder="Search all columns ", ng-model="search.$")
+					
+							div(style="overflow-x:scroll")
+								table( class="table table-striped table-hover margin-0px airtable", id="table-2", aria-describedby="table-2_info")
+									thead
+										tr(ng-repeat="header in points" ,ng-if="$index == 0")
+											th(class="sorting_asc", role="columnheader" ,tabindex="0", ng-if="$index == 0", ng-click="order = 2") Store
+											th(class="sorting", role="columnheader" ,tabindex="0", ng-repeat="(key, value) in header",ng-if="$index > 0", ng-click="order = 23") {{ key }}
+
+									tbody(role="alert" ,aria-live="polite" ,aria-relevant="all")
+										tr(ng-repeat="row in points | filter:search | orderBy:order")
+											td(ng-repeat="(key, value) in row") {{ (value % 1 == 0) || isString(value) ? (isString(value) ? value:(value |number:0)) : (value | number:2)}}
+
+						//- map
+						div.col-md-6
+							div#map.relative
+								div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+								
+								div.check-heatmap.orb-form
+									label.toggle
+										input(type="checkbox", name="heat-map-check", ng-model="heatmapcheck")
+										i 
+										| Heat Map
+									//-label.checkbox
+										input(type="checkbox", name="heat-map-check", ng-model="heatmapcheck")
+										i 
+										| Heat Map
+
+								leaflet(center="madeira", height="395px" ,markers="markers",layers="layers",geojson="geojson")

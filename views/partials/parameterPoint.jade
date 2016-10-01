@@ -1,0 +1,217 @@
+script
+	//mixpanel.track("ParameterPoint")
+
+include sidebarData
+
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/data/{{pid}}') All points
+			li
+				a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+			li
+				a(href='/indicator/{{pid}}/{{iid}}/{{pointid}}') Indicator {{indicator.title}}
+			li.active Parameter "{{parameter.title}}"
+	//- div.page-header
+	//- 	h1 
+	//- 		small Point {{pointid}}
+	div#powerwidgets.row
+		div.col-md-12.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 
+							| General Parameter Goals
+							small Point {{pointid}}
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-delete-btn(href='#',target='_self',eat-click)
+								i.fa.fa-share-alt.fa-lg(style='margin-right: 5px;')
+							a.button-icon.powerwidget-edit-btn(ng-click='toggleShowReadingsForm()', href='#',target='_self',eat-click)
+								i.fa.fa-lg(class='{{iconConfig}}')
+							//- a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+							//- 	i.fa.fa-times-circle
+							//- a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+							//- 	i.fa.fa-arrows-alt
+							//- a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+							//- 	i.fa.fa-chevron-circle-up
+						span.powerwidget-loader
+				div(role='content')
+					.powerwidget-editbox(class='{{readingsFormClass}}')
+						ul.nav.nav-tabs
+							li.active
+								a(href='#one-normal', target='_self', data-toggle='tab')
+									i.entypo-droplet
+									|  Add single reading
+							li
+								a(href='#two-normal', target='_self', data-toggle='tab')
+									i.entypo-water
+									|  Add multiple readings
+						.tab-content
+							#one-normal.tab-pane.active
+								p: input(placeholder='Input one value', type='text', ng-model='readingForm.value')
+								p: input(placeholder='Date', type='date', ng-model='readingForm.timestamp')
+								p: button(ng-click='submitNewPointReading()') Add
+							#two-normal.tab-pane
+								p: textarea(placeholder='Paste values from Excel. The required format of each row is 2 columns with Date and Value. Example: 15/05/2014	23', ng-model='sentence',rows='10', style='width:85%;')
+								p: button(ng-click='submitNewPointMultipleReadings()') Add
+					div.inner-spacer
+						.row(style='margin-top:15px;')
+							.col-md-4.col-sm-4.col-xs-4.text-center
+								//- i.fa.fa-circle-o.fa-4x
+								i.fa.fa-flag-o.fa-4x(style='color:#c4c5c5;')
+								h4 Year 0
+								h2 {{parameter.readings[0].value}}
+									small {{parameter.unit}}
+							.col-md-4.col-sm-4.col-xs-4.text-center
+								i.fa.fa-tachometer.fa-4x(style='color:#c4c5c5;')
+								h4 Current
+								h2 {{parameter.value}}
+									small {{parameter.unit}}
+							.col-md-4.col-sm-4.col-xs-4.text-center
+								i.fa.fa-flag-checkered.fa-4x(style='color:#c4c5c5;')
+								h4 Objective
+								h2 {{parameter.objective}}
+									small {{parameter.unit}}
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2
+						| Map
+						small Point {{pointid}}
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.nopadding
+					div(ng-controller="DemoController")
+						div#map
+							leaflet(center="madeira",height="400",markers="markers",layers="layers")
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget',ng-controller="ExamplePointCtrl")
+				header
+					h2
+						| {{parameter.title}} History
+						small Point {{pointid}}
+					.powerwidget-ctrls(role='menu')
+						a.button-icon.powerwidget-edit-btn(href='readingsParameter/{{pid}}/{{iid}}/{{pointparmid}}/{{pointid}}')
+							i.fa.fa-lg.fa-pencil
+						a.button-icon.powerwidget-refresh-btn(ng-click='refreshChart()',href='#',target='_self',eat-click)
+								i.fa.fa-refresh.fa-lg
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.text-center
+					div(style='width:90%; height:200px; margin-left:auto; margin-right:auto;')
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking",ng-model="exampleDataRanking",color="colorFunction()",width='600', height='300',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						nvd3-line-chart(data="exampleData",ng-model="exampleData",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()")
+		//- div.col-md-12.bootstrap-grid
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.dark-red.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header
+		//- 			h2
+		//- 				| Input readings for {{parameter.title}}
+		//- 				small Point {{pointid}}
+		//- 			//- .powerwidget-ctrls(role='menu')
+		//- 			//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 			//- 			i.fa.fa-share-alt
+		//- 			//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+		//- 			//- 		i.fa.fa-times-circle
+		//- 			//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+		//- 			//- 		i.fa.fa-arrows-alt
+		//- 			//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+		//- 			//- 		i.fa.fa-chevron-circle-up
+		//- 			span.powerwidget-loader
+		//- 		div.inner-spacer
+		//- 			.row
+		//- 				.col-md-6.col-sm-6.col-xs-6.text-center
+		//- 					h4 Add single reading
+		//- 					p: input(placeholder='Input one value', type='number', ng-model='readingForm.value')
+		//- 					p: input(placeholder='Date (optional)', type='date', ng-model='readingForm.date')
+		//- 					p: button(ng-click='submitNewPointReading()') Add
+		//- 				.col-md-6.col-sm-6.col-xs-6.text-center
+		//- 					h4 Add multiple readings
+		//- 					p: textarea(placeholder='Paste values from Excel', ng-model='sentence',rows='10', cols='50')
+		//- 					p: button(ng-click='submitNewPointMultipleReadings()') Add
+
+//- div.wrap
+//- 	ul.breadcrumb
+//- 		li
+//- 			a(href='/') Home
+//- 		li
+//- 			a(href='/projects') Projects
+//- 		li
+//- 			a(href='/dashboard/{{pid}}') Dashboard
+//- 		li
+//- 			a(href='/dashboard/{{pid}}/{{pointid}}') Point {{pointid}}
+//- 		li
+//- 			a(href='/indicator/{{pid}}/{{iid}}/{{pointid}}') Indicator {{indicator.title}}
+//- 		li
+//- 			a(href='') Parameter {{parameter.title}}
+//- div.mainDiv
+//- 	div.leftDiv
+//- 		div.leftDivContent
+//- 			div.areaInfo
+//- 				div.leftInfoDiv
+//- 					img.thumbnail(src='pics/saotome.jpg')
+//- 				div.rightInfoDiv
+//- 					div
+//- 						h2(style='margin-left:25px;') São Tomé
+//- 					div
+//- 						div.leftBarDiv
+//- 							h4 124.455 inhabitants
+//- 						div.rightBarDiv
+//- 							h4 100 km2
+//- 			div#map(ng-controller="DemoController")
+//- 				leaflet(center="madeira",width="450",height="400",markers="markers")
+//- 	div.rightDiv
+//- 		div.topCenteredButtons
+//- 			p Goals
+//- 			//- /parameter/{{pid}}/{{iid}}/{{parameter.pointparmid}}/{{pointid}}
+//- 			p: a(href='/parameterHistory/{{pid}}/{{iid}}/{{pointparmid}}/{{pointid}}') History
+//- 		div.widgetChartLarge(ng-controller='BulletCtrl',style='margin-top: 75px;')
+//- 			nvd3-bullet-chart(data='bulletDataRead', width='200', height='20', showXAxis="false", margin="{left:5,top:0,bottom:0,right:5}", showYAxis="false", tooltips="true", interactive="false")
+//- 		div(style='width:675px; margin-left:auto; margin-right:auto;margin-top:50px;')
+//- 			ul.list-item
+//- 				li.item
+//- 					div.widgetContent
+//- 						h3.widgetTitle Year 0
+//- 						div.line
+//- 							div.line-item.value {{parameter.value*2}}
+//- 							div.line-item.unit {{parameter.unit}}
+//- 				li.item
+//- 					div.widgetContent
+//- 						h3.widgetTitle Current
+//- 						div.line
+//- 							div.line-item.value {{parameter.value}}
+//- 							div.line-item.unit {{parameter.unit}}
+//- 				li.item
+//- 					div.widgetContent
+//- 						h3.widgetTitle Objective
+//- 						div.line
+//- 							div.line-item.value {{parameter.value/2}}
+//- 							div.line-item.unit {{parameter.unit}}
+//- 		div
+//- 			div.leftDiv
+//- 				div(style='margin-left:auto;margin-right:auto;width:150px;')
+//- 					h4 Add single reading
+//- 					p: input(placeholder='Paste values from Excel', type='number', ng-model='readingForm.value')
+//- 					p: input(placeholder='Date (optional)', type='date', ng-model='readingForm.date')
+//- 					p: button(ng-click='submitNewPointReading()') Add
+//- 			div.rightDiv
+//- 				div(style='margin-left:auto;margin-right:auto;width:412px;')
+//- 					h4 Add multiple readings
+//- 					p: textarea(placeholder='Values', ng-model='sentence',rows='10', cols='50')
+//- 					p: button(ng-click='submitNewPointMultipleReadings()') Add
+		//- div
+		//- 	h5 Parameter goals
+		//- 	p Title: {{parameter.title}}
+		//- 	p Value: {{parameter.value}}

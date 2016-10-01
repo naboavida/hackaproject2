@@ -1,0 +1,462 @@
+//- include leftMenu
+script
+	//mixpanel.track("Widget")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+
+include sidebarDashboard
+
+div.content-wrapper(ng-controller="DemoWidgetPointsController")
+
+	div(style="width:100%; background-color:#dddddb; display:inline-flex; justify-content:space-between; border-radius: 4px")
+		div
+			ul.breadcrumb(style="margin-top:0;margin-bottom: 0px;")
+				//- li
+				//- 	a(href='/data/{{pid}}')
+				//- 		i.entypo-book-open.fa-2x
+				//- //- li
+				//- //- 	a(href='/projects') Projects
+				//- //- li
+				//- //- 	a(href='/dashboard/{{pid}}') Dashboard
+				li
+					a(href='/dashboard/{{pid}}') Dashboard
+				li.active {{indicator.title}}
+				//-Widget {{wid}}
+				
+		//filter icons
+		div(style="display:flex; align-items: center; font-weight: 700; text-transform: uppercase; font-size:10px")
+			p(style="display:inline; background-color:transparent; border-radius: 4px; color: #555;padding: 5px 10px; margin-bottom:0") Filter by
+
+			a.tooltips(ng-click="filterBoxFunction('cal')", style="text-decoration: none; cursor: pointer; border-radius: 4px; color: #555;background-color:transparent; margin-right: 15px;")
+				span Calendar
+				i.icon-filter.fa(class="fa-calendar fa-2x {{ iconCal}}")
+
+			a.tooltips(ng-click="filterBoxFunction('place')", style="text-decoration: none; cursor: pointer; border-radius: 4px; color: #555;background-color:transparent, color:white; margin-right: 15px; ")
+				span Points
+				i.icon-filter.fa(class="fa-map-marker fa-2x {{ iconPoint}}")
+				
+			a.tooltips(ng-click="filterBoxFunction('cat')", style="text-decoration: none; cursor: pointer; border-radius: 4px; color: #555;background-color:transparent, color:white; margin-right: 15px; ")
+				span Category
+				i.icon-filter.fa(class="fa-tags fa-2x {{ iconCat}}")
+				
+			a.tooltips(ng-hide="userProfile.prodGM", ng-click="filterBoxFunction('prod')", style="text-decoration: none; cursor: pointer; border-radius: 4px; color: #555;background-color:transparent, color:white; margin-right: 15px; ")
+				span Products
+				i.icon-filter.fa(class="fa-shopping-cart fa-2x {{ iconProd}}")
+			
+			//a.tooltips(ng-click="clearFilter()", style="text-decoration: none; cursor: pointer; border-radius: 4px; color: #555;background-color:transparent, color:white; margin-right: 15px; ")
+				span Clear Filter
+				i.icon-filter.fa.fa-times.fa-lg(class="{{ iconDelFilter}}")
+
+		div(style="display:flex; align-items: center", ng-hide="userProfile.configGM")
+			a(ng-click="configBoxFunction()", style="padding: 5px 10px; text-decoration: none; cursor: pointer; background: white; border-radius: 4px; color: #555;margin-right:10px;  font-weight: 700; text-transform: uppercase; font-size:10px")
+				| Config  
+				i.fa(class="{{configBoxIcon}}")
+
+	//- pre {{prodFilter.state | json}}
+	//- pre {{prodFilters | json}}
+
+	div#powerwidgets.row
+		#myModalHistory.modal(ng-controller="ModalChartCtrl")
+			//- .modal-dialog.modal-sm
+			.modal-dialog.modal-lg
+				.modal-content.modal-content-caution
+					.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						h4.modal-title History
+					.modal-body
+						div(style='width:90%; height:300px; margin-left:auto; margin-right:auto;')
+							//- nvd3-discrete-bar-chart(data="exampleDataRanking",ng-model="exampleDataRanking",color="colorFunction()",width='600', height='300',showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+							nvd3-line-chart(data="exampleDataModal",id='example3', color="colorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()", useInteractiveGuideLine="true")
+					.modal-footer
+						a.btn.btn-default(href='#', target='_self', data-dismiss='modal') Close
+		script
+			$('#openBtn').click(function(){
+				$('#myModalHistory').modal({show:true});
+			});
+
+		
+		div.col-md-12.bootstrap-grid(class="{{configBoxClass}}")
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-white.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+					h2 Config heatmap visualization
+				div.inner-spacer.text-center
+					div.row
+						div.col-sm-6
+							form.orb-form
+								fieldset
+									section
+										label.label
+											| Use Local Extreme
+										label.toggle(style="float: left;")
+											input(type="checkbox", name="localextreme", ng-model="localextreme")
+											i
+						div.col-sm-3
+							form.orb-form
+								fieldset
+									section
+										label.label
+											| Heatmap Radius
+										label.select
+											select(ng-model="heatmapradius")
+												option(value="Tiny") Tiny
+												//- overriden default value for moja farmacja
+												//- option(value="Small", selected) Small (default)
+												option(value="Small") Small
+												option(value="Medium") Medium
+												option(value="Big") Big
+												option(value="Giant") Giant
+												option(value="Fixed0.005") Fixed 0.005
+												option(value="Fixed0.01") Fixed 0.01
+												option(value="Fixed0.1") Fixed 0.1
+												option(value="Fixed0.5") Fixed 0.5
+												option(value="Fixed1") Fixed 1
+												option(value="Average") Average
+											i
+					div.row
+						div.col-sm-12
+							button.pull-right.btn.btn-success(type="button", ng-click="applyConfig()", ng-disabled="{{applyConfigButtonDisabled}}") {{applyConfigButtonText}}
+
+		div.col-md-12.bootstrap-grid(class="{{filterBoxClass}}")
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-white.powerwidget-sortable(data-widget-editbutton='false',role='widget')(style="background:transparent;")
+				header(role='heading', style="padding-right: 10px;")
+					h2(style="float: right;")
+						small(style="color:#000000") {{filterCurrDateMessage}}
+					h2(style="float: right;")
+						small(style="color:#000000") {{filterCurrPointMessage}}
+					h2(style="float: right;")
+						small(style="color:#000000") {{filterCurrCategoryMessage}}
+					h2(style="float: right;")
+						small(style="color:#000000") {{filterCurrProductMessage}}
+						
+				div.inner-spacer.text-center(class="{{filterBoxClassInner}}")(style="background:transparent;")
+
+					div(class="{{filterBoxClassInnerCal}}")
+						div(style="position: relative; display: inline-block;")
+							form.orb-form.custom-filter
+
+								label.label.toggle Filter by Date
+									input(type="checkbox", name="checkbox-date-filter", ng-model="dateFilter.state", ng-change="procDateFilter(false, true)")
+									i(class="{{toggleClassDate}}")
+
+								fieldset
+									label.label Choose time period
+										select(ng-change="preDatesFilter(selectedPreDate)", ng-model="selectedPreDate")
+											option(value="lastSample") Last Sample
+											option(value="thisWeek") This Week
+											option(value="lastWeek") Last Week
+											option(value="last15") Last 15 days
+											option(value="thisMonth") This Month
+											option(value="lastMonth") Last Month
+											option(value="trimester") Trimester
+											option(value="quarter") Quarter
+											option(value="semester") Semester
+											option(value="thisYear") This Year
+											option(value="lastYear") Last Year
+
+								//p OR
+
+								fieldset
+									label.label Choose date range
+									label.label.input Start Date
+										input(type='date', placeholder="Start date", ng-model="dateFilter.startdate", ng-change="toggleDateFilter()")
+									label.label.input Finish Date
+										input(type='date', placeholder="Finish date", ng-model="dateFilter.finishdate", ng-change="toggleDateFilter()")
+							
+								div.date-warn(class="{{dateWarn}}")
+									i.fa.fa-exclamation-triangle.fa-lg
+									p {{dateMessage}}
+							
+							a.btnCloseFilter(ng-click="filterBoxFunction('cal')", style="text-decoration: none;")
+								i.icon-filter.fa.fa-times-circle.fa-lg
+
+							
+									
+
+					div(class="{{filterBoxClassInnerPlace}}")
+						div(style="position: relative; display: inline-block;")
+							form.orb-form.custom-filter
+								fieldset
+									label.label.toggle
+										| Filter by Point
+										input(type="checkbox", name="checkbox-points-filter", ng-model="pointFilter.state",ng-change="procPointsFilter(false)")
+										i(class="{{toggleClassPoints}}")
+
+									//label.checkbox.filterCheckbox
+										input(type="checkbox", name="checkbox-all", checked="{{check}}", ng-click="togglePointsFilterAll(pointsFilteredBox)")
+										i
+										| {{toggleAll}}
+
+									label.checkbox.filterCheckbox(ng-repeat="marker in markers")
+										input(type="checkbox", name="checkbox-{{marker.name}}", ng-model="pointsFilteredBox[marker.pointid]", ng-change="togglePointsFilter()")
+										i 
+										| {{marker.name}}
+							a.btnCloseFilter(ng-click="filterBoxFunction('place')", style="text-decoration: none;")
+								i.icon-filter.fa.fa-times-circle.fa-lg
+
+					div(class="{{filterBoxClassInnerCat}}")
+						div(style="position: relative; display: inline-block;")
+							form.orb-form.custom-filter
+								fieldset
+									label.label.toggle
+										|Filter by Category
+										input(type="checkbox", name="checkbox-category-filter", ng-model="catFilter.state", ng-change="procCategoryFilter(false)")
+										i(class="{{toggleClassCat}}")
+
+									//label.checkbox.filterCheckbox
+										input(type="checkbox", name="checkbox-all", checked="{{check}}", ng-click="togglePointsFilterAll(cat)")
+										i
+										| {{toggleAll}}
+
+									div(ng-hide="Objectsize(catFilters)==1")
+										label.checkbox.filterCheckbox(ng-repeat="(category, enabled) in catFilters")
+											input(type="checkbox", ng-model="catFilters[category]", ng-change="toggleCatFilter()")
+											i 
+											| {{category}}
+							a.btnCloseFilter(ng-click="filterBoxFunction('cat')", style="text-decoration: none;")
+								i.icon-filter.fa.fa-times-circle.fa-lg
+												
+					div(class="{{filterBoxClassInnerProd}}")
+						div(style="position: relative; display: inline-block;")
+							form.orb-form.custom-filter
+								fieldset
+									label.label.toggle
+										| Filter by Product
+										input(type="checkbox", name="checkbox-product-filter", ng-model="prodFilter.state", ng-change="procProductFilter(false)")
+										i(class="{{toggleClassProd}}")
+									div(ng-hide="Objectsize(prodFilters)==1")
+										label.checkbox.filterCheckbox(ng-repeat="(product, enabled) in prodFilters")
+											input(type="checkbox", ng-model="prodFilters[product]", ng-change="toggleProdFilter()")
+											i 
+											| {{product}}
+							a.btnCloseFilter(ng-click="filterBoxFunction('prod')", style="text-decoration: none;")
+								i.icon-filter.fa.fa-times-circle.fa-lg
+					//div.row
+						div.col-sm-12
+							button.btn.btn-success(style= "margin-top: 10px;")(type="button", ng-click="applyFilter(true)", ng-disabled="{{applyFilterButtonDisabled}}") {{applyFilterButtonText}}
+
+		//- pre {{filterSpec | json}}
+
+		div.col-md-6.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+						h2
+							| Map
+							small{{markers.length}} points
+					div.inner-spacer.nopadding
+						div
+							div#map
+								div.info.country(ng-show="hoveredGeometry != ''")
+									| {{hoveredGeometry}}
+								div.info.country2
+									label(style="color: #000000") 
+									| Heat Map       
+									input(type="checkbox", name="heat-map-check", ng-model="heatmapcheck") 
+
+								//- leaflet(center="madeira",height="550",markers="markers",layers="layers")
+								leaflet(center="madeira",height="550",markers="markers",layers="layers",geojson="geojson",controls="controls")
+								//- leaflet(center="madeira",height="550",markers="markers",layers="layers",controls="controls")
+		//- div.col-md-6.bootstrap-grid
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.powerwidget-as-portlet-green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header(role='heading')
+		//- 			h2 layers object content
+		//- 		div.inner-spacer.nopadding
+		//- 			pre(ng-bind="layers | json")
+
+		div.col-md-6.bootstrap-grid(ng-show="widget.title != 'NPS INDEX (HoN)'")
+			#point-image.powerwidget.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header(role='heading')
+						h2
+							| {{widget.title}}
+							small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+							small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") From {{dateFilter.startdate | date:"dd/MM/yyyy"}} to {{dateFilter.finishdate | date:"dd/MM/yyyy"}}
+							small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}	
+
+
+				div.inner-spacer
+					.row
+						.col-md-6.col-sm-6.col-xs-6
+							p(style="border-bottom: 1px solid #ccc; padding: 5px 0; margin-right: 15%;")
+								strong KPI STATISTICS
+							p
+								strong(style='margin-right:5px;') Number of Stores:
+								| {{nPoints}}
+							p(ng-if="parseFloat(sum/nPoints,2) >= 1000 || widget.title == 'Number of Customers'")
+								strong(style='margin-right:5px;') Average value:
+								| {{parseFloat(sum/nPoints,0)}} {{indicator.unit}}
+							p(ng-if="parseFloat(sum/nPoints,2) < 1000 && widget.title != 'Number of Customers'")
+								strong(style='margin-right:5px;') Average value:
+								| {{parseFloat(sum/nPoints,2)}} {{indicator.unit}}
+							p(ng-if="minimum >= 1000 || widget.title == 'Number of Customers'")
+								strong(style='margin-right:5px;') Minimum value:
+								| {{minimum | number: 0}} {{indicator.unit }}
+							p(ng-if="minimum < 1000 && widget.title != 'Number of Customers'")
+								strong(style='margin-right:5px;') Minimum value:
+								| {{minimum | number: 2}} {{indicator.unit }}
+							p(ng-if="maximum >= 1000 || widget.title == 'Number of Customers'")
+								strong(style='margin-right:5px;') Maximum value:
+								| {{maximum | number: 0}} {{indicator.unit}}
+							p(ng-if="maximum < 1000 && widget.title != 'Number of Customers'")
+								strong(style='margin-right:5px;') Maximum value:
+								| {{maximum | number: 2}} {{indicator.unit}}
+							p(ng-if="dataRankingTotal >= 1000 || widget.title == 'Number of Customers'")
+								strong(style='margin-right:5px;') Total value:
+								| {{dataRankingTotal | number: 0}} {{indicator.unit}}
+							p(ng-if="dataRankingTotal < 1000 && widget.title != 'Number of Customers'")
+								strong(style='margin-right:5px;') Total value:
+								| {{dataRankingTotal | number: 2}} {{indicator.unit}}
+
+							p(ng-if="standardError >= 1000 || widget.title == 'Number of Customers'")
+								strong(style='margin-right:5px;') Standard Error:
+								| {{standardError | number: 0}} {{indicator.unit}}
+							p(ng-if="standardError < 1000 && widget.title != 'Number of Customers'")
+								strong(style='margin-right:5px;') Standard Error:
+								| {{standardError | number: 2}} {{indicator.unit}}
+
+						.col-md-6.col-sm-6.col-xs-6
+							p(style="border-bottom: 1px solid #ccc; padding: 5px 0; margin-right: 15%;")
+								strong KPI INFORMATION
+							p(ng-show="widget.aggrmethod != 'average'")
+								strong(style='margin-right:5px;') Aggregation Method:
+								| Sum
+							p(ng-show="widget.aggrmethod == 'average'")
+								strong(style='margin-right:5px;') Aggregation Method:
+								| Average
+							p(ng-hide = "userProfile.annualGM")
+								strong(style='margin-right:5px;') Sampling Frequency:
+								| Daily
+							p(ng-show = "userProfile.annualGM")
+								strong(style='margin-right:5px;') Sampling Frequency:
+								| Annual
+							p(ng-hide="dateFilter.stateapplied || userProfile.annualGM")
+								strong(style='margin-right:5px;') Last Sample:
+								| {{widget.date | date:"dd/MM/yyyy"}}
+							p(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined")
+								strong(style='margin-right:5px;') Last Sample:
+								| {{dateFilter.finishdate | date:"dd/MM/yyyy"}}
+							p(ng-show = "userProfile.annualGM")
+								strong(style='margin-right:5px;') Last Date:
+								| {{widget.date | date : "yyyy"}}
+
+		div.col-md-6.bootstrap-grid(ng-show="categories.length && categories[0] != ''")
+			#point-image.powerwidget.powerwidget-as-portlet.yellow.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2(ng-show="widget.title != 'NPS INDEX (HoN)'") Category Ranking in {{widget.title}} ({{widget.unit}})
+					h2(ng-hide="widget.title != 'NPS INDEX (HoN)'") Happy or Not (responses)
+						small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") {{dateFilter.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.text-center
+					div(style='width:90%; height:{{200+(categories.length/2*25)}}px; margin-left:auto; margin-right:auto;')
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking",id='exampleRanka',ng-model="exampleDataRanking",color="colorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking", id='exampleRanka', color="colorFunction()", showXAxis="true",showYAxis="true",tooltips="true",interactive="true",objectequality="true")
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking", id='exampleRanka', color="colorFunction()", showXAxis="true",showYAxis="true",showValues="true", tooltips="true",interactive="true",objectequality="true", rotateLabels="17")
+						nvd3-multi-bar-chart(data="exampleDataRankingMulti", id='exampleRanka2', color="catColorFunction()", legendColor="catColorFunction()", yAxisTickFormat="yAxisTickFormatFunction()", margin="{left:70,top:100,bottom:50,right:30}", showXAxis="true",showYAxis="true",showValues="false", tooltips="true",interactive="true",objectequality="true", rotateLabels="0", showLegend="true", delay="100", showControls="false")
+
+
+		div.col-md-12.bootstrap-grid(ng-show="realProductsLength && products[0] != ''")
+			#point-image.powerwidget.powerwidget-as-portlet.yellow.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Product Ranking in {{widget.title}} ({{widget.unit}})
+						small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") {{dateFilter.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.text-center
+					//- div(style='width:90%; height:{{200+(products.length/2*25)}}px; margin-left:auto; margin-right:auto;')
+					div(style='width:90%; height:200px; margin-left:auto; margin-right:auto;')
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking",id='exampleRanka',ng-model="exampleDataRanking",color="colorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking", id='exampleRanka', color="colorFunction()", showXAxis="true",showYAxis="true",tooltips="true",interactive="true",objectequality="true")
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking", id='exampleRanka', color="colorFunction()", showXAxis="true",showYAxis="true",showValues="true", tooltips="true",interactive="true",objectequality="true", rotateLabels="17")
+						nvd3-multi-bar-chart(data="productsRankingMulti", id='exampleRankProducts', color="colorFunction20()", legendColor="colorFunction20()", yAxisTickFormat="yAxisTickFormatFunction()", margin="{left:70,top:100,bottom:50,right:30}", showXAxis="true",showYAxis="true",showValues="false", tooltips="true",interactive="true",objectequality="true", rotateLabels="-17", showLegend="true", delay="100", showControls="false")
+
+		//- script
+		//- 	alert( "ready!" );
+		//- 	console.log($('#exampleRanka2'));
+		div.col-md-12.bootstrap-grid(ng-show="widget.title != 'NPS INDEX (HoN)'")
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Point Ranking in {{widget.title}} ({{widget.unit}})
+						small(ng-hide="dateFilter.stateapplied || userProfile.annualGM") {{widget.date | date:"dd/MM/yyyy"}}
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") From {{dateFilter.startdate | date:"dd/MM/yyyy"}} to {{dateFilter.finishdate | date:"dd/MM/yyyy"}}
+						small(ng-show="userProfile.annualGM") {{widget.date | date: "yyyy"}}
+
+					//- .powerwidget-ctrls(role='menu')
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 			i.fa.fa-share-alt
+					//- 	a.button-icon.powerwidget-delete-btn(href='#',eat-click)
+					//- 		i.fa.fa-times-circle
+					//- 	a.button-icon.powerwidget-fullscreen-btn(href='#',eat-click)
+					//- 		i.fa.fa-arrows-alt
+					//- 	a.button-icon.powerwidget-toggle-btn(href='#',eat-click)
+					//- 		i.fa.fa-chevron-circle-up
+					span.powerwidget-loader
+				div.inner-spacer.text-center
+					div(style='width:90%; height:200px; margin-left:auto; margin-right:auto;')
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking",id='exampleRanka',ng-model="exampleDataRanking",color="colorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true")
+						//- nvd3-discrete-bar-chart(data="exampleDataRanking", id='exampleRanka', color="colorFunction()", showXAxis="true",showYAxis="true",tooltips="true",interactive="true",objectequality="true")
+						nvd3-discrete-bar-chart(data="exampleDataRanking", id='exampleRanka', margin="{left:70,top:20,bottom:50,right:30}", color="catColorFunction()", showXAxis="true",showYAxis="true", yAxisTickFormat="yAxisTickFormatFunction()",showValues="false", tooltips="true",interactive="true",objectequality="true", rotateLabels="17")
+
+
+		//- div.bootstrap-grid.col-md-12
+		//- 	#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+		//- 		header
+		//- 			h2 History in {{widget.title}}
+		//- 			.powerwidget-ctrls(role='menu')
+		//- 				script
+		//- 					function tryClickFun(){
+		//- 						console.log("wau");
+		//- 					}
+		//- 				//- //- a.button-icon.powerwidget-refresh-btn(ng-click='toggleChartClass()',href='#',target='_self')
+		//- 				//- //- 	i.fa.fa-expand.fa-lg
+		//- 				//- a.button-icon.powerwidget-delete-btn(data-toggle='modal', target='_self', href='#myModalHistory', onclick='tryClickFun()')
+		//- 				//- 	i.fa.fa-expand
+		//- 		div.inner-spacer.text-center
+		//- 			div(style='width:90%; height:300px; margin-left:auto; margin-right:auto;')
+		//- 				nvd3-line-chart(data="exampleData",id='example', color="catColorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()", useInteractiveGuideLine="true")
+		
+		div.bootstrap-grid.col-md-12
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')(class="{{hide}}")
+				header.relative
+					h2 History in {{widget.title}} ({{widget.unit}})
+						small(ng-show="dateFilter.stateapplied && userProfile.annualGM == undefined") From {{dateFilter.startdate | date:"dd/MM/yyyy"}} to {{dateFilter.finishdate | date:"dd/MM/yyyy"}}
+					div.absolute(style="right:0")
+						button.btn.btn-info.btn-xs(ng-click="changeGraphsOld('total')", ng-hide="widget.title == 'Stock Level'") Total
+						button.btn.btn-info.btn-xs(style="margin: 0 10px",ng-click="changeGraphsOld('stores')") Stores
+				div.inner-spacer.text-center
+					div(style='width:99%; height:{{375+(markers.length/15*25)}}px; margin-left:auto; margin-right:auto;')
+						nvd3-line-chart(data="exampleData", id="exampleIdFocus", color="catColorFunction()",legendColor="catColorFunction()",showXAxis="true",showYAxis="true",tooltips="true",interactive="true",xAxisTickFormat="xAxisTickFormatFunction()", yAxisTickFormat="yAxisTickFormatFunction()", useInteractiveGuideLine="true", margin="{left:80,top:50,bottom:40,right:50}", showLegend="true", forcey="[0]")
+				
+		div.bootstrap-grid.col-md-12(ng-show = "widget.title == 'NPS INDEX (HoN)'")
+			#point-image.powerwidget.powerwidget-as-portlet.green.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 History in Happy or Not (responses)
+					
+				div.inner-spacer.text-center
+					div(style='width:90%; height:{{375+(markers.length/15*25)}}px; margin-left:auto; margin-right:auto;')
+						nvd3-multi-bar-chart(data="stackedData", id="stackedExample", xAxisTickFormat="xAxisTickFormatFunction()", yAxisTickFormat="yAxisTickFormatFunction()", stacked="true", color="happyOrNotColorFunction()", legendColor="happyOrNotColorFunction()", margin="{left:70,top:100,bottom:70,right:30}", showXAxis="true",showYAxis="true",showValues="true", tooltips="true",interactive="true",objectequality="true", rotateLabels="-50", showLegend="true", delay="1000", showControls="true")

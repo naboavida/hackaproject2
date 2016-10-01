@@ -1,0 +1,165 @@
+extends layout
+
+block body
+  nav.main-header.clearfix(role='navigation', ng-controller='NavBarCtrl')
+    a.navbar-brand(href='/',style='margin:0;padding:0;width:250px;')
+      img(src='img/logo.png')
+    //- // Search
+    //- .site-search(class='{{buttonsClass}}')
+    //-   form#inline-search(action='#')
+    //-     i.fa.fa-search
+    //-     input(type='search', placeholder='Search')
+    // Navigation Itself
+    .navbar-content
+      // Sidebar Toggler
+      //- div.btn.btn-default.left-toggler(href='#', class='{{buttonsClass}}')
+      //-   i.fa.fa-bars
+      a.btn.btn-default(type='button',href='/projects', style='margin-left: 10px;')
+        i.entypo-home
+      a.btn.btn-default(type='button',href='/alerts')
+        i.entypo-megaphone
+
+      //- // Right Userbar Toggler
+      //- div.btn.btn-user.right-toggler.pull-right(class='{{buttonsClass}}')
+      //-   i.entypo-vcard
+      //-   span.logged-as.hidden-xs Logged as
+      //-   span.logged-as-name.hidden-xs João Santos
+      // Log out button
+      .btn-group.pull-right(class='{{buttonsClass}}')
+        a.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', style='border: 1px solid #eee; padding-top: 4px; padding-bottom: 4px;',analytics-on="click",analytics-event="Video Play")
+          i.fa.fa-user(style='margin-right: 5px')
+          | {{username}}
+        #user-dropdown.dropdown-menu
+          .dropdown-header
+            | {{organization}}
+          .dropdown-container(style='height:auto;')
+            ul#menu
+              li(style='padding:5px;')
+                a(href='/changePassword', target='_self')
+                  span
+                  | Change password
+              li(style='padding:5px;', ng-show='organization == "earthindicators"')
+                a(href='/stats', target='_self')
+                  span
+                  | Admin
+          .dropdown-footer
+            a.btn.btn-dark(href='/logout', target='_self') Log out
+      // Fullscreen Trigger
+      button#toggle-fullscreen.btn.btn-default.hidden-xs.pull-right(type='button')
+        i.entypo-popup
+      // Notifications Dropdown
+      //- .btn-group(class='{{buttonsClass}}')
+      //-   button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+      //-     i.entypo-megaphone
+      //-     span.new
+      //-     //- i.entypo-megaphone(style='margin-right: 10px;')
+      //-     //- span.new(style=' width:20px; height:20px;')
+      //-     //-   p(style='font-size: 10px;') +99
+      //-   #notification-dropdown.dropdown-menu
+      //-     .dropdown-header
+      //-       | Notifications
+      //-       span.badge.pull-right 8
+      //-     .dropdown-container
+      //-       .nano
+      //-         .nano-content
+      //-           ul.notification-dropdown
+      //-             li.bg-warning
+      //-               a(href='#')
+      //-                 span.notification-icon
+      //-                   i.fa.fa-bolt
+      //-                 h4 Humidity below 30%
+      //-                 p Location: Farming Field in Sintra
+      //-                 span.label.label-default
+      //-                   i.entypo-clock
+      //-                   |  2 mins ago
+      //-             li.bg-info
+      //-               a(href='#')
+      //-                 span.notification-icon
+      //-                   i.fa.fa-bolt
+      //-                 h4 Water Sampling
+      //-                 p Location: Water Fountain in Gerês
+      //-                 span.label.label-default
+      //-                   i.entypo-clock
+      //-                   |  15 mins ago
+      //-             li.bg-danger
+      //-               a(href='#')
+      //-                 span.notification-icon
+      //-                   i.fa.fa-android
+      //-                 h4 Fire Started
+      //-                 p Location: National Park
+      //-                 span.label.label-default
+      //-                   i.entypo-clock
+      //-                   |  1 hour ago
+      //-             li.bg-success
+      //-               a(href='#')
+      //-                 span.notification-icon
+      //-                   i.fa.fa-bolt
+      //-                 h4 Biomass Collection Completed
+      //-                 p Location: North Forest Park
+      //-                 span.label.label-default
+      //-                   i.entypo-clock
+      //-                   |  3 hours ago
+      //-     .dropdown-footer
+      //-       a.btn.btn-dark(href='/alerts') See All
+  div.main-wrap(ng-view)
+
+  script(src='/socket.io/socket.io.js')
+  //- script(src='js/lib/angular/angular.js')
+  script(src='bower_components/angular-route/angular-route.js')
+  script(src='bower_components/angular-socket-io/socket.js')
+
+  script(src='js/app.js')
+  script(src='js/services.js')
+  script(src='js/controllers.js')
+  script(src='js/filters.js')
+  script(src='js/directives.js')
+
+
+  script(type='text/javascript', src='js/vendors/jquery/jquery.min.js')
+  script(type='text/javascript', src='js/vendors/jquery/jquery-ui.min.js')
+
+  script(type='text/javascript', src='js/vendors/easing/jquery.easing.1.3.min.js')
+  script(type='text/javascript', src='js/vendors/easypie/jquery.easypiechart.min.js')
+
+  script(type='text/javascript', src='js/vendors/fullscreen/screenfull.min.js')
+
+  script(type='text/javascript', src='js/vendors/nanoscroller/jquery.nanoscroller.min.js')
+
+  script(type='text/javascript', src='js/vendors/sparkline/jquery.sparkline.min.js')
+  //
+    Horizontal Dropdown
+  script(type='text/javascript', src='js/vendors/horisontal/cbpHorizontalSlideOutMenu.js')
+  script(type='text/javascript', src='js/vendors/classie/classie.js')
+  //
+    PowerWidgets
+  script(type='text/javascript', src='js/vendors/powerwidgets/powerwidgets.min.js')
+  //
+    Morris Chart
+  script(type='text/javascript', src='js/vendors/raphael/raphael-min.js')
+  script(type='text/javascript', src='js/vendors/morris/morris.min.js')
+  //
+    FlotChart
+  script(type='text/javascript', src='js/vendors/flotchart/jquery.flot.min.js')
+  script(type='text/javascript', src='js/vendors/flotchart/jquery.flot.resize.min.js')
+  script(type='text/javascript', src='js/vendors/flotchart/jquery.flot.axislabels.js')
+  //
+    Chart.js
+  script(type='text/javascript', src='js/vendors/chartjs/chart.min.js')
+  //
+    Calendar
+  script(type='text/javascript', src='js/vendors/fullcalendar/fullcalendar.min.js')
+  script(type='text/javascript', src='js/vendors/fullcalendar/gcal.js')
+  //
+    Bootstrap
+  script(type='text/javascript', src='js/vendors/bootstrap/bootstrap.min.js')
+  //
+    Vector Map
+  script(type='text/javascript', src='js/vendors/vector-map/jquery.vmap.min.js')
+  script(type='text/javascript', src='js/vendors/vector-map/jquery.vmap.sampledata.js')
+  script(type='text/javascript', src='js/vendors/vector-map/jquery.vmap.world.js')
+  //
+    ToDo
+  script(type='text/javascript', src='js/vendors/todos/todos.js')
+  //
+    Main App
+  script(type='text/javascript', src='js/scripts.js')

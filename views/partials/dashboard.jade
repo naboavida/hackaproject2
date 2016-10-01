@@ -1,0 +1,128 @@
+//- include leftMenu
+script
+	//mixpanel.track("Dashboard")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+
+
+include sidebarDashboard
+
+div.content-wrapper
+	//- div.breadcrumb.clearfix
+	//- 	ul
+	//- 		li
+	//- 			a(href='/')
+	//- 				i.fa.fa-home.fa-2x
+	//- 		li
+	//- 			a(href='/projects') Projects
+	//- 		li.active Dashboard {{project.location}}
+	div.row(ng-controller="DemoController")
+		div.col-md-12.bootstrap-grid
+			div#map.total-map
+				div.info.country(ng-show="hoveredGeometry != ''")
+					| {{hoveredGeometry}}
+				leaflet(center="madeira",markers="markers",layers="layers",geojson="geojson", style="100%")
+				div.col-md-6.widgets-div
+					div.col-md-12.bootstrap-grid
+						div.row(ng-show='showDashboardHelp')
+							div.col-md-12
+								.callout.callout-info.callout-info-new-icon(style='background: white; margin-top: 0px;')
+									h4 Insert your data points
+									h6.lead(style='font-size: 16px;') You have no data to analyze. Please click on "Manage Data" (or click 
+										a(href='/data/{{pid}}') here
+										| ).
+					div.col-md-6(ng-repeat='widget in widgets', ng-show='widgets.length')
+						div.powerwidget.blue(data-widget-editbutton='false',id='{{widget.wid}', class="shadowed-powerwidget")
+							header
+								h2 {{widget.title}}
+
+								.powerwidget-ctrls(role='menu')
+									a.button-icon.powerwidget-edit-btn(ng-show="widget.hasAlarm")(href='/occurrences/{{pid}}')
+										i.entypo-megaphone(style='{{widget.newAlert}}',ng-click='{{widget.hideNewAlert}}')
+											span(ng-show="widget.alerts != 0")
+												| {{widget.alerts}}
+							.inner-spacer
+								.row
+									.col-md-10.col-sm-10.col-xs-10
+										h2(ng-if="widget.value >= 1000 || widget.title == 'NPS INDEX (HoN)' || widget.title == 'Number of Customers'") {{widget.value | number: 0}}
+											span
+												h5.inline  {{widget.unit}}
+										h2(ng-if="widget.value < 1000 && widget.title != 'NPS INDEX (HoN)'", ng-hide="widget.title == 'Number of Customers'") {{widget.value | number: 2}}
+											span
+												h5.inline  {{widget.unit}}
+												//h5(ng-hide="widget.title != 'NPS INDEX (HoN)'") index
+									.col-md-2.col-sm-2.col-xs-2
+										div.pull-right.pull-down
+											h2
+												a(href='/widget/{{pid}}/{{widget.wid}}')
+													i.fa.fa-folder-open
+								.row
+									.col-xs-6(ng-hide = "userProfile.annualGM")
+										p.notedate(ng-show="widget.aggrmethod == 'average'") Daily Average
+										p.notedate(ng-show="widget.aggrmethod != 'average'") Daily Total
+									.col-xs-6(ng-show = "userProfile.annualGM")
+										p.notedate(ng-show="widget.aggrmethod == 'average'") Annual Average
+										p.notedate(ng-show="widget.aggrmethod != 'average'") Annual Total
+									.col-xs-6
+										p.notedate.pull-right(ng-hide = "userProfile.annualGM") {{widget.date | date : "dd/MM/yyyy"}}
+										p.notedate.pull-right(ng-show = "userProfile.annualGM") {{widget.date | date : "yyyy"}}
+
+		//- div.col-md-6.bootstrap-grid(ng-show='showAddPointHelp')
+		//- 	//- div.powerwidget.powerwidget-as-portlet-white
+		//- 		header(role='heading')
+		//- 		div.inner-spacer(role='content')
+		//- 	div.row
+		//- 		//- div.col-md-12
+		//- 		//- 	.callout.callout-info.callout-info-new-icon(style='margin-top: 0px;')
+		//- 		//- 		h4 This project has {{markers.length}} data points.
+		//- 		//- 		h6.lead(style='font-size: 16px;') To start adding your data, please insert a point by pressing the button "Add Point" on the map (or click 
+		//- 		//- 			a(href='/addPoint/{{pid}}') here
+		//- 		//- 			| ).
+		//- 		div.col-md-12
+		//- 			.callout.callout-info.callout-info-new-icon(style='margin-top: 0px;')
+		//- 				h4 Empty dataset
+		//- 				h6.lead(style='font-size: 16px;') Please click on "Manage Data" to insert data for your analysis (or click 
+		//- 					a(href='/data/{{pid}}') here
+		//- 					| ).
+		//- div.col-md-6.bootstrap-grid
+		//- 	div.row(ng-show='showDashboardHelp')
+		//- 		div.col-md-12
+		//- 			.callout.callout-info.callout-info-new-icon(style='background: white; margin-top: 0px;')
+		//- 				h4 Insert your data points
+		//- 				h6.lead(style='font-size: 16px;') You have no data to analyze. Please click on "Manage Data" (or click 
+		//- 					a(href='/data/{{pid}}') here
+		//- 					| ).
+		div.col-md-12.bottom-widgets
+			
+			div.col-xs-6.bootstrap-grid(ng-repeat='widget in widgets', ng-show='widgets.length')
+				div.powerwidget.blue(data-widget-editbutton='false',id='{{widget.wid}')
+					header
+						h2 {{widget.title}}
+
+						.powerwidget-ctrls(role='menu')
+							a.button-icon.powerwidget-edit-btn(ng-show="widget.hasAlarm")(href='/alerts/{{pid}}/{{widget.title}}')
+								i.entypo-megaphone(style='{{widget.newAlert}}',ng-click='{{widget.hideNewAlert}}')
+									span(ng-show="widget.alerts != 0")
+										| {{widget.alerts}}
+					.inner-spacer
+						.row
+							.col-md-10.col-sm-10.col-xs-10
+								h2
+									| {{widget.value | number}}
+									small {{widget.unit}}
+							.col-md-2.col-sm-2.col-xs-2
+								div.pull-right.pull-down
+									h2
+										a(href='/widget/{{pid}}/{{widget.wid}}')
+											i.fa.fa-folder-open
+						.row
+							.col-xs-6
+								p.notedate(ng-show="widget.aggrmethod == 'average'") Daily Average
+								p.notedate(ng-show="widget.aggrmethod != 'average'") Daily Total
+							.col-xs-6
+								p.notedate.pull-right {{widget.date | date : "dd/MM/yyyy"}}

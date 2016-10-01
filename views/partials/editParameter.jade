@@ -1,0 +1,79 @@
+script
+	//mixpanel.track("Edit Parameter")
+include sidebarDashboard
+div.content-wrapper
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/data/{{pid}}') All points
+			li
+				a(href='/indicator/{{pid}}/{{iid}}') Indicator {{indicator.title}}
+			li.active Edit Parameter...
+	div#powerwidgets.row
+		div.col-md-12.bootstrap-grid(ng-controller="DemoController")
+			#point-image.powerwidget.powerwidget-as-portlet.orange.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Edit Parameter Data
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							section
+								label.label Title
+								label.input
+									i.icon-append.fa.fa-star-o
+									input#date2(placeholder='Title', name='title', ng-model='form.title')
+							section
+								label.label Start Value
+								label.input
+									i.icon-append.fa.fa-tachometer
+									input#phone(placeholder='Value', name='value', ng-model='form.value')
+							section
+								label.label Unit
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Unit', name='unit', ng-model='form.unit')
+							section
+								label.label Objective
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Objective', name='objective', ng-model='form.objective')
+							section
+								label.label Alarm
+								.margin-left
+									.inline-group
+										label.radio
+											input(type='radio', name='radio-inline', value='no', ng-model='form.alarm', checked)
+											i
+											| No
+										label.radio
+											input(type='radio', name='radio-inline', value='yes', ng-model='form.alarm')
+											i
+											| Yes
+								//- label.input
+								//- 	//- i.icon-append.fa.fa-crosshairs
+								//- 	i.icon-append.fa.fa-bell-o
+								//- 	input#serial(placeholder='Alarm', name='alarm', ng-model='form.alarm')
+							section(ng-show="form.alarm == 'yes'")
+								label.label Minimum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+							section(ng-show="form.alarm == 'yes'")
+								label.label Maximum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+							section.overflow-hidden(ng-show="form.alarm == 'no'")
+								label.label Minimum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Minimum Value', name='min', ng-model='form.min')
+							section.overflow-hidden(ng-show="form.alarm == 'no'")
+								label.label Maximum Value
+								label.input
+									i.icon-append.fa.fa-money
+									input#card(placeholder='Maximum Value', name='max', ng-model='form.max')
+							
+							button.btn.btn-default(ng-click='editParameter()') Edit Parameter
+							p(style='{{lastAddedMsgStyle}}margin-top:15px;') {{lastAddedMsg}}
+					p: a(href='{{backUrl}}') Back

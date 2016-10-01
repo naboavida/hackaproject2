@@ -1,0 +1,89 @@
+include partials/leftMenu
+script
+	//mixpanel.track("Add Project")
+div.content-wrapper.no-left-navigation
+	div.breadcrumb.clearfix
+		ul
+			li
+				a(href='/')
+					i.fa.fa-home.fa-2x
+			li
+				a(href='/projects') Projects
+			li.active Add Project...
+	//- div.page-header
+	//- 	h1 Indicator
+	//- 		small {{indicator.title}}
+	div#powerwidgets.row
+		div.col-md-8.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+						h2 Input Project Information
+				div.inner-spacer
+					form#input-masking.orb-form(class='{{addForm}}')
+						fieldset
+							section
+								label.label Title
+								label.input
+									i.icon-append.fa.fa-star-o
+									input#date2(placeholder='Project Name', name='title', ng-model='form.title')
+							section
+								label.label Location
+								label.input
+									i.icon-append.fa.fa-crosshairs
+									input#phone(placeholder='Write a location and country. E.g. Lisbon, Portugal', name='location', type='text', ng-model='form.location')
+								div.note
+									button(type="button", class="btn btn-default btn-xs", ng-click='checkLocation()', style='margin-right: 5px;') Confirm location
+									strong(style='{{locationFindStatusStyle}} margin-top:15px;') {{locationFindStatus}}
+									|  {{locationFindCoordinates}}
+							//-section
+								label.label Area (ha)
+								label.input
+									i.icon-append.fa.fa-cube
+									input#card(placeholder='Input the number of hectares only (no units needed)', name='area', type='number', ng-model='form.area')
+							//- fieldset
+							//- 	label.label Select date range
+							//- 	.row
+							//- 		section.col.col-6
+							//- 			label.input
+							//- 				i.icon-append.fa.fa-calendar
+							//- 				input#start.hasDatepicker(type='text', name='start', placeholder='Start date')
+							//- 		section.col.col-6
+							//- 			label.input
+							//- 				i.icon-append.fa.fa-calendar
+							//- 				input#finish.hasDatepicker(type='text', name='finish', placeholder='Expected finish date')
+
+							//- section
+							//- 	label.label Picture Upload
+							//- 	label.input.input-file(for='file')
+							//- 		.button
+							//- 			input#file(placeholder='Upload a picture of your project', type='file', onchange='this.parentNode.nextSibling.value = this.value')
+							//- 			| Browse
+							//- 		input(type='text', readonly='')
+							
+							button.btn.btn-default(ng-click='submitNewProject()') Add Project
+							p(style='{{newProjectMsgStyle}} margin-top:15px;') {{newProjectMsg}}
+						a(href='/projects') Back
+		div.col-md-4.bootstrap-grid
+			#point-image.powerwidget.powerwidget-as-portlet.blue.powerwidget-sortable(data-widget-editbutton='false',role='widget')
+				header
+					h2 Existing Projects
+				div.inner-spacer
+					div(style='margin-top:25px')
+						div(ng-repeat='project in projects')
+							p {{project.title}} {{project.location}} 
+
+//- {{project.area}}  IR retirei da linha acima
+
+//- div.itemBox(style='width:400px;margin-left:auto;margin-right:auto;margin-top:100px;')
+//- 	h1 Add Project
+//- 	div(ng-controller="ProjectsCtrl")
+//- 		div(ng-repeat='project in projects')
+//- 			p {{project.title}} {{project.location}} {{project.area}}
+//- 		//- form(action='/addProject', method='post')
+//- 		div
+//- 			p: input(placeholder='Project Name', name='title', ng-model='form.title')
+//- 			p: input(placeholder='Location', name='location', ng-model='form.location')
+//- 			p: input(placeholder='Area', name='area', ng-model='form.area')
+//- 			p: button(ng-click='submitNewProject()') Add
+//- 	p: a(href='/projects') Back
+//- 	p: a(href='/') Home

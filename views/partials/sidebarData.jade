@@ -1,0 +1,59 @@
+.responsive-admin-menu
+	.tabs-offcanvas
+		.main-info(style='border-bottom: 1px solid rgba(255,255,255,.1);')
+			.user-img
+				//-div(ng-show="project.title != 'General Mills'")
+					img(src='images/project{{pid % 9}}.png', alt='Project Picture')
+				
+				//- div(ng-show="userProfile.logoGM")
+				//- 	img( src='images/generalmills-bw.jpg', alt='Project Picture')
+				//- div(ng-hide="userProfile.logoGM")
+				//- 	img( src='{{ (userProfile.logoMF && "images/moja2.png" || !userProfile.logoMF && "images/project5.png") }}', alt='Project Picture')
+				div
+					img(src='images/{{project.image || project.image_org || "project5.png"}}', alt='Project Picture')
+						
+			h1(ng-cloak, style='margin-top:20px;')
+				| {{project.title}}
+				small(style='margin-top:15px;') {{project.location}}
+				//- small(style='margin-top:10px;') {{project.area}} ha
+	ul#menu(ng-controller="MenuCtrl")
+		li(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'", ng-hide='userProfile.mapGM')
+			a(href='/map/{{pid}}', title='Map')
+				i.entypo-map
+				span(ng-hide='userProfile.warMF')  Map
+				span(ng-show='userProfile.warMF')  War Room
+				span(class = "powerwidget-loader", style = "display: inline; float: right; margin-right: 5px margin-top: 3px;", ng-show="loading")
+
+		li(ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'", ng-hide='userProfile.occurrencesGM')
+			a(href="/occurrences/{{pid}}", title="Occurrences")
+				i.entypo-list
+				span(style = "margin-right: 5px") Occurrences
+				span(ng-show = "showOpenOcc", style = "color: red") ({{openOcc}})
+				span(class = "powerwidget-loader", style = "display: inline; float: right; margin-right: 2px; margin-top: 3px;", ng-show="occLoading")
+
+		li
+			a(href='/dashboard/{{pid}}', title='Dashboard')
+				i.entypo-layout
+				span  Dashboard
+		li(ng-show="project.name.indexOf('ISA') != 0", ng-hide='userProfile.compareMF')
+			a(href='/compare/{{pid}}', title='Compare')
+				i.entypo-docs
+				span  Compare
+		li(ng-hide='userProfile.dataMF')
+			a.active(href='/data/{{pid}}', title='Manage Data')
+				i.entypo-book-open
+				span  Manage Data
+			//- ul.accordion(style="display: block;", ng-show="project.name == 'earthindicators' || project.name == 'Inodev' || project.name == 'MojaFarmacja'")
+			ul.accordion(style="display: block;")
+				li(ng-show="project.name.indexOf('ISA') != 0", ng-hide='userProfile.olapCubeMF || userProfile.olapGM')
+					a(href="/olap/{{pid}}", title="OLAP Cube")
+						i.entypo-list
+						span  OLAP Cube
+		li(ng-show="project.name.indexOf('ISA') != 0", ng-hide='userProfile.configGM')
+			a(href='/config/{{pid}}', title='Settings')
+				i.entypo-cog
+				span Settings
+		li(ng-show="userProfile.newdashboard")
+			a(href='/newdash/{{pid}}', title='newdash')
+				i.entypo-layout
+				span  newdash

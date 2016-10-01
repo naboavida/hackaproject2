@@ -1,0 +1,1133 @@
+//- include leftMenu
+script
+	//mixpanel.track("Widget")
+style
+	.callout-info:before {
+		font-size: 2.5em;
+		font-family: 'FontAwesome';
+		content: "\f129";
+	}
+	.noBefore::before{ content: ''; }
+	.modal-content{ background-color: #82b964; }
+	.modal-content-caution { background-color: #82b964; background-color: #d24d33; }
+	.modal-header{ color: #fff; }
+	.modal-body{ background-color: #fff; }
+	.modal-footer{ background-color: #fff; margin-top: 0px; }
+
+include sidebarDashboard
+
+div.content-wrapper.create-report
+	div.row
+		include modals/configureLevels
+
+		div.col-md-12
+			div.page-header.relative
+				div.row(ng-show="userReport.label.enabled")
+					div.col-md-5
+						h1.d-inline-block(ng-show="!stateReport",ng-click="userReport.label.enabled = false", data-tooltip="Rename") {{userReport.label.text}}
+						h1.d-inline-block(ng-show="stateReport") {{userReport.label.text}} 
+			
+				div.row(ng-show="!userReport.label.enabled")
+					div.col-md-4
+						form.orb-form
+							fieldset
+								section
+									
+									//-label.input(ng-show="!userReport.label.enabled")
+										i.icon-append.fa.fa-check.pointer(ng-click="userReport.label.enabled = true ")
+										input(type="text", placeholder="Untitled Report", ng-model="userReport.label.text")
+
+									label.input.input-file(ng-show="!userReport.label.enabled")
+										div.button(ng-show="userReport.label.text")
+											input(type='button', name='file', ng-click="userReport.label.enabled = true ")
+											| Save
+										input(type="text", placeholder="Untitled Report", ng-model="userReport.label.text") 
+
+				div.absolute(style="right:0; top: 0px", ng-show="stateReport")
+					div.btn-group.btn-group-sm
+						button.btn.btn-default(type="button")
+							i.fa.fa-pencil.fa-lg(data-tooltip="Edit Report", ng-click="editReport()")
+						div.btn-group.btn-group-sm(ng-if="userProfile.admin")
+							button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown")
+								i.fa.fa-ellipsis-v.fa-lg(data-tooltip="Options")
+							ul.dropdown-menu.dropdown-menu-right(style="min-width: auto")
+								li
+									a(href="#")
+										i.fa.fa-clone
+										|  Copy
+								li
+									a(href="#")
+										i.fa.fa-share
+										|  Export
+								li
+									a(href="#")
+										i.fa.fa-print
+										|  Print
+								li
+									a(href="#")
+										i.fa.fa-pencil
+										|  Edit
+								li
+									a(href="#")
+										i.fa.fa-envelope-o
+										|  E-mail
+								li
+									a(href="#", ng-click="deleteReport()")
+										i.fa.fa-times-circle
+										|  Delete
+						
+
+				div.absolute(style="right:0; top: 5px", ng-show="!stateReport && userReport.charts.length > 0 && userReport.label.enabled")
+					div.btn-group.btn-group-sm
+						//-button.btn.btn-default(type="button", ng-init="btnDelReport = true", ng-show="btnDelReport", ng-click="btnDelReport = false")
+							span.label Delete
+						//-button.btn.btn-danger(type="button", ng-show="!btnDelReport", ng-click="btnDelReport = true; cancelChart(tempChart)")
+							span.label Confirm Delete
+						button.btn.btn-success(type="button", ng-click="btnDelReport = true; saveReport()")
+							span.label Save Report
+							
+					
+
+	//-div.row(ng-show="!stateReport")
+		div.col-md-4
+			form.orb-form
+				fieldset
+					section
+						//-label.label 
+							h5 Report Name
+						label.input
+							input(type="text", placeholder="Report Name", ng-model="userReport.label")
+	//- user charts
+	div.row(ng-show="userReport.charts.length > 0")
+		div.col-md-12	
+			//-div.page-header
+				h3 Visualizations
+			div.row
+				div.col-md-12(ng-repeat="chart in userReport.charts track by $index")
+					div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable				
+						div.inner-spacer(role="content")
+
+							div.row(ng-show="stateReport == false")
+								div.col-md-12
+									div.pull-right
+										div.btn-group.btn-group-sm
+											button.btn.btn-default(type="button", data-tooltip="Refresh", ng-click="refreshChart(chart)")
+												i.fa.fa-refresh.fa-lg
+											button.btn.btn-default(type="button", data-tooltip="Edit", ng-click="editChart(chart)")
+												i.fa.fa-pencil.fa-lg
+											div.btn-group.btn-group-sm(ng-if="userProfile.admin")
+												button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown", data-tooltip="Options")
+													i.fa.fa-ellipsis-v.fa-lg
+												ul.dropdown-menu.dropdown-menu-right(style="min-width: auto")
+													li
+														a(href="#")
+															i.fa.fa-clone
+															|  Copy
+													li
+														a(href="#")
+															i.fa.fa-share
+															|  Export
+													li
+														a(href="#")
+															i.fa.fa-print
+															|  Print
+													li
+														a(href="#")
+															i.fa.fa-pencil
+															|  Edit
+													li
+														a(href="#")
+															i.fa.fa-envelope-o
+															|  E-mail
+													//-li
+														a(href="#", ng-click="deleteChart(chart)")
+															i.fa.fa-times-circle
+															|  Delete
+
+							div.row
+								div.col-md-12
+									
+									div(ng-show="chart.extra.category == 'chart'")
+										highchart(id="previewChart", config="chart.config")
+										div(ng-show="chart.extra.note.enabled || chart.extra.note.text") 
+											h5 Notes
+											p {{chart.extra.note.text}}
+
+									div.text-center(ng-show="chart.extra.category == 'table'")
+										h5 {{chart.config.title.text}}
+										p {{chart.config.options.subtitle.text}}
+
+					
+										div.relative(style="overflow-x:scroll")
+					
+											table( class="table table-striped table-hover margin-0px")
+												thead
+													tr
+														th
+															table 
+																tr 
+																	td 
+																		small {{chart.extra.xAxis}} 
+																		i.fa.fa-arrow-right
+																tr 
+																	td 
+																		i.fa.fa-arrow-down 
+																		small {{chart.extra.series}} 
+
+														th.pointer(ng-repeat="(key, value) in chart.table.data[0] track by $index", ng-if="key != 'name'", ng-class="{'sorting_asc': tempSort == key, 'sorting': tempSort != key}", ng-click="setSort(key); chart.table.sort = key") {{key | date:"d/M"}}
+												tbody
+													tr(ng-repeat="row in chart.table.data | orderBy: tempSort")
+														td
+															h5 {{row.name}}
+														td(ng-repeat="(key, value) in row", ng-if="key !='name'") {{ value | number:2}}
+										div(ng-show="chart.extra.note.enabled || chart.extra.note.text") 
+											h5 Notes
+											p {{chart.extra.note.text}}
+	
+	//- filter
+	div.row.report-filter(ng-show="!stateReport")
+		div.col-md-12
+			div.page-header
+				h3 Create Visualisation
+
+		div.col-md-12
+		
+			//- filter buttons
+			div.row(ng-show="!stateReport")
+
+				div.col-md-10
+					div.btn-group.btn-group-sm.filter-buttons
+					
+						button.btn.btn-default(type='button', ng-repeat="btn in filterOptions", ng-class="{'active': btnSelected == btn.label}", ng-click="getButton(btn)", ng-if="btn.label == 'KPIs' ")
+							i.fa.fa-tachometer
+							|  {{ btn.label }} 
+							//-small  ({{btn.data.length}}) 
+							span.caret
+
+						button.btn.btn-default(type='button', ng-repeat="btn in filterOptions", ng-class="{'active': btnSelected == btn.label}", ng-click="getButton(btn)", ng-if="btn.label == 'stores'")
+							i.fa.fa-map-marker
+							|  {{btn.label}} 
+							//-small  ({{btn.data.length}}) 
+							span.caret
+
+						//-button.btn.btn-default.btn-sm(type='button', ng-repeat="btn in filterOptions", ng-class="{'active': btnSelected == btn.label}", ng-click="getButton(btn)", ng-show="stateFilter", ng-if="btn.label == 'KPIs' || btn.label == 'stores'")
+							i(ng-class="btn.icon")
+							//-|  {{btn.label == "KPIs" ? selectecKpi : btn.label}} 
+							|  {{btn.label}}
+							small  ({{btn.data.length}}) 
+							span.caret
+						button.btn.btn-default(type='button', ng-hide="emptyDatalevels", ng-class="{'active': btnSelected == 'datalevels'}", ng-click="getButton({'label': 'datalevels'})")
+							i.fa.fa-tags
+							|  Data Levels
+							small 
+							span.caret
+
+						button.btn.btn-default(type='button', ng-class="{'active': btnSelected == 'date'}", ng-click="datepicker = !datepicker; btnSelected = 'date'; stateFilter = false")
+							i(ng-class="dates.icon")
+							//-|  {{dates.state == false ? 'Date' : dates.startDate == dates.endDate ? (dates.startDate | date:"d/M/yyyy") : (dates.startDate | date:"d/M/yyyy") + ' - ' + (dates.endDate | date:"d/M/yyyy") }} 
+							|  Dates
+							span.caret
+
+				div.col-md-2(ng-show="!stateFilter")
+					div.pull-right
+						div.btn-group.btn-group-sm
+							//-button.btn.btn-danger(type="button") 
+								i.fa.fa-times
+								span.label Cancel 
+							button.btn.btn-success(type="button", ng-click="saveStates(true)") 
+								i.fa.fa-check
+								span.label Save Filter
+
+			//- filter options
+			div.row.filter-options(style="margin-top:10px")
+				div.col-md-12
+					div.powerwidget(ng-show="btnSelected && !stateFilter")
+						div.inner-spacer
+							
+							//- indicators
+							div(ng-show="btnSelected == 'KPIs'", ng-repeat="obj in filterOptions", ng-if="obj.label == 'KPIs'")
+								//-div.row
+									div.col-md-6
+										form.orb-form
+											fielset
+												section
+													label.input
+														i.icon-append.fa.fa-search
+														input(type='text', placeholder='Search', ng-model='search.$')
+														//-input(type='text', placeholder='Search by name, manager, adress...', ng-model='search.$', ng-if="obj.name == 'stores'")
+								div.row
+									div.col-md-12
+										form.orb-form
+											fieldset
+												section
+													div.row
+														div.col-md-2(ng-repeat=" objectOption in obj.data | filter:search | orderBy: 'label' track by $index")
+															label.radio
+																input(type='radio', ng-model="selectedIndicator.index", ng-value="objectOption.id", ng-init=" objectOption.id == selectedIndicator.index ? objectOption.state = true : objectOption.state = false" , ng-change="checkIndicator()")
+																i
+																| {{objectOption.label}}
+																small(ng-show="objectOption.sublabel != undefined && objectOption.sublabel != null && objectOption.sublabel != ''")  ({{objectOption.sublabel}})
+								
+							//- points
+							div(ng-show="btnSelected == 'stores'", ng-repeat="obj in filterOptions", ng-if="obj.label == 'stores'")
+								div.row
+									div.col-md-6
+										form.orb-form
+											fielset
+												section
+													label.input
+														i.icon-append.fa.fa-search
+														input(type='text', placeholder='Search', ng-model='search.$')
+														//-input(type='text', placeholder='Search by name, manager, adress...', ng-model='search.$', ng-if="obj.name == 'stores'")
+								div.row
+									div.col-md-6
+										div.row
+											div.col-md-5
+												div.btn-group.btn-group-xs
+													button.btn.btn-primary(ng-click="checkAll(obj.data)")
+														i.fa.fa-check
+														span.label Check All
+													button.btn.btn-primary(ng-click="uncheckAll(obj.data)")
+														i.fa.fa-times
+														span.label Uncheck All 
+								
+											div.col-md-4	
+												div.orb-form
+													label.toggle
+														input(type='checkbox', ng-init="displayPointAttributes = false", ng-model="displayPointAttributes")
+														| Show attributes
+														i
+								div.row
+									div.col-md-12
+										form.orb-form
+											fieldset
+												section
+													div.row
+														div.col.col-4(ng-repeat=" objectOption in obj.data | filter:search | orderBy: 'label' track by $index", ng-show="!objectOption.hide")
+															label.checkbox(ng-style="{'margin-bottom': (displayPointAttributes ? '18px' : '0px')}")
+																input(type='checkbox', name='checkbox-inline', ng-model="objectOption.state", ng-change="metaLevelChange(objectOption.state, objectOption.label, item.name)")
+																i
+																| {{objectOption.label}}
+																small(ng-show="objectOption.attributes && displayPointAttributes")
+																	span
+																		p(ng-repeat="(key, attribute) in objectOption.attributes", style="line-height: 16px;") {{key}}: {{attribute}}
+													
+							//- levels
+							div(ng-show="btnSelected == 'datalevels'")
+								div.row
+									div.col-md-6
+										form.orb-form
+											fielset
+												section
+													label.input
+														i.icon-append.fa.fa-search
+														input(type='text', placeholder='Search', ng-model='search.$')
+								div.row
+									div.col-md-6
+										div.btn-group.btn-group-xs
+											button.btn.btn-primary(ng-click="checkAllDataLevels()")
+												i.fa.fa-check
+												span.label Check All
+											button.btn.btn-primary(ng-click="uncheckAllDataLevels()")
+												i.fa.fa-times
+												span.label Uncheck All 
+										div.btn-group.btn-group-xs.no-left-navigation
+											button.btn.btn-primary
+												a(data-toggle='modal', target='_self', href='#myModalConfigureLevels')
+													span.label Configure Levels
+								div.row
+									div.col-md-12
+										form.orb-form 
+											fieldset
+												section
+													div.row
+														//- div.col(ng-repeat="level in filterOptions | dataLevelsFilter:this", ng-class="(filterOptions.length-2 > 2) ? ( (filterOptions.length-2 > 3) ? 'col-md-3' : 'col-md-4') : 'col-md-6' ")
+														div.col(ng-repeat="level in filterOptions | dataLevelsFilter:this", ng-class="dataLevelsClass")
+															label.label {{level.label}}
+															label.checkbox(ng-repeat="item in level.data| filter:search | orderBy: 'label' track by $index", ng-show="!item.hide && item.label != ''")
+																input(type="checkbox", name="checkbox-inline", ng-init="item.state = true", ng-model="item.state", ng-change="metaLevelChange(item.state, item.label, level.label)")
+																i
+																| {{item.label}}
+							
+							//- date
+							div(ng-show="btnSelected == 'date'")
+							
+								div.row
+									div.col-md-8.text-center
+										div.row
+											span.label.bg-purple Data avaiable between {{readingsDates.min | date:"dd/MM/yyyy" }} and {{readingsDates.max | date:"dd/MM/yyyy"}}
+
+										div.row
+
+												div(ng-show="dateWarn")
+													span.label.label-warning 
+														i.fa.fa-exclamation-triangle
+														|  {{dateWarnMessage}} {{widget.date | date:"dd/MM/yyyy"}}
+										div.row
+											
+
+											div.inner-spacer.d-inline-block.text-center
+												p.label.label-primary Start Date
+												//-div(date-picker="dt1", view="date", min-view="date")
+												div.inner-spacer.custom-dp-theme
+													datepicker.well.well-sm(ng-model='dt1', min-date='readingsDates.min', max-date='readingsDates.max', show-weeks='false', starting-day='1')
+
+												
+												form.orb-form
+													fieldset
+														section
+															label.input
+																input.text-center(type="text", datepicker-popup="dd/MM/yyyy", ng-model="dt1")
+										
+											div.inner-spacer.d-inline-block.text-center
+												p.label.label-primary End Date
+												//-div(date-picker="dt2", view="date", min-view="date")
+												div.inner-spacer.custom-dp-theme
+													datepicker.well.well-sm(ng-model='dt2', min-date='readingsDates.min', max-date='readingsDates.max', show-weeks='false', starting-day='1')
+
+												form.orb-form
+													fieldset
+														section
+															label.input
+																input.text-center(type="text", datepicker-popup="dd/MM/yyyy", ng-model="dt2")
+
+									div.col-md-4.text-center.inner-spacer
+
+										p.label.label-primary Choose Time Period 
+										div.btn-group.btn-group-sm(style="margin-top:10px")
+											button.btn.btn-default(type="button", ng-click="togglePreDates('today')") Today
+											button.btn.btn-default(type="button", ng-click="togglePreDates('yesterday')") Yesterday
+											button.btn.btn-default(type="button", ng-click="togglePreDates('thisWeek')") This Week
+											button.btn.btn-default(type="button", ng-click="togglePreDates('lastWeek')") Last Week
+											button.btn.btn-default(type="button", ng-click="togglePreDates('last15')") Last 15 days
+											button.btn.btn-default(type="button", ng-click="togglePreDates('thisMonth')") This Month
+											button.btn.btn-default(type="button", ng-click="togglePreDates('lastMonth')") Last Month
+											button.btn.btn-default(type="button", ng-click="togglePreDates('trimester')") Trimester
+											button.btn.btn-default(type="button", ng-click="togglePreDates('quarter')") Quarter
+											button.btn.btn-default(type="button", ng-click="togglePreDates('semester')") Semester
+											button.btn.btn-default(type="button", ng-click="togglePreDates('thisYear')") This Year
+											button.btn.btn-default(type="button", ng-click="togglePreDates('lastYear')") Last Year
+								//-div.display-block
+									div.btn-group.btn-group-sm
+										button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown") Choose Period 
+											span.caret
+										ul.dropdown-menu(style="min-width: auto")
+											li
+												a(ng-click="togglePreDates('today')") Today
+											li
+												a(ng-click="togglePreDates('yesterday')") Yesterday
+											li 
+												a(ng-click="togglePreDates('thisWeek')") This Week
+											li
+												a(ng-click="togglePreDates('lastWeek')") Last Week
+											li
+												a(ng-click="togglePreDates('last15')") Last 15 days
+											li
+												a(ng-click="togglePreDates('thisMonth')") This Month
+											li
+												a(ng-click="togglePreDates('lastMonth')") Last Month
+											li
+												a(ng-click="togglePreDates('trimester')") Trimester
+											li
+												a(ng-click="togglePreDates('quarter')") Quarter
+											li
+												a(ng-click="togglePreDates('semester')") Semester
+											li
+												a(ng-click="togglePreDates('thisYear')") This Year
+											li
+												a(ng-click="togglePreDates('lastYear')") Last Year
+								
+							div
+								div.pull-right
+									button.btn.btn-success.btn-sm(type="button", ng-click="saveStates(false)")
+										i.fa.fa-check
+										spab.label Ok	
+
+					//-div.row(ng-show="!stateFilter")
+						div.col-md-12
+							div.pull-right
+								div.btn-group.btn-group-sm
+									button.btn.btn-danger(type="button") 
+										i.fa.fa-times
+										span.label Cancel 
+									button.btn.btn-success(type="button", ng-click="saveStates(true)") 
+										i.fa.fa-check
+										span.label Save Filter
+
+			//- filter summary
+			//-div.filter-summary(ng-show="stateFilter")
+			div.filter-summary
+				div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable
+					//-header		
+					div.inner-spacer
+						div.row
+							div.col-md-12
+								div
+									p
+										strong(style="text-transform:capitalize") Date : 
+										span.label.label-info {{dates.startDate.getTime() == dates.endDate.getTime() ? (dates.startDate | date:"d/M/yyyy") : (dates.startDate | date:"d/M/yyyy") + ' - ' + (dates.endDate | date:"d/M/yyyy")}}
+									
+									p(ng-repeat="obj in filterOptions | orderBy: obj.label track by $index", ng-if="obj.label != 'dates'")
+										strong(style="text-transform:capitalize") {{obj.label}}
+											small  ({{ counter.length}}/{{obj.data.length}})
+											| : 
+										span.label.label-info(style="white-space: normal; margin-bottom:5px; margin-top:5px", ng-repeat="item in counter = (obj.data | filter:{state:true})", ng-if="item.state == true && obj.data.length == counter.length && $index == 0") All
+										span.label.label-info(style="white-space: normal; margin-bottom:5px; margin-top:5px", ng-repeat="item in counter = (obj.data | filter:{state:true})", ng-if="item.state == true && obj.data.length != counter.length") {{item.label}} 
+			div.row 
+				div.col-md-12(ng-show="!stateFilter")
+					div.pull-right
+						div.btn-group.btn-group-sm
+							//-button.btn.btn-danger(type="button") 
+								i.fa.fa-times
+								span.label Cancel 
+							button.btn.btn-success(type="button", ng-click="saveStates(true)") 
+								i.fa.fa-check
+								span.label Save Filter
+
+	//- create chart
+	div.row.create-visualization(ng-show="stateFilter && !stateReport")
+		//-div.col-md-12
+			div.page-header
+				h3 Create Visualization
+
+		//- chart type
+		div.col-md-12(ng-show="!typeChart")
+			//-div.visualization-icons.text-center
+			div.inline-group.text-center.icons
+				div.d-inline-block.text-center
+					a(ng-click="typeChart = 'chart'; stateReport = false; loadPreCharts()")
+						i.glyphicon.glyphicon-signal.fa-3x
+						small.display-block Chart
+				div.d-inline-block.text-center
+					a(ng-click="typeChart = 'table'; stateReport = false; loadPreCharts()")
+						i.glyphicon.glyphicon-th.fa-3x
+						small.display-block Table
+				//-div.d-inline-block.text-center
+					a(ng-click="typeChart = 'heatmap'; stateReport = false")
+						i.glyphicon.glyphicon-fire.fa-3x
+						small.display-block Heat Map
+
+
+		//- new and templates 
+		div.col-md-12(ng-show="typeChart && !configChart")
+			div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+				header
+					h2 Select a template
+					div.powerwidget-ctrls
+						a.button-icon.powerwidget-edit-btn 
+							span.label.label-primary Selected Charts: {{selectedCharts}}
+
+								
+				div.inner-spacer
+
+					div.row
+						div.col-md-12(ng-repeat="chart in preCharts", ng-if="chart.extra.category == 'new'")
+							
+							//-div.big-icons-buttons
+								a.btn.btn-default
+									i.fa.fa-bar-chart
+									| {{chart.config.title.text}}
+
+							div(ng-show="typeChart == 'chart'")
+								div.d-inline-block
+									i.fa.fa-bar-chart.fa-lg
+
+								div.d-inline-block
+									form.orb-form
+										fieldset
+											section
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+													i
+													| New Chart
+
+							div(ng-show="typeChart == 'table'")
+								div.d-inline-block
+									i.glyphicon.glyphicon-th.fa-lg
+
+								div.d-inline-block
+									form.orb-form
+										fieldset
+											section
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+													i
+													| New Table
+
+					div.row
+						div.col-md-12(ng-show="userReport.charts.length > 0")
+							div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+								header.pointer(ng-click="showUserCharts = !showUserCharts")
+									h2 My {{typeChart}}s
+									div.powerwidget-ctrls
+										a(href="#" ,class="button-icon")
+											i.fa.fa-question-circle
+										a(href="#" ,class="button-icon")
+											i.fa(ng-class="{'fa-chevron-circle-down': !showUserCharts , 'fa-chevron-circle-up': showUserCharts}")
+										
+								div.inner-spacer(ng-init="showUserCharts = false", ng-show="showUserCharts")
+									div.row
+										div.col-md-2(ng-repeat="chart in userReport.charts track by $index", ng-if="chart.extra.category == typeChart")
+											div
+												form.orb-form
+													fieldset
+														section
+															label.checkbox
+																input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+																i
+																| {{chart.config.title.text}}
+					
+					//-div.row
+
+						div.col-md-12(ng-show="userReport.charts.length > 0")
+							div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+								header
+									h2 Your Charts 
+									div.powerwidget-ctrls
+										a(href="#" ,class="button-icon")
+											i.fa.fa-question-circle
+										a(href="#" ,class="button-icon", ng-click="showUserCharts = !showUserCharts")
+											i.fa.fa-chevron-circle-down 
+										
+								div.inner-spacer(ng-init="showUserCharts = false", ng-show="showUserCharts")
+									div.row
+										div.col-md-2(ng-repeat="chart in userReport.charts track by $index")
+											div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+															label.checkbox
+																input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+																i
+																| {{chart.config.title.text}}
+						div.col-md-12
+							div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+								header
+									h2 History
+										small See how {{selectedIndicator.label}} varied over time
+									div.powerwidget-ctrls
+										a(href="#" ,class="button-icon")
+											i.fa.fa-question-circle
+										a(href="#" ,class="button-icon", ng-click="showHistoryCharts = !showHistoryCharts")
+											i.fa.fa-chevron-circle-down
+
+								div.inner-spacer(ng-init="showHistoryCharts = false", ng-show="showHistoryCharts")
+									div.row
+										div.col-md-2(ng-repeat="chart in preCharts", ng-if="chart.extra.category == 'history'")
+											div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+													i
+													| {{chart.config.title.text}}
+										//-div.col-md-2(ng-repeat="chart in userReport.charts track by $index", ng-if="chart.extra.category == 'history'")
+											div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+													i
+													| {{chart.config.title.text}}
+						div.col-md-12
+							div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+								header
+									h2 Ranking
+										small Quickly identify top and bottom performances
+									div.powerwidget-ctrls
+										a(href="#" ,class="button-icon")
+											i.fa.fa-question-circle
+										a(href="#" ,class="button-icon", ng-click="showRankingCharts = !showRankingCharts")
+											i.fa.fa-chevron-circle-down 
+
+								div.inner-spacer(ng-init="showRankingCharts = false", ng-show="showRankingCharts")
+									div.row	
+										div.col-md-2(ng-repeat="chart in preCharts", ng-if="chart.extra.category == 'ranking'")
+											div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+															label.checkbox
+																input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+																i
+																| {{chart.config.title.text}}
+										//-div.col-md-2(ng-repeat="chart in userReport.charts track by $index", ng-if="chart.extra.category == 'ranking'")
+											div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+													i
+													| {{chart.config.title.text}}
+
+						div.col-md-12
+							div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+								header
+									h2 Objectives
+									div.powerwidget-ctrls
+										a(href="#" ,class="button-icon")
+											i.fa.fa-question-circle
+										a(href="#" ,class="button-icon", ng-click="showObjectiveCharts = !showObjectiveCharts")
+											i.fa.fa-chevron-circle-down 
+									
+								div.inner-spacer(ng-init="showObjectiveCharts = false", ng-show="showObjectiveCharts")
+									div.row
+										div.col-md-2(ng-repeat="chart in preCharts", ng-if="chart.extra.category == 'objective'")
+											div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+															label.checkbox
+																input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+																i
+																| {{chart.config.title.text}}
+										//-div.col-md-2(ng-repeat="chart in userReport.charts track by $index", ng-if="chart.extra.category == 'objective'")
+													div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+														label.checkbox
+															input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+															i
+															| {{chart.config.title.text}}
+
+						div.col-md-12
+							div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable(role='widget')
+								header
+									h2 Two Factor 
+									div.powerwidget-ctrls
+										a(href="#" ,class="button-icon")
+											i.fa.fa-question-circle
+										a(href="#" ,class="button-icon", ng-click="showTwoFCharts = !showTwoFCharts")
+											i.fa.fa-chevron-circle-down 
+										
+								div.inner-spacer(ng-init="showTwoFCharts = false", ng-show="showTwoFCharts")
+									div.row
+										div.col-md-2(ng-repeat="chart in preCharts", ng-if="chart.extra.category == 'twof'")
+														div
+												highchart(id="previewChart", config="chart.config")
+												form.orb-form
+													fieldset
+														section
+															label.checkbox
+																input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+																i
+																| {{chart.config.title.text}}
+										//-div.col-md-2(ng-repeat="chart in userReport.charts track by $index")
+												div
+												//-i.fa.fa-bar-chart.fa-lg
+											label.checkbox
+												input(type='checkbox', name='checkbox-inline', ng-init="chart.selected = false", ng-model="chart.selected", ng-change="countSelectedCharts()")
+												i
+												| {{chart.config.title.text}}
+
+					div.row
+						div.col-md-12
+							div.pull-right
+								div.btn-group.btn-group-sm
+									button.btn.btn-default(type="button", ng-click="unloadSelectedCharts(); typeChart = false") 
+										i.fa.fa-times
+									button.btn.btn-success(type="button", ng-class="{disabled: selectedCharts == 0}", ng-click="loadSelectedCharts()") 
+										i.fa.fa-check
+									
+		//- chart configuration 
+		div.col-md-12.chart-configuration(ng-show="configChart", ng-repeat="tempChart in tempCharts")
+			div.powerwidget.powerwidget-as-portlet-white.powerwidget-sortable
+				//-header
+				div	
+					div.row
+						div.col-md-5
+
+							//- chart options
+							div.inner-spacer.chart-options(ng-show="typeChart == 'chart'")
+								h4 Chart Options
+								form.orb-form
+									fieldset		
+										section
+											//-label.label Chart Name
+											label.input
+												input(type="text", placeholder="Chart Name", ng-model="tempChart.config.title.text")
+									
+										section
+											label.label Choose Chart Type
+											div.inline-group.icons
+
+												//-div.d-inline-block.text-center
+													a(ng-class="{'active': tempChart.config.options.chart.type == 'pie'}", ng-click="tempChart.config.options.chart.type = 'pie'")
+														i.fa.fa-pie-chart.fa-3x
+														small.display-block Pie Chart
+												div.d-inline-block.text-center
+													a(ng-class="{'active': tempChart.config.options.chart.type == 'column'}",ng-click="tempChart.config.options.chart.type = 'column'")
+														i.fa.fa-bar-chart.fa-3x
+														small.display-block Column Chart
+												div.d-inline-block.text-center
+													a(ng-class="{'active': tempChart.config.options.chart.type == 'line'}",ng-click="tempChart.config.options.chart.type = 'line'")
+														i.fa.fa-line-chart.fa-3x
+														small.display-block Line Chart
+									//- column
+									fieldset(ng-show="tempChart.config.options.chart.type == 'column'")
+										section(ng-repeat=" obj in filterOptions", ng-if="obj.label == 'KPIs'")
+											//-label.label Y Axis
+											label.select
+												select(ng-model="tempChart.extra.yAxis", ng-options="item.label as item.label for item in obj.data | filter:{ state: 'true'}",  ng-change="tempChart.config.options.yAxis.title.text = item.label")
+													option(value="", disabled) Y Axis
+												i
+
+										section
+											//-label.label X Axis
+											label.select
+												select(ng-model="tempChart.extra.xAxis", ng-options="obj.label as obj.label for obj in filterOptions | filter:{ label : '!KPIs'}", ng-change="changeConfigChart(tempChart)")
+													option(value="", disabled) X Axis
+												i
+										section
+											//-label.label Choose From Series
+											label.select
+												select(ng-model="tempChart.extra.series", ng-options="obj.label as obj.label for obj in filterOptions | filter:{ label : '!KPIs'}", ng-change="changeConfigChart(tempChart)")
+													//-option(value="", disabled) Choose From Series
+													option(value="") Choose From Series
+												i
+												
+									//- line
+									fieldset(ng-show="tempChart.config.options.chart.type == 'line' ")
+										section(ng-repeat=" obj in filterOptions", ng-if="obj.label == 'KPIs'")
+											//-label.label Y Axis
+											label.select
+												select(ng-model="tempChart.extra.yAxis", ng-options="item.label as item.label for item in obj.data | filter:{ state: 'true'}",  ng-change="tempChart.config.options.yAxis.title.text = item.label")
+													option(value="", disabled) Y Axis
+												i
+
+										section
+											//-label.label X Axis
+											label.select
+												select(ng-model="tempChart.extra.xAxis", ng-options="obj.label as obj.label for obj in filterOptions | filter:{ label : 'dates'}", ng-change="changeConfigChart(tempChart)")
+													option(value="", disabled) X Axis
+												i
+										section
+											//-label.label Choose From Series
+											label.select
+												select(ng-model="tempChart.extra.series", ng-options="obj.label as obj.label for obj in filterOptions  | filter:{ label : '!KPIs'} | filter:{ label : '!dates'}", ng-change="changeConfigChart(tempChart)")
+													//-option(value="", disabled) Choose From Series
+													option(value="") Choose From Series
+												i
+
+									//-fieldset(ng-show="tempChart.config.options.chart.type == 'pie' ")
+										section
+											//-label.label Y Axis
+											label.select
+												select
+													option Net Sales
+												i
+
+										section
+											//-label.label Slice
+											label.select
+												select
+													option Slice ?
+													//-option(ng-repeat="")
+												i
+
+									//-fieldset		
+										section
+											label.label Timelapse
+											label.select
+												select
+													option None
+													option 1
+													option 2
+													option 3
+												i
+
+									fieldset	
+										section
+											label.label Notes
+											label.textarea.textarea-expandable
+												textarea(rows='3', ng-model="tempChart.extra.note.text") 
+
+									//-fieldset
+										section
+											label.label Add to chart
+											div.inline-group
+												//-label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Statistics
+												//-label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Objective Comparison
+												//-label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Year Over Year Comparison
+												//-label.checkbox
+													input(type='checkbox', name='checkbox-inline', ng-model="tempChart.extra.table.enabled")
+													i
+													| Table
+														
+							//- table options 		
+							div.inner-spacer.table-options(ng-show="typeChart == 'table'")
+								h4 Table Options
+								form.orb-form
+									fieldset		
+										section
+											//-label.label Chart Name
+											label.input
+												input(type="text", placeholder="Table Name", ng-model="tempChart.config.title.text")
+									
+										//-section
+											label.label Choose Table Type
+											div.inline-group.chart-icons
+
+												div.d-inline-block.text-center
+													a(ng-class="{'active': tempChart.config.options.table.type == 'regular'}",ng-click="tempChart.config.options.table.type = 'regular'")
+														i.glyphicon.glyphicon-th.fa-3x
+														small.display-block Regular Table
+												//-div.d-inline-block.text-center
+													a(ng-class="{'active': tempChart.config.options.table.type == 'coloured'}",ng-click="tempChart.config.options.table.type = 'coloured'")
+														i.glyphicon.glyphicon-th.fa-3x
+														small.display-block Coloured Table
+
+										//- regular
+										//-fieldset(ng-show="tempChart.config.options.table.type == 'regular'")
+										section
+											//-label.label Columns
+											label.select
+												select(ng-model="tempChart.extra.xAxis", ng-options="obj.label as obj.label for obj in filterOptions | filter:{ label : '!KPIs'}",  ng-change="changeConfigChart(tempChart)")
+													option(value="", disabled) Columns
+												i
+										section
+											//-label.label Rows
+											label.select
+												select(ng-model="tempChart.extra.series", ng-options="obj.label as obj.label for obj in filterOptions | filter:{ label : '!KPIs'}", ng-change="changeConfigChart(tempChart)")
+													option(value="", disabled) Rows
+												i
+										
+
+									//-fieldset		
+										section
+											label.label Timelapse
+											label.select
+												select
+													option None
+													option 1
+													option 2
+													option 3
+												i
+
+									fieldset	
+										section
+											label.label Notes
+											label.textarea.textarea-expandable
+												textarea(rows='3', ng-model="tempChart.extra.note.text") 
+
+										//-section
+											label.label Add to Table
+											div.inline-group
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Row Statistics
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline',)
+													i
+													| Column Statistics
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Colored by Objective
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Colored by Last Year
+										
+							//- heat map options
+							//-div.inner-spacer.heatmap-options(ng-show="typeChart == 'heatmap'")
+								h4 Heat Map Options
+								form.orb-form
+									fieldset		
+										//-section
+											label.label Your Heat Maps
+											label.select
+												select
+													option
+													option 1
+													option 2
+												i
+										section
+											label.label Heat Map Name
+											label.input
+												input(type="text")
+									
+										section
+											label.label Choose Heat Map Type
+											div.inline-group.chart-icons
+
+												div.d-inline-block.text-center
+													a
+														i.fa.fa-question.fa-3x
+														small.display-block Points
+												div.d-inline-block.text-center
+													a
+														i.fa.fa-question.fa-3x
+														small.display-block Polygons
+												div.d-inline-block.text-center
+													a
+														i.fa.fa-question.fa-3x
+														small.display-block Bubbles
+
+									fieldset		
+										section
+											label.label Data Show
+											label.select
+												select
+													option None
+													option 1
+													option 2
+													option 3
+												i
+
+									//-fieldset		
+										section
+											label.label Timelapse
+											label.select
+												select
+													option None
+													option 1
+													option 2
+													option 3
+												i
+
+									fieldset	
+										section
+											label.label Notes
+											label.textarea.textarea-expandable
+												textarea(rows='3')
+
+										section
+											label.label Add to Map
+											div.inline-group
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Colored by Objective
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Colored by Last Year
+												label.checkbox
+													input(type='checkbox', name='checkbox-inline')
+													i
+													| Notes
+
+						//- preview
+						div.col-md-7 
+							div.inner-spacer
+								h4 Preview
+								
+								div(ng-show="typeChart == 'chart'")
+									highchart(id="previewChart", config="tempChart.config")
+									//-button(ng-click="print(tempChart.config)") print
+									div(ng-show="tempChart.extra.note.enabled || tempChart.extra.note.text") 
+										h5 Notes
+										p {{tempChart.extra.note.text}}
+								
+								div.text-center(ng-show="typeChart == 'table'")
+									h5 {{tempChart.config.title.text}}
+									p {{tempChart.config.options.subtitle.text}}
+									div.relative(style="overflow-x:scroll", ng-show="tempChart.table.headers && tempChart.table.data")
+										
+										table( class="table table-striped table-hover margin-0px")
+											thead
+												tr
+													th
+														table 
+															tr 
+																td 
+																	small {{tempChart.extra.xAxis}} 
+																	i.fa.fa-arrow-right
+															tr 
+																td 
+																	i.fa.fa-arrow-down 
+																	small {{tempChart.extra.series}} 
+
+													th.pointer(ng-repeat="(key, value) in tempChart.table.data[0] track by $index", ng-if="key != 'name'", ng-class="{'sorting_asc': tempSort == key, 'sorting': tempSort != key}", ng-click="setSort(key); tempChart.table.sort = key") {{key | date:"d/M"}}
+											tbody
+												tr(ng-repeat="row in tempChart.table.data | orderBy: tempSort")
+													td
+														h5 {{row.name}}
+													td(ng-repeat="(key, value) in row", ng-if="key !='name'") {{ value | number:2}}
+
+
+
+									div(ng-show="tempChart.extra.note.enabled || tempChart.extra.note.text") 
+										h5 Notes
+										p {{tempChart.extra.note.text}}
+										
+					//- save chart
+					div.row
+						div.col-md-12
+							div.inner-spacer.pull-right
+								div.btn-group.btn-group-sm
+									button.btn.btn-default(type="button", ng-init="btnDelChart = true", ng-show="btnDelChart", ng-click="btnDelChart = false")
+										span.label Delete
+									button.btn.btn-danger(type="button", ng-show="!btnDelChart", ng-click="btnDelChart = true; delTempChart(tempChart)")
+										span.label Confirm Delete
+									button.btn.btn-success(type="button", ng-click="btnDelChart = true; saveChart(tempChart)")
+										span.label Save {{typeChart	}}
+
+	//- save report								
+	div.row(ng-show="userReport.charts.length > 0 && !stateReport && userReport.label.enabled")
+		div.col-md-12
+			div.pull-right
+				div.btn-group.btn-group-sm
+					//-button.btn.btn-default(type="button", ng-init="btnDelReport = true", ng-show="btnDelReport", ng-click="btnDelReport = false")
+						span.label Delete
+					//-button.btn.btn-danger(type="button", ng-show="!btnDelReport", ng-click="btnDelReport = true; cancelChart(tempChart)")
+						span.label Confirm Delete
+					button.btn.btn-success(type="button", ng-click="btnDelReport = true; saveReport()")
+						span.label Save Report
+
+	div.row(ng-show="stateReport")
+		div.col-md-12
+			div.inner-spacer.pull-right
+				div.btn-group.btn-group-sm
+					button.btn.btn-default(type="button", data-tooltip="Edit Report", ng-click="editReport()" )
+						i.fa.fa-pencil.fa-lg
+					div.btn-group.btn-group-sm(ng-if="userProfile.admin")
+						button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown", data-tooltip="Options")
+							i.fa.fa-ellipsis-v.fa-lg
+						ul.dropdown-menu.dropdown-menu-right(style="min-width: auto")
+							li
+								a(href="#")
+									i.fa.fa-clone
+									|  Copy
+							li
+								a(href="#")
+									i.fa.fa-share
+									|  Export
+							li
+								a(href="#")
+									i.fa.fa-print
+									|  Print
+							li
+								a(href="#")
+									i.fa.fa-pencil
+									|  Edit
+							li
+								a(href="#")
+									i.fa.fa-envelope-o
+									|  E-mail
+							li
+								a(href="#", ng-click="deleteReport()")
+									i.fa.fa-times-circle
+									|  Delete

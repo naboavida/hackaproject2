@@ -1,0 +1,232 @@
+#myModalDataSources.modal
+	//- .modal-dialog.modal-sm
+	.modal-dialog.modal-lg
+		.modal-content
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+				h4.modal-title Configure your KPI data sources for each store
+			.modal-body
+				.row
+					.col-md-12.col-sm-12.col-xs-12
+						div.page-header
+							h3 Data Sources
+								small List
+						div.row
+							div.col-md-6.col-centered
+								//- div.list-group
+								//- 	a(href='#', target='_self', ng-click="setCurrDataSource(CONST_MSAS)").list-group-item MSAS Data Cube
+								//- 	a(href='#', target='_self', ng-click="setCurrDataSource(CONST_REST)").list-group-item REST API
+								//- 	a(href='#', target='_self', ng-click="setCurrDataSource(CONST_DROPBOX)").list-group-item Dropbox (.xlsx only)
+								p {{curr_data_source}}
+								div.list-group
+									a(ng-repeat="source in dataSources", href='#', target='_self', ng-click="setCurrDataSource(source)",
+										ng-class="(source.value == curr_data_source && source.title == curr_data_source_title) ? 'selectedDataSource' : '' ").list-group-item {{source.title}}
+										
+
+						div.page-header(ng-show="curr_data_source == ''")
+							h5 Select a data source above
+
+						div.page-header(ng-show="curr_data_source == CONST_INACTIVE")
+							h5 Still under constrution
+
+						div.page-header(ng-show="curr_data_source == CONST_DROPBOX")
+							h3 Dropbox Account and Folder
+								small Select in which account the intended folder is
+						div.row(ng-show="curr_data_source == CONST_DROPBOX")
+							div.col-md-6.col-centered
+								div.list-group
+									a(href='#', target='_self', ng-click="setCurrDropboxFolder(CONST_EIPUBLICFOLDER)",
+										ng-class="(CONST_EIPUBLICFOLDER == curr_dropbox_folder) ? 'selectedDataSource' : '' ").list-group-item On Earthindicators' public folder
+									a(href='#', target='_self', ng-click="setCurrDropboxFolder(CONST_PRIVATEFOLDER)",
+										ng-class="(CONST_PRIVATEFOLDER == curr_dropbox_folder) ? 'selectedDataSource' : '' ").list-group-item On your private folder
+
+								div.list-group(ng-show="curr_dropbox_folder == CONST_EIPUBLICFOLDER")
+									div.list-group-item
+										form.orb-form
+											fieldset
+												section
+													label.label Dropbox folder
+													label.input
+														input(type="text", ng-model="dropbox.folder")
+												section
+													label.label Dropbox client subfolder
+													label.input
+														input(type="text", ng-model="dropbox.client_folder")
+									div.list-group-item
+										button.btn.btn-primary(ng-click="readDropboxFolder()") Read folder
+
+						div.page-header(ng-show="curr_data_source == CONST_DROPBOX")
+							h3 Dropbox File (.xlsx only)
+								small Earthindicators' public folder
+						div.row(ng-show="curr_data_source == CONST_DROPBOX")
+							div.col-md-10.col-centered
+								div.list-group
+									//- a(href='#', target='_self', ng-click="").list-group-item.thin Controlo de Gestão OM v5.11 ALGÉS.xlsx NOVO.xlsx
+									//- a(href='#', target='_self', ng-click="").list-group-item.thin NOVEMBRO SANTAREM.xlsx
+									//- a(href='#', target='_self', ng-click="").list-group-item.thin Controlo de Receção OM v5 11 - BRAGA.xlsx
+
+									a(ng-repeat="filename in filenames", href='#', target='_self', 
+										ng-click="selectFilename(filename)", ng-class="(filename == curr_filename) ? 'selectedDataSource' : '' ").list-group-item.thin {{filename}}
+
+						div.page-header(ng-show="curr_data_source == CONST_DROPBOX")
+							h3 Select cells
+								small Map KPIs to cells
+						div.row(ng-show="curr_data_source == CONST_DROPBOX && !loaded_xlsx_file")
+							div.col-md-12
+								div.spinner-icon(ng-show="show_spinner")
+									i(class="fa fa-spinner fa-spin fa-4x")
+								h4 {{load_xlsx_file_message}}
+						div.row(ng-show="fetch_file_error")
+							div.col-md-12
+								div.callout.callout-warning
+									h4 An error occurred opening the file
+									p {{fetch_file_error}}
+						div.row(ng-show="curr_data_source == CONST_DROPBOX && loaded_xlsx_file && !fetch_file_error")
+							div.col-md-10.col-centered
+								form.orb-form
+									fieldset
+										section
+											label.label Filename to match (RegEx - replace with wildcard *)
+											label.input
+												input(type="text", ng-model="curr_filename_regex")
+											div.note(ng-show="curr_filename !== curr_filename_regex")
+												strong Matching filenames:
+												| {{curr_filename_regex_hits}} of {{filenames.length}}
+											div.note(ng-show="curr_filename === curr_filename_regex")
+												strong Note:
+												| Replace some letters with * on the filename to match
+										section
+											label.label Select store
+											label.select
+												select(ng-model="curr_store")
+													//- option Select a store
+													option(ng-repeat="point in points_list", value="{{point.pointid}}") {{point.name}}
+
+										//- section
+										//- 	label.label KPI matching
+										//- 	label.textarea
+										//- 		ul.list-group
+										//- 			li(ng-repeat="kpi in kpis_list").list-group-item
+										//- 				div.col-md-3
+										//- 					p {{kpi.title}}
+										//- 				div.col-md-3
+										//- 					select(ng-model="kpiMatching[kpi.title].sheet")
+										//- 						option Select a sheet
+										//- 						option(ng-repeat="sheet in sheet_names") {{sheet}}
+										//- 				div.col-md-3
+										//- 					label.inline-group
+										//- 						input(type="text", style="width: 75px;", ng-model="kpiMatching[kpi.title].cell")
+										//- 						button.btn.btn-xs(ng-click="readCell(kpi.title)") Read cell →
+										//- 				div.col-md-3
+										//- 					p {{kpiMatching[kpi.title].value}}
+
+										section
+											label.label General data
+											label.textarea
+												ul.list-group
+													li.list-group-item
+														div.col-md-3
+															p Date
+														div.col-md-3
+															select(ng-model="generaldata.date.sheet")
+																option Select a sheet
+																option(ng-repeat="sheet in sheet_names") {{sheet}}
+														div.col-md-3
+															label.inline-group
+																input(type="text", style="width: 30px;", ng-model="generaldata.date.cell")
+																button.btn.btn-xs(ng-click="readDatalevelCell(generaldata.date, 'date1900')") Read cell →
+														div.col-md-3
+															p {{generaldata.date.value | date:'yyyy-MM-d'}}
+													li.list-group-item
+														div.col-md-3
+															p Clinic name
+														div.col-md-3
+															select(ng-model="generaldata.clinic.sheet")
+																option Select a sheet
+																option(ng-repeat="sheet in sheet_names") {{sheet}}
+														div.col-md-3
+															label.inline-group
+																input(type="text", style="width: 30px;", ng-model="generaldata.clinic.cell")
+																button.btn.btn-xs(ng-click="readDatalevelCell(generaldata.clinic)") Read cell →
+														div.col-md-3
+															p {{generaldata.clinic.value}}
+
+										section
+											label.label Data level values
+											label.textarea
+												ul.list-group
+													li(ng-repeat="datalevel in datalevels").list-group-item
+														div.col-md-3
+															p {{datalevel.name}} ({{datalevel.datalevel}})
+														div.col-md-3
+															select(ng-model="datalevel.sheet")
+																option Select a sheet
+																option(ng-repeat="sheet in sheet_names") {{sheet}}
+														div.col-md-3
+															label.inline-group
+																input(type="text", style="width: 30px;", ng-model="datalevel.cell")
+																button.btn.btn-xs(ng-click="readDatalevelCell(datalevel)") Read cell →
+														div.col-md-3
+															p {{datalevel.value}}
+
+										section
+											label.label KPI matching
+											label.textarea
+												ul.list-group
+													li(ng-repeat="kpi in kpis_list").list-group-item
+														div.col-md-12
+															div.row
+																div.col-md-12
+																	p KPI: {{kpi.title}}
+															div.row(ng-repeat="datalevel in datalevels")
+																div.col-md-12
+																	div.col-md-3
+																		p {{datalevel.name}}
+																	div.col-md-3
+																		select(ng-model="kpiMatching[kpi.title][datalevel.name].sheet")
+																			option Select a sheet
+																			option(ng-repeat="sheet in sheet_names") {{sheet}}
+																	div.col-md-3
+																		label.inline-group
+																			input(type="text", style="width: 30px;", ng-model="kpiMatching[kpi.title][datalevel.name].cell")
+																			button.btn.btn-xs(ng-click="readCell(kpi.title, datalevel.name)") Read cell →
+																	div.col-md-3
+																		p {{kpiMatching[kpi.title][datalevel.name].value}}
+
+										section
+											label.label Default values
+												div.col-md-12
+													div.row
+														button.btn.btn-primary(ng-click="applyDefaultValues()") Apply Default Values
+
+			.modal-footer
+				a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Close
+				button.btn.btn-primary(ng-click="addStoreMapping()", ng-disabled="") Finish
+script
+	$('#openBtn').click(function(){
+		$('#myModalDataSources').modal({show:true});
+	});
+
+
+
+#myModalDeleteDataSource.modal
+	//- .modal-dialog.modal-sm
+	.modal-dialog
+		.modal-content.modal-content-caution
+			.modal-header
+				button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+				h4.modal-title Confirm delete
+			.modal-body
+				//- p
+				//-   i.fa.fa-2x.fa-exclamation-triangle(style='color: orange;')
+				p Are you sure you want to delete the Data Source
+					| {{ toDelDataSource.curr_store_name }} ?
+			.modal-footer
+				a.btn.btn-default.left(href='#', target='_self', data-dismiss='modal') Cancel
+				a.btn.btn-danger(href='#', target='_self', data-dismiss='modal', ng-click='deleteDataSource()')
+					i.fa.fa-exclamation-triangle
+					|  Delete
+script
+	$('#openBtn').click(function(){
+		$('#myModalDeleteDataSource').modal({show:true});
+	});
