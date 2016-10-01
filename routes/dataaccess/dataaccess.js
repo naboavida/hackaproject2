@@ -1,0 +1,985 @@
+var pg = require('pg');
+var config = require('../../config.js');
+var conString = config.conString;
+
+
+
+var kpiQueryCalcs = {};
+kpiQueryCalcs["Net Sales"] = {"n_base_kpis": 1, "base_kpi_a": "Net Sales", "base_kpi_b": "Net Sales", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["Number of Customers"] = {"n_base_kpis": 1, "base_kpi_a": "Number of Customers", "base_kpi_b": "Number of Customers", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["NPS INDEX (HoN)"] = {"n_base_kpis": 1, "base_kpi_a": "NPS INDEX (HoN)", "base_kpi_b": "NPS INDEX (HoN)", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["Basket"] = {"n_base_kpis": 2, "base_kpi_a": "Net Sales", "base_kpi_b": "Number of Customers", "calc_formula": "( (SUM(querya.values)) / (SUM(queryb.values)) )"};
+kpiQueryCalcs["Net Margin"] = {"n_base_kpis": 2, "base_kpi_a": "Net Margin", "base_kpi_b": "Net Sales", "calc_formula": "( (SUM(querya.values / 100 * queryb.values)) / (SUM(queryb.values)) ) *100"};
+kpiQueryCalcs["Multiline Bills"] = {"n_base_kpis": 2, "base_kpi_a": "Multiline Bills", "base_kpi_b": "Number of Customers", "calc_formula": "( (SUM(querya.values / 100 * queryb.values)) / (SUM(queryb.values)) ) *100"};
+
+kpiQueryCalcs["Financiamento"] = {"n_base_kpis": 1, "base_kpi_a": "Financiamento", "base_kpi_b": "", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["Orçamentação"] = {"n_base_kpis": 1, "base_kpi_a": "Orçamentação", "base_kpi_b": "", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["Primeiras Consultas"] = {"n_base_kpis": 1, "base_kpi_a": "Primeiras Consultas", "base_kpi_b": "", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["Vendas Efectivas"] = {"n_base_kpis": 1, "base_kpi_a": "Vendas Efectivas", "base_kpi_b": "", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["Número de Vendas"] = {"n_base_kpis": 1, "base_kpi_a": "Número de Vendas", "base_kpi_b": "", "calc_formula": "( (SUM(querya.values)) )"};
+kpiQueryCalcs["VPP"] = {"n_base_kpis": 2, "base_kpi_a": "Vendas", "base_kpi_b": "Primeiras Efectivas", "calc_formula": "( COALESCE(SUM(querya.values)/NULLIF(SUM(queryb.values),0), 0) )"};
+
+kpiQueryCalcs["default_kpi_average"] = {"n_base_kpis": 1, "base_kpi_a": "", "base_kpi_b": "", "calc_formula": "( (AVG(querya.values)) )"};
+kpiQueryCalcs["default_kpi_total"] = {"n_base_kpis": 1, "base_kpi_a": "", "base_kpi_b": "", "calc_formula": "( (SUM(querya.values)) )"};
+
+
+
+
+
+
+var attributes_config = ['Name', 'name', 'PointKey', 'Address'];
+
+
+
+
+
+// generic auxilliary methods
+
+var runQuery = function(query, callback){
+  var client = new pg.Client(conString);
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+
+    client.query(query, function(err, result) {
+      if(err) {
+        client.end();
+        console.log(query);
+        return console.error('dataaccess.runQuery error running query', err);
+      }
+
+      if (typeof callback === "function") {
+        callback(result.rows);
+      }
+      client.end();
+    });
+
+  });
+}
+
+
+
+var array_to_object = function(arr, attribute){
+  var toReturn = {};
+
+  for(var i in arr){
+    toReturn[arr[i][attribute]] = "";
+  }
+
+  return toReturn;
+}
+
+
+
+
+
+
+// auxilliary methods
+
+var generatePointRankingQuery = function(pid, title, filter, isAverage){
+  var kpiCalc = kpiQueryCalcs[title];
+  if(!kpiQueryCalcs.hasOwnProperty(title)){
+    if(isAverage){
+      kpiCalc = kpiQueryCalcs["default_kpi_average"];
+    } else {
+      kpiCalc = kpiQueryCalcs["default_kpi_total"];
+    }
+    kpiCalc.base_kpi_a = title;
+    kpiCalc.base_kpi_b = title;
+  }
+
+  var mindate = "(select max from dates)";
+  if(filter.hasOwnProperty('startDate')){
+    mindate = "'"+filter.startDate + "'::date";
+  }
+
+  var maxdate = "(select max from dates)";
+  if(filter.hasOwnProperty('endDate')){
+    maxdate = "'"+filter.endDate + "'::date";
+  }
+
+
+  // var toReturn = "with dates as ( select min(to_date(c->>'timestamp', 'YYYY-MM-DD')) as min, max(to_date(c->>'timestamp', 'YYYY-MM-DD')) as max "+
+  //     "from indicators, json_array_elements(readings) as c where title = '"+title+"' and pid_proj = "+pid+")";
+
+
+  var toReturn = "with dates as ( select min(to_date(c->>'timestamp', 'YYYY-MM-DD')) as min, max(to_date(c->>'timestamp', 'YYYY-MM-DD')) as max "+
+      "from indicators, json_array_elements(readings) as c where title = '"+title+"' and pid_proj = "+pid+")";
+
+  if(kpiCalc.n_base_kpis == 1){
+    subquery = "querya";
+  } else {
+    subquery = "queryb";
+  }
+
+  toReturn += "select pointid_point, valuesjson from ( select rawvalues.pointid_point, json_agg((date, value)) as values from ( ";
+  toReturn += "select "+subquery+".pointid_point, "+subquery+".date, "+kpiCalc.calc_formula+" as value from ";
+
+  toReturn += "( SELECT pointid_point, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date ";
+  toReturn += "FROM indicators, json_array_elements(readings) AS c ";
+
+  toReturn += "WHERE title='"+kpiCalc.base_kpi_a+"' and pid_proj = "+pid+" ";
+
+  toReturn += 
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+  // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+  "order by (c->>'hour')::numeric) as querya ";
+
+  if(kpiCalc.n_base_kpis == 2){
+    toReturn += "right outer join ( "+
+    "SELECT pointid_point, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date "+
+    "FROM indicators, json_array_elements(readings) AS c "+
+    "WHERE title='"+kpiCalc.base_kpi_b+"' and pid_proj = "+pid+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+    // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+    "order by (c->>'hour')::numeric "+
+    ") as queryb "+
+    "on ( (querya.hour is null or querya.hour = queryb.hour) and querya.date = queryb.date and querya.pointid_point = queryb.pointid_point) ";
+  }
+
+  toReturn += "group by "+subquery+".pointid_point, "+subquery+".date "+
+  "order by "+subquery+".pointid_point, "+subquery+".date "+
+  ") as rawvalues "+
+  "group by rawvalues.pointid_point "+
+  ") as aas, json_array_elements(aas.values) as valuesjson "+
+  "where valuesjson->>'f1' <> 'null' and valuesjson->>'f2' <> 'null' "+
+  "order by (valuesjson->>'f2')::decimal DESC";
+
+  // console.log(toReturn);
+
+  return toReturn;
+}
+
+
+
+
+
+
+var generateRankingQueryByPoints = function(pid, title, filter, isAverage){
+  var kpiCalc = kpiQueryCalcs[title];
+  if(!kpiQueryCalcs.hasOwnProperty(title)){
+    if(isAverage){
+      kpiCalc = kpiQueryCalcs["default_kpi_average"];
+    } else {
+      kpiCalc = kpiQueryCalcs["default_kpi_total"];
+    }
+    kpiCalc.base_kpi_a = title;
+    kpiCalc.base_kpi_b = title;
+  }
+
+  var mindate = "(select max from dates)";
+  if(filter.hasOwnProperty('startDate')){
+    mindate = "'"+filter.startDate + "'::date";
+  }
+
+  var maxdate = "(select max from dates)";
+  if(filter.hasOwnProperty('endDate')){
+    maxdate = "'"+filter.endDate + "'::date";
+  }
+
+  var points = "";
+  if(filter.hasOwnProperty('points') && filter.points != ""){
+    points = "and pointid_point in (" + filter.points.toString() + ")";
+  }
+
+  var datalevels = "";
+  if(filter.hasOwnProperty('levels')){
+    datalevels = generateDataLevelsSql(filter);
+  }
+
+
+  var toReturn = "with dates as ( select min(to_date(c->>'timestamp', 'YYYY-MM-DD')) as min, max(to_date(c->>'timestamp', 'YYYY-MM-DD')) as max "+
+    "from indicators, json_array_elements(readings) as c where title = '"+title+"' and pid_proj = "+pid+")";
+
+  if(kpiCalc.n_base_kpis == 1){
+    subquery = "querya";
+  } else {
+    subquery = "queryb";
+  }
+
+
+  toReturn += "select pointid_point, value from ( ";
+  toReturn += "select "+subquery+".pointid_point, "+kpiCalc.calc_formula+" as value from ";
+
+
+
+
+
+  toReturn += "( SELECT pointid_point, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date ";
+  toReturn += "FROM indicators, json_array_elements(readings) AS c ";
+
+  toReturn += "WHERE title='"+kpiCalc.base_kpi_a+"' and pid_proj = "+pid+" ";
+
+  toReturn += 
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+  // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+  points +
+  datalevels +
+  "order by (c->>'hour')::numeric) as querya ";
+
+
+  if(kpiCalc.n_base_kpis == 2){
+    toReturn += "right outer join ( "+
+    "SELECT pointid_point, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date "+
+    "FROM indicators, json_array_elements(readings) AS c "+
+    "WHERE title='"+kpiCalc.base_kpi_b+"' and pid_proj = "+pid+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+    // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+    points +
+    datalevels +
+    "order by (c->>'hour')::numeric "+
+    ") as queryb "+
+    "on ( (querya.hour is null or querya.hour = queryb.hour) and querya.date = queryb.date and querya.pointid_point = queryb.pointid_point) ";
+  }
+
+
+
+  toReturn += "group by "+subquery+".pointid_point "+
+  "order by "+subquery+".pointid_point "+
+  ") as aas "+
+  "order by value DESC";
+
+
+  return toReturn;
+
+}
+
+
+var getXAxis = function(filter){
+  if(filter.hasOwnProperty('chart')){
+    if(filter.chart.hasOwnProperty('xAxis')){
+      if(filter.chart.xAxis == "stores"){
+        return "pointid_point";
+      } else if(filter.chart.xAxis == "dates"){
+        return "c->>'timestamp'";
+      } else if(filter.levels.indexOf(filter.chart.xAxis) >= 0){
+        return "c->>'"+filter.chart.xAxis+"'";
+      }
+    }
+  }
+  return 'pointid_point';
+}
+
+
+var generateRankingQueryByChart = function(pid, title, filter, isAverage){
+  // this method expects filter.chart to get the xaxis
+  // if not, axis will be pointid_point
+  var xaxis = getXAxis(filter);
+
+  var kpiCalc = kpiQueryCalcs[title];
+  if(!kpiQueryCalcs.hasOwnProperty(title)){
+    if(isAverage){
+      kpiCalc = kpiQueryCalcs["default_kpi_average"];
+    } else {
+      kpiCalc = kpiQueryCalcs["default_kpi_total"];
+    }
+    kpiCalc.base_kpi_a = title;
+    kpiCalc.base_kpi_b = title;
+  }
+
+  var mindate = "(select max from dates)";
+  if(filter.hasOwnProperty('startDate')){
+    mindate = "'"+filter.startDate + "'::date";
+  }
+
+  var maxdate = "(select max from dates)";
+  if(filter.hasOwnProperty('endDate')){
+    maxdate = "'"+filter.endDate + "'::date";
+  }
+
+  var points = "";
+  if(filter.hasOwnProperty('points') && filter.points != ""){
+    points = "and pointid_point in (" + filter.points.toString() + ")";
+  } else if(filter.hasOwnProperty('stores') && filter.stores != ""){
+    points = "and pointid_point in (" + filter.stores.toString() + ")";
+  }
+
+  var datalevels = "";
+  if(filter.hasOwnProperty('levels')){
+    datalevels = generateDataLevelsSql(filter);
+  }
+
+
+  var toReturn = "with dates as ( select min(to_date(c->>'timestamp', 'YYYY-MM-DD')) as min, max(to_date(c->>'timestamp', 'YYYY-MM-DD')) as max "+
+    "from indicators, json_array_elements(readings) as c where title = '"+title+"' and pid_proj = "+pid+")";
+
+  if(kpiCalc.n_base_kpis == 1){
+    subquery = "querya";
+  } else {
+    subquery = "queryb";
+  }
+
+
+  toReturn += "select xaxis, value from ( ";
+
+  if(xaxis == 'pointid_point'){
+    toReturn += "select get_point_name("+subquery+".xaxis) as xaxis, "+kpiCalc.calc_formula+" as value from ";
+  } else {
+    toReturn += "select "+subquery+".xaxis, "+kpiCalc.calc_formula+" as value from ";
+  }
+
+
+
+
+
+  toReturn += "( SELECT "+xaxis+" as xaxis, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date ";
+  toReturn += "FROM indicators, json_array_elements(readings) AS c ";
+
+  toReturn += "WHERE title='"+kpiCalc.base_kpi_a+"' and pid_proj = "+pid+" ";
+
+  toReturn += 
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+  // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+  points +
+  datalevels +
+  "order by (c->>'hour')::numeric) as querya ";
+
+
+  if(kpiCalc.n_base_kpis == 2){
+    toReturn += "right outer join ( "+
+    "SELECT "+xaxis+" as xaxis, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date "+
+    "FROM indicators, json_array_elements(readings) AS c "+
+    "WHERE title='"+kpiCalc.base_kpi_b+"' and pid_proj = "+pid+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+    // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+    points +
+    datalevels +
+    "order by (c->>'hour')::numeric "+
+    ") as queryb "+
+    "on ( (querya.hour is null or querya.hour = queryb.hour) and querya.date = queryb.date and querya.xaxis = queryb.xaxis) ";
+  }
+
+
+
+  toReturn += "group by "+subquery+".xaxis "+
+  "order by "+subquery+".xaxis "+
+  ") as aas ";
+
+  if(xaxis != "c->>'timestamp'"){
+    toReturn += "order by value DESC";
+  }
+
+
+  return toReturn;
+
+}
+
+
+
+
+var generateKpisListQuery = function(pid){
+  //return "select distinct title, unit from indicators where pid_proj = " + pid;
+  var q = "select * from "+
+  " (select distinct title, unit, pid_proj, aggrmethod from indicators where pid_proj = " + pid +" ) as querya " +
+  " join "+
+  "(select mailconfig as icons, pid from projects where pid = " + pid + " ) as queryb " +
+  " on querya.pid_proj = queryb.pid";
+
+  return q ;
+}
+
+
+
+var generatePointsListQuery = function(pid, callback){
+  /* 
+    doing best effort, but we need to have a configuration on the platform
+    where we define which attribute of the points is to be shown (i.e. considered
+    to be the displayable info of the points)
+
+    best effort by getting the available attributes of all points,
+    and switch via hardcoded possibilities on a config array
+  */
+
+  var aux_q = "select distinct json_object_keys(attributes) as attrs from points where pid_proj = "+pid;
+
+  console.log(aux_q);
+
+  runQuery(aux_q, function(result){
+    var final_query = "";
+    var final_attribute = "";
+    var all_attrs = array_to_object(result, 'attrs');
+
+    for(var attr_i in attributes_config){
+      var attribute = attributes_config[attr_i];
+      if(all_attrs.hasOwnProperty(attribute)){
+        final_attribute = attribute;
+        break;
+      }
+    }
+
+    if(final_attribute == ""){
+      // needs to map pointid to pointid ...
+      console.log("needs to map pointid to pointid ...");
+    } else {
+      // needs to map pointid to the found attribute
+      console.log("needs to map pointid to the found attribute");
+      final_query = "select pointid, attributes->>'"+final_attribute+"' as attr from points where pid_proj = " + pid + " order by attr";
+    }
+
+    // hardcoded faux query
+    if (typeof callback === "function") {
+      callback(final_query);
+    }
+  })
+}
+
+
+
+var generateValueQuery = function(pid, title, filter, isAverage){
+  var kpiCalc = kpiQueryCalcs[title];
+  if(!kpiQueryCalcs.hasOwnProperty(title)){
+    if(isAverage){
+      kpiCalc = kpiQueryCalcs["default_kpi_average"];
+    } else {
+      kpiCalc = kpiQueryCalcs["default_kpi_total"];
+    }
+    kpiCalc.base_kpi_a = title;
+    kpiCalc.base_kpi_b = title;
+  }
+
+  var mindate = "(select max from dates)";
+  if(filter.hasOwnProperty('startDate')){
+    if(filter.startDate.toUpperCase().indexOf("MIN") >= 0){
+      mindate = "(select min from dates)";
+    } else if(filter.startDate.toUpperCase().indexOf("MAX") >= 0){
+      mindate = "(select max from dates)";
+    } else {
+      mindate = "'"+filter.startDate + "'::date";
+    }
+  }
+
+  var maxdate = "(select max from dates)";
+  if(filter.hasOwnProperty('endDate')){
+    if(filter.endDate.toUpperCase().indexOf("MIN") >= 0){
+      maxdate = "(select min from dates)";
+    } else if(filter.endDate.toUpperCase().indexOf("MAX") >= 0){
+      maxdate = "(select max from dates)";
+    } else {
+      maxdate = "'"+filter.endDate + "'::date";
+    }
+  }
+
+  var toReturn = "with dates as ( select min(to_date(c->>'timestamp', 'YYYY-MM-DD')) as min, max(to_date(c->>'timestamp', 'YYYY-MM-DD')) as max "+
+      "from indicators, json_array_elements(readings) as c where title = '"+title+"' and pid_proj = "+pid+")";
+
+  
+
+  toReturn += "select (value) as values from ( select "+kpiCalc.calc_formula+" as value from ("+
+    "SELECT pointid_point, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date, c->>'category' as category FROM indicators, json_array_elements(readings) AS c "+
+    " WHERE title='"+kpiCalc.base_kpi_a+"' and pid_proj = "+pid+
+    " and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+
+    " order by (c->>'hour')::numeric) as querya ";
+
+
+  if(kpiCalc.n_base_kpis == 2){
+    toReturn += "right outer join ( "+
+    "SELECT pointid_point, title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date, c->>'category' as category FROM indicators, json_array_elements(readings) AS c "+
+    "WHERE title='"+kpiCalc.base_kpi_b+"' and pid_proj = "+pid+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+    // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+    "order by (c->>'hour')::numeric) as queryb "+
+    "on ( (querya.hour is null or querya.hour = queryb.hour) and querya.date = queryb.date and querya.pointid_point = queryb.pointid_point and querya.category = queryb.category) ";
+  }
+
+  toReturn += ") as rawvalues ";
+
+// console.log("\n\n");
+// console.log(toReturn);
+// console.log("\n\n");
+
+  return toReturn;
+
+}
+
+
+
+
+
+var generateDataLevelsSql = function(filter){
+  // assuming that filter brings property levels
+  // which defines which levels are there on the filter
+  var toReturn = "";
+
+  for(var i=0; i<filter.levels.length; i++){
+    var auxLevel = filter.levels[i];
+    if(filter[auxLevel].length > 0){
+      var valuesStr = filter[auxLevel].toString();
+      valuesStr = valuesStr.replace(",", "', '");
+      toReturn += " and c->>'"+auxLevel+"' in ('"+valuesStr+"') ";
+    }
+  }
+
+  return toReturn;
+}
+
+
+
+
+
+
+
+
+
+
+// module exposed methods
+
+
+
+exports.getDummyData = function(pid, callback){
+	var val = 124;
+
+	if (typeof callback === "function") {
+		callback(val);
+	}
+};
+
+
+
+
+
+
+
+
+exports.getKpisList = function(pid, callback){
+  var client = new pg.Client(conString);
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+
+    var q = generateKpisListQuery(pid);
+
+    client.query(q, function(err, result) {
+      if(err) {
+        client.end();
+        return console.error('dataaccess.getKpisList error running query', err);
+      }
+
+      // console.log("num of results "+result.rows.length);
+
+      if (typeof callback === "function") {
+        callback(result.rows);
+      }
+      client.end();
+    });
+
+  });
+}
+
+
+
+exports.getKpisAndPointsList = function(pid, callback){
+  var client = new pg.Client(conString);
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+
+    var q = generateKpisListQuery(pid);
+    var toReturn = {};
+
+    client.query(q, function(err, result) {
+      if(err) {
+        client.end();
+        return console.error('dataaccess.getKpisList error running query', err);
+      }
+
+      toReturn.kpis_list = result.rows;
+
+      generatePointsListQuery(pid, function(result_q){
+        var q2 = result_q;
+
+        if(q2 == ""){
+          // no mapping between pointid and attribute was found
+
+          toReturn.points_list = null;
+
+          if (typeof callback === "function") {
+            callback(toReturn);
+          }
+          client.end();
+
+        } else {
+          client.query(q2, function(err2, result2){
+
+            toReturn.points_list = result2.rows;
+
+            if (typeof callback === "function") {
+              callback(toReturn);
+            }
+            client.end();
+
+          });
+        }
+
+      });
+
+
+    });
+
+  });
+}
+
+
+
+
+
+
+
+
+// filter should contain: points, dates and hierarchy data like categories, products, channels, promoters
+exports.getAllPointValues = function(pid, kpi_title, filter, callback){
+
+	var client = new pg.Client(conString);
+	client.connect(function(err) {
+		if(err) {
+			return console.error('could not connect to postgres', err);
+		}
+
+		var q = generatePointRankingQuery(pid, kpi_title, filter, false); // no support to generic sum/average kpis
+
+		client.query(q, function(err, result) {
+			if(err) {
+				client.end();
+				return console.error('dataaccess.getAllPointValues error running query', err);
+			}
+
+			// console.log("num of results "+result.rows.length);
+
+			if (typeof callback === "function") {
+				callback(result.rows.length, result.rows, kpi_title);
+			}
+			client.end();
+		});
+
+	});
+
+};
+
+
+
+
+
+exports.getTotalValue = function(pid, kpi_title, filter, callback){
+
+  var client = new pg.Client(conString);
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+
+    if(filter.aggrmethod == 'sum')
+        var q = generateValueQuery(pid, kpi_title, filter, false); // no support to generic sum/average kpis
+    else
+        var q = generateValueQuery(pid, kpi_title, filter, true);
+    
+    // console.log("\n\ndataaccess.getTotalValue START");
+    // console.log(q);
+
+    client.query(q, function(err, result) {
+      if(err) {
+        if (typeof callback === "function") {
+          callback([], kpi_title);
+        }
+        client.end();
+        return console.error('dataaccess.getTotalValue error running query', err);
+      }
+
+      // console.log("num of results "+result.rows.length);
+
+      if (typeof callback === "function") {
+        callback(result.rows, kpi_title);
+      }
+      client.end();
+    });
+
+  });
+
+}
+
+
+
+exports.getTotalValueMultiple = function(pid, kpi_title, filter_a, filter_b, callback){
+
+  var client = new pg.Client(conString);
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+
+    var q = generateValueQuery(pid, kpi_title, filter_a, false); // no support to generic sum/average kpis
+    var to_return = {};
+
+    client.query(q, function(err, result) {
+      if(err) {
+        client.end();
+        return console.error('dataaccess.getTotalValue error running query', err);
+      }
+
+      // console.log("num of results "+result.rows.length);
+
+      to_return.values = result.rows;
+
+      var q2 = generateValueQuery(pid, kpi_title, filter_b, false); // no support to generic sum/average kpis
+
+      client.query(q2, function(err2, result2) {
+        if(err2) {
+          client.end();
+          return console.error('dataaccess.getTotalValue error running query', err2);
+        }
+
+        to_return.values_b = result2.rows;
+        
+        if (typeof callback === "function") {
+          callback(to_return, kpi_title);
+        }
+        client.end();
+
+      });
+
+    });
+
+  });
+
+}
+
+
+
+
+
+exports.getKpiTitleByWid = function(pid, wid, callback){
+  var q = "select distinct indicators.title, indicators.aggrmethod from widgets join indicators on (widgets.title = indicators.title) where indicators.pid_proj = "+pid+" and wid = "+wid;
+
+  runQuery(q, function(result){
+    if (typeof callback === "function") {
+        if(result.length > 0){
+          callback(result[0].title, result[0].aggrmethod);
+        } else {
+          callback(null, null);
+        }
+      }
+  })
+}
+
+
+
+exports.getAllPointRanking = function(pid, kpi_title, aggrmethod, filter, callback){
+  // var q1 = generatePointRankingQuery(pid, kpi_title, filter, false);
+  var q2 = generateRankingQueryByPoints(pid, kpi_title, filter, (aggrmethod == "average"));
+
+  // executar a q2
+  // retornar array do tipo [{pointid_point, value}, ...]
+  // e dps no dashboarddata, retornar este array, e no controllers.js parse do array para dentro do grafico
+
+  runQuery(q2, function(result){
+    if (typeof callback === "function") {
+        if(result.length > 0){
+          callback(result.length, result, kpi_title);
+        } else {
+          callback(0, [], kpi_title);
+        }
+      }
+  })
+
+}
+
+
+exports.getChartData = function(pid, kpi_title, aggrmethod, filter, callback){
+  // var q1 = generatePointRankingQuery(pid, kpi_title, filter, false);
+  var q2 = generateRankingQueryByChart(pid, kpi_title, filter, (aggrmethod == "average"));
+
+  // executar a q2
+  // retornar array do tipo [{pointid_point, value}, ...]
+  // e dps no dashboarddata, retornar este array, e no controllers.js parse do array para dentro do grafico
+
+  runQuery(q2, function(result){
+    if (typeof callback === "function") {
+        if(result.length > 0){
+          callback(result.length, result, kpi_title, filter.seriesName);
+        } else {
+          callback(0, [], kpi_title);
+        }
+      }
+  })
+
+}
+
+exports.getAllWid = function(pid, callback){
+  var q = "select wid from widgets where pid_proj = "+pid;
+
+  runQuery(q, function(result){
+    if (typeof callback === "function") {
+        if(result.length > 0){
+          callback(result);
+        } else {
+          callback(null, null);
+        }
+      }
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// this function is specific for obtaining the accumulated values from startDate to endDate
+// and it has logic inside specific for this usecase (xlsx dropbox)
+exports.getDataAllLevels = function(pid, title, pointid, startDate, endDate, callback){
+
+  // if startDate has a different month than endDate, it means were changing months
+  // and no accumulated value of the last month should be returned
+  // -- this logic is specific for this usecase (xlsx dropbox)
+  // console.log("title " + title + " " + pointid + " dates: " + startDate + " " + endDate);
+  if( parseInt(startDate.charAt(4)) > parseInt(endDate.charAt(4)) ){
+    callback(null, null);
+  }
+
+  var kpiCalc = kpiQueryCalcs[title];
+  var isAverage = false;
+  if(title == 'VPP'){
+    isAverage = true;
+  }
+
+  if(!kpiQueryCalcs.hasOwnProperty(title)){
+    if(isAverage){
+      kpiCalc = kpiQueryCalcs["default_kpi_average"];
+    } else {
+      kpiCalc = kpiQueryCalcs["default_kpi_total"];
+    }
+    kpiCalc.base_kpi_a = title;
+    kpiCalc.base_kpi_b = title;
+  }
+
+
+  var mindate = "'"+ startDate + "'::date";
+  var maxdate = "'"+ endDate + "'::date";
+
+
+  var points = "and pointid_point in (" + pointid + ")";
+
+
+
+
+
+  var toReturn = "";
+
+  if(kpiCalc.n_base_kpis == 1){
+    subquery = "querya";
+  } else {
+    subquery = "queryb";
+  }
+
+
+  var metadatalevels = ["coordinator", "manager"];
+
+  toReturn += "";
+
+  toReturn += "select "+kpiCalc.calc_formula+" as value";
+
+  if(metadatalevels.length > 0){
+    for(var i=0; i<metadatalevels.length; i++){
+      toReturn += ", querya." + metadatalevels[i] + " ";
+    }
+  }
+
+
+  toReturn += " from ";
+
+
+  toReturn += "( SELECT title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date ";
+
+  if(metadatalevels.length > 0){
+    for(var i=0; i<metadatalevels.length; i++){
+      toReturn += ", c->>'" + metadatalevels[i] + "' as " + metadatalevels[i] + " ";
+    }
+  }
+
+  toReturn += "FROM indicators, json_array_elements(readings) AS c ";
+
+  toReturn += "WHERE title='"+kpiCalc.base_kpi_a+"' and pid_proj = "+pid+" ";
+
+  toReturn += 
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+  "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+  // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+  points +
+  "order by (c->>'hour')::numeric) as querya ";
+
+
+  if(kpiCalc.n_base_kpis == 2){
+    toReturn += "right outer join ( "+
+    "SELECT title, CAST(c->>'value' as decimal) AS values, c->>'hour' as hour, c->>'timestamp' as date ";
+
+    if(metadatalevels.length > 0){
+      for(var i=0; i<metadatalevels.length; i++){
+        toReturn += ", c->>'" + metadatalevels[i] + "' as " + metadatalevels[i] + " ";
+      }
+    }
+    toReturn += "FROM indicators, json_array_elements(readings) AS c "+
+    "WHERE title='"+kpiCalc.base_kpi_b+"' and pid_proj = "+pid+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') >= "+mindate+" "+
+    "and  to_date(c->>'timestamp', 'YYYY-MM-DD') <= "+maxdate+" "+
+    // "and (c->>'hour')::numeric >= 0 and (c->>'hour')::numeric <= 23 "+
+    points +
+    "order by (c->>'hour')::numeric "+
+    ") as queryb "+
+    "on ( (querya.hour is null or querya.hour = queryb.hour) and querya.date = queryb.date " ;
+
+    if(metadatalevels.length > 0){
+      for(var i=0; i<metadatalevels.length; i++){
+        toReturn += "and querya." + metadatalevels[i] + " = queryb. " + metadatalevels[i] + " ";
+      }
+    }
+
+    toReturn += ") ";
+  }
+
+
+
+  toReturn += "group by ";
+  
+  if(metadatalevels.length > 0){
+    for(var i=0; i<metadatalevels.length; i++){
+      toReturn += "querya." + metadatalevels[i];
+      if(i < metadatalevels.length-1){
+        toReturn += ",";
+      } else {
+        toReturn += " ";
+      }
+    }
+  }
+
+
+
+  
+  // console.log(toReturn);
+
+
+  runQuery(toReturn, function(result){
+    if (typeof callback === "function") {
+        if(result.length > 0){
+          callback(result);
+        } else {
+          callback(null, null);
+        }
+      }
+  })
+
+
+}
