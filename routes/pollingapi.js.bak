@@ -1,0 +1,188 @@
+var olapModule = require('./olapmodule');
+var mail = require('./email/temail');
+var timerManager = require('./timer/timerManager')
+
+var intervalValue = 8000;
+var reads = new Array();
+var projectid = 518;
+var lastDateDay = 0;
+
+
+
+var getDateString = function(date, withDelimiters){
+	var today = new Date(date);
+
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+	var yyyy = today.getFullYear();
+
+	if(dd<10) {
+	    dd='0'+dd
+	}
+	if(mm<10) {
+	    mm='0'+mm
+	} 
+
+	var delim = "";
+
+	if(withDelimiters){
+		delim = "-"
+	}
+
+	return yyyy + delim + mm + delim + dd;
+}
+
+
+
+exports.init = function(){
+	// make all external data sources modules get the missing data
+	olapModule.getMissingData();
+}
+
+
+exports.setInitValues = function(pollingDetails){
+	console.log("\n\setInitValues");
+	console.log(pollingDetails);
+	if( pollingDetails != null && pollingDetails != undefined ){
+
+
+		if(pollingDetails.hasOwnProperty('intervalvalue') && pollingDetails.intervalvalue != null && pollingDetails.intervalvalue != undefined && pollingDetails.intervalvalue != ''){
+			console.log("setting interval value");
+			intervalValue = pollingDetails.intervalvalue;
+		}
+
+		if(pollingDetails.hasOwnProperty('pid_proj') && pollingDetails.pid_proj != null && pollingDetails.pid_proj != undefined){
+			console.log("setting pid_proj");
+			projectid = pollingDetails.pid_proj;
+		}
+
+		if(pollingDetails.hasOwnProperty('lastdailyprocessdate') && pollingDetails.lastdailyprocessdate != null && pollingDetails.lastdailyprocessdate != undefined){
+			console.log("setting lastdailyprocessdate");
+			lastSentDate = pollingDetails.lastdailyprocessdate;
+		}
+
+		if(pollingDetails.hasOwnProperty('running') && pollingDetails.running != null && pollingDetails.running != undefined){
+			console.log("setting running");
+			if(pollingDetails.running == true || pollingDetails.running == 't'){
+				console.log("its running!!!!!!!!");
+				currentIntervalStatus = true;
+				schedule();
+			}
+		}
+
+	}
+}
+
+
+exports.getIntervalValue = function(req, res){
+	console.log("POLLING API call: getIntervalValue");
+
+	var obj = {};
+	obj.intervalValue = intervalValue;
+	obj.currentIntervalStatus = currentIntervalStatus;
+	obj.projectid = projectid;
+	res.json(obj);
+}
+
+
+
+exports.setIntervalValue = function(req, res){
+	console.log("POLLING API call: setIntervalValue");
+	// console.log(req.body.intervalValue);
+	intervalValue = req.body.intervalValue;
+	projectid = req.body.projectid;
+	olapModule.setIntervalValue(projectid, intervalValue);
+
+	var toRet = {};
+	toRet.intervalValue = intervalValue;
+	toRet.projectid = projectid;
+	res.json(toRet);
+}
+
+
+
+exports.getCurrentReads = function(req, res){
+	console.log("POLLING API call: getCurrentReads");
+	res.json(reads.slice(-5));
+}
+
+
+
+var currentIntervalTimer;
+var currentIntervalStatus = false;
+
+
+var ctr = 0;
+var schedule = function() {
+	currentIntervalTimer = setTimeout(function do_it(){
+		console.log("TIMER GOIN ON!!!");
+
+		// var dateNow = new Date();
+		// reads.push({"id":ctr, "count":Math.round(Math.random()*10), "date":dateNow});
+		// ctr++;
+
+		olapModule.readIntervalQuery(projectid);
+
+		timerManager.getAttributeValue('lastsummarydate', {"pid_proj" : projectid}, function(result){
+			var now = new Date();
+			var lastDateDay = new Date(result);
+			lastDateDay = lastDateDay.getDate();
+			if(parseInt(now.getHours()) >= 22 && now.getDate() != lastDateDay){
+				timerManager.updateTimerDB('lastsummarydate', getDateString(now, true), {"pid_proj" : projectid});
+				mail.generateSummary({"pid": projectid, "date": getDateString(new Date(), true)});
+				// mail.generateSummary(null, null, projectid, getDateString(new Date(), true) );
+			}
+			
+		})
+
+
+		schedule();
+	}, intervalValue);
+}
+
+exports.setStartStopInterval = function(req, res){
+	console.log("POLLING API call: setStartStopInterval");
+	// console.log(req.body.intervalValue);
+	var status = req.body.status;
+
+
+
+	
+	if(status){
+		console.log("START timer");
+		schedule();
+		currentIntervalStatus = true;
+	}
+	else {
+		console.log("STOP timer");
+		clearTimeout(currentIntervalTimer);
+		currentIntervalStatus = false;
+	}
+
+	// NUNOALEX inform all modules that were starting/stopping
+	olapModule.startStop(projectid, status);
+
+	res.json(status);
+}
+
+
+exports.addRead = function(read) {
+	reads.push(read);
+	if(reads.length > 10){
+		reads.shift();
+		console.log("reads length: " + reads.length);
+	}
+}
+
+
+exports.syncDate = function(req, res){
+	var connector = req.body.connector;
+	var date = req.body.forcedate;
+	var projectid = req.body.projectid;
+
+	if(connector == 'olap'){
+		olapModule.syncDate(projectid, date);
+	}
+
+	res.json({"status": 200});
+}
