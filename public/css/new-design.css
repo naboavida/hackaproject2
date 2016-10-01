@@ -1,0 +1,1190 @@
+/* STANDARD */
+
+.display-none{
+  display:none!important;
+}
+
+.inline {
+	display: inline !important;
+}
+.d-inline-block
+{
+	display: inline-block;
+}
+
+.display-block{
+  display:block!important;
+}
+
+.relative {
+	position: relative !important;
+}
+
+.absolute {
+	position: absolute !important;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.disablePointerCursor{
+  cursor: default;
+}
+
+.overflow-hidden{
+  visibility:hidden!important;
+}
+
+.padding-0 {
+  padding: 0 !important;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+a {
+  color: inherit;
+}
+
+a:hover, a:visited, a:link, a:active {
+  text-decoration: none;
+}
+
+.addPointButton{
+	text-decoration: none!important;
+	cursor: pointer;
+}
+.addingPoints{
+	background-color: orange;
+}
+
+.widgetChart{
+  margin-top: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 110px;
+  /*height: 30px;*/
+}
+
+.fc-day-number{
+  font-size: 26px!important;
+}
+.fc-event-title{
+  font-size: 14px!important;
+}
+
+.items-title {
+  overflow: visible;
+}
+
+.noShowAlarm {
+  display: none!important;
+}
+
+.rotating {
+  -webkit-animation: spin 3s infinite linear;
+  -moz-animation: spin 3s infinite linear;
+  -o-animation: spin 3s infinite linear;
+  animation: spin 3s infinite linear;
+}
+
+
+
+/*.content-wrapper {
+  margin-left: 10px;
+}*/
+
+.leaflet-control-geocoder * {
+  color: black;
+}
+
+
+.inner-control-points div{
+  color: #aaa;
+  margin: 4px 4px 6px 6px;
+  /*margin: 8px 8px 4px 8px;*/
+  height: 26px;
+  width: 26px;
+
+  /* delete point: tipo trash? ou markerMinus */
+  /*set project center:; fa-crosshairs*/
+
+  /* fa-map-marker como base para criar os dois icones em png */
+}
+
+.inner-control-points .fa-plus,
+.inner-control-points .fa-minus{
+  position: absolute;
+  /*right: 2px;*/
+}
+
+#deletePopover{
+  display: none!important;
+}
+
+#deleteButton:hover + #deletePopover {
+  display: block!important;
+}
+
+.leaflet-control-layers-overlays{
+  max-height: 350px;
+  overflow-x: none;
+  overflow-y: scroll;
+}
+.leaflet-control-layers-base, .leaflet-control-layers-overlays{
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.leaflet-popup-content-wrapper{
+  color: #555;
+}
+
+
+.left {
+  float: left;
+}
+
+#example .nv-x .tick.major text {
+  transform: rotate(-17deg) translate(0px, 20px)!important;
+}
+
+#exampleRanka .nv-x .tick.major text {
+  transform: rotate(-17deg) translate(0px, 20px)!important;
+}
+
+#exampleRanka2 .nv-x .tick.major text {
+  transform: rotate(-17deg) translate(0px, 0px)!important;
+}
+
+#exampleIdFocus .nv-x .tick.major text {
+  transform: rotate(-17deg) translate(0px, 10px)!important;
+}
+
+
+.nvtooltip.xy-tooltip.nv-pointer-events-none {
+  top: 0px!important;
+}
+
+.notedate{
+  margin-bottom: 0px;
+  font-size: 11px;
+  text-align: left;
+}
+
+.norelevance {
+  color: #ddd;
+}
+
+.no-h-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+tr.highlight {
+  background-color: transparent!important;
+  /*border: 1px solid #666!important;*/
+}
+
+.no-left-navigation {
+  margin-left: 10px;
+}
+
+.reset-breadcrumb {
+  background-color: white;
+  color: #555;
+  background: #fff;
+  display:block;
+  height:28px;
+  padding: 5px 10px 8px;
+  float: left;
+  text-decoration: none;
+  color: #555;
+  position: relative;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+.state-success {
+  background-color: #cae1bd!important;
+}
+
+.legend {
+    /*font: 14px/16px Arial, Helvetica, sans-serif;*/
+    font-size: 14px;
+    background: rgba(255,255,255, 1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 6px 8px;
+    line-height: 18px;
+    color: #555;
+}
+.legend i {
+    width: 16px;
+    height: 16px;
+    float: left;
+    margin-right: 8px;
+    /*opacity: 0.7;*/
+}
+
+/**, h1, h2, h3, h4, h5, h6 {
+  font-family: 'Source Sans Pro', 'Segoe UI', 'Droid Sans', Tahoma, Arial, sans-serif;
+}*/
+
+.info {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+}
+
+div.country {
+  font-size: 1.25em;
+  font-weight: bold;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  z-index: 100;
+  /*padding: .2em .5em;*/
+  padding: .5em .5em;
+  line-height: 1.1em;
+  text-align: center;
+}
+
+div.country2 {
+  font-size: 1.25em;
+  font-weight: bold;
+  position: absolute;
+  bottom: 2em;
+  right: 0.5em;
+  z-index: 100;
+  /*padding: .2em .5em;*/
+  padding: .5em .5em;
+  line-height: 1.1em;
+  text-align: left;
+}
+
+.check-heatmap {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  z-index: 2;
+  padding: 10px;
+  background-color: white;
+}
+
+.textOrange {
+  color: #f0ad4e;
+}
+
+.modal {
+  overflow-x: auto;
+  overflow-y: scroll;
+}
+
+.list-group-item{
+	display: flex;
+	flex-grow: 3;
+}
+.list-group-item ul {text-align:justify; margin-bottom: 0; padding-left: 0}
+.list-group-item ul li {display:inline-block; }
+/*.list-group-item > ul:after { content:' '; display:inline-block; width: 100%; height: 0 }*/
+
+
+
+#powerwidgets *::-webkit-scrollbar {
+      width: 12px;
+      
+}
+
+#powerwidgets *::-webkit-scrollbar-track {
+    margin-left: 5px;
+      /*background-color: #b46868;*/
+} /* the new scrollbar will have a flat appearance with the set background color */
+ 
+#powerwidgets *::-webkit-scrollbar-thumb {
+      /*background-color: rgba(0, 0, 0, 0.2); */
+      background-color: #ddd; 
+      border-radius: 6px;
+} /* this will style the thumb, ignoring the track */
+ 
+#powerwidgets *::-webkit-scrollbar-button {
+      /*background-color: #7c2929;*/
+} /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+ 
+#powerwidgets *::-webkit-scrollbar-corner {
+      /*background-color: black;*/
+}
+
+.chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+
+  margin-left: 35px;
+  height: 31px;
+}
+
+.chart div.verypositive {
+  background-color: rgb(106, 200, 50);
+}
+.chart div.positive {
+  background-color: rgb(178, 211, 156);
+}
+.chart div.negative {
+  background-color: rgb(240, 155, 141);
+}
+.chart div.verynegative {
+  background-color: rgb(240, 69, 77);
+}
+
+.chart div.verynegative:before {
+    content: url('../img/custommarkers/sad.png');
+    position: absolute;
+    left: 0;
+    margin-top: -3px;
+    /*top: 0;*/
+}
+
+.chart div.negative:before {
+    content: url('../img/custommarkers/nok.png');
+    position: absolute;
+    left: 0;
+    margin-top: -3px;
+    /*top: 0;*/
+}
+
+.chart div.positive:before {
+    content: url('../img/custommarkers/ok.png');
+    position: absolute;
+    left: 0;
+    margin-top: -3px;
+    /*top: 0;*/
+}
+
+.chart div.verypositive:before {
+    content: url('../img/custommarkers/happy.png');
+    position: absolute;
+    left: 0;
+    margin-top: -3px;
+    /*top: 0;*/
+}
+
+
+
+
+#chartid {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+
+.btn-ei-greendefault,
+.btn-ei-greendefault:visited {
+  background-color: #C1D7AE;
+  color: #999;
+  width: 60px;
+}
+.btn-ei-greendefault:hover {
+  background-color: #C1D7AE;
+  color: white;
+}
+
+.btn-ei-greenprimary,
+.btn-ei-greenprimary:hover {
+  background-color: #2c9145;
+  cursor: default;
+  width: 60px;
+}
+
+
+
+#map.total-map {
+  height: calc(100vh - 15px - 15px - 62px);
+}
+
+#map.total-map.bcrumb {
+  height: calc(100vh - 15px - 15px - 62px - 44px - 15px);
+}
+
+.angular-leaflet-map {
+  height: 100%; 
+}
+
+.widgets-div {
+  position: absolute;
+  z-index: 102!important;
+  right: 15px;
+  bottom: 15px;
+  float: left;
+  -webkit-transform: scaleY(-1);
+  transform: scaleY(-1);
+  padding-right: 0px;
+  padding-bottom: 50px;
+  overflow-y: auto;
+
+  /*comment top 15px value but uncomment background color to draw dark glass behind widgets */
+  top: 15px;
+  /*background-color: rgba(50, 50, 50, 0.25);*/
+  pointer-events: none;
+}
+
+.widgets-div > div {
+  position: relative;
+  -webkit-transform: scaleY(-1);
+  transform: scaleY(-1);
+  float: right;
+  pointer-events: all;
+}
+
+.shadowed-powerwidget {
+  /*-webkit-box-shadow: 7px 7px 10px 0px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    7px 7px 10px 0px rgba(50, 50, 50, 0.75);
+  box-shadow:         7px 7px 10px 0px rgba(50, 50, 50, 0.75);*/
+}
+
+.bottom-widgets {
+  display: none;
+  margin-top: 15px;
+}
+
+.orange-icon-open {
+  color: #f0ad4e;
+}
+
+
+.widgets-div::-webkit-scrollbar {
+      width: 22px;
+      pointer-events: all;
+}
+
+.widgets-div::-webkit-scrollbar-track {
+    margin-left: 25px;
+      /*background-color: #b46868;*/
+      pointer-events: all;
+} /* the new scrollbar will have a flat appearance with the set background color */
+ 
+.widgets-div::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.7);
+      /*background-color: #222;*/
+      border: 2px solid rgba(91, 192, 222, 0.7);
+      border-radius: 6px;
+      pointer-events: all;
+} /* this will style the thumb, ignoring the track */
+
+
+.widgets-div.orange-icon::-webkit-scrollbar-thumb {
+      border: 2px solid rgba(240, 173, 78, 0.7);
+      pointer-events: all;
+} /* this will style the thumb, ignoring the track */
+
+
+@media screen and (max-width: 1120px) {
+    .bottom-widgets {
+      display: block;
+    }
+
+    .widgets-div {
+      display: none;
+    }
+}
+
+
+.objectivesLine {
+  stroke: #9e1983;
+  stroke-dasharray: 5,5;
+}
+
+.todaysLine {
+  stroke-dasharray: 5,5;
+}
+
+
+.objectivesCell {
+  width: 4em;
+  border: none;
+}
+.kpiCol,
+.kpiColDay,
+.kpiColHour {
+  width: 150px;
+}
+
+.objectivesCellHour {
+  width: 2.3em;
+  border: none;
+}
+
+
+.objectivesCellDay{
+  width: 7em;
+  border: none;
+}
+
+.storeObjectives td {
+  border: 1px solid #EEE;
+}
+
+/* WIDGET */
+
+.filterDiv {
+  max-width: 225px;
+  margin: 0 auto;
+}
+
+.filterCheckbox {
+  text-align: left;
+}
+
+.icon-filter:hover {
+	color: #6CA94B;
+}
+
+.tooltips {
+	position: relative;
+	display: inline;
+}
+
+a {
+	cursor: pointer;
+}
+a.tooltips span {
+  position: absolute;
+  color: #FFFFFF;
+  background: #000000;
+	padding: 5px;
+  text-align: center;
+  display: none;
+  border-radius: 4px;
+	text-transform: capitalize;
+	color: white;
+}
+
+a.tooltips span:after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 35%;
+  width: 0;
+	height: 0;
+  border-bottom: 8px solid #000000;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+}
+a:hover.tooltips span {
+  display: block;
+	top: 35px;
+	left: -100%;
+  z-index: 999;
+}
+
+.btnCloseFilter {
+	position: absolute;
+	top:-8px;
+	right: -8px;
+}
+
+.wrap-filter {
+	background-color: white;
+	
+}
+
+.custom-filter {
+	background-color: white; 
+	padding: 10px 10px; 
+	border-radius: 4px;
+	display: inline-block;
+}
+
+.custom-filter label {
+	padding-left:0;
+	text-align: left;
+}
+
+.custom-filter > label {
+	text-transform: uppercase;
+	font-weight: 700 !important;
+}
+
+.filter-active {
+	color: #F0AD4E;
+}
+
+.closer {
+	position: absolute;
+	top:0;
+	right: 0;
+}
+
+.on-filter{
+	color: #6CA94B;
+}
+
+.date-warn{
+	display: none;
+	color: orange;
+}
+
+select {
+	display: block;
+}
+
+.inline ul li {
+	display: inline;
+}
+
+.custom-i i {
+	margin-left: 2%!important;
+}
+
+/* OCCURRENCES */
+
+.occurrences {
+	margin: 0 auto;
+	max-width: 90%;
+}
+
+.occurrences thead {
+	background-color: #5bc0de;
+	color: white;
+}
+.ocurrences td {
+	cursor: pointer;
+}
+.ocurrences td p {
+	
+margin: 0;
+}
+
+.ocurrences td .small {
+	font-style: italic;
+}
+
+[type="checkbox"]:not(:checked),
+[type="checkbox"]:checked {
+  width: 15px; height: 15px;
+	background-color: transparent;
+	margin: 0;
+	vertical-align: -2px;
+}
+
+textarea {
+	background: white;
+	border: none;
+	display: inline-block;
+	width: 500px;
+
+}
+
+.note {
+	margin-left: 2%;
+}
+
+.note button:nth-child(2) {
+	
+margin: 0 0.25rem;
+}
+
+.filterOcc {
+	max-width: 90%;
+	margin: 0 auto;
+	background: #DDDDDB;
+	border-radius: 4px;
+	margin-bottom: 0.5rem;
+	font-size: 10px;
+	text-transform: uppercase;
+	font-weight: 700;
+}
+
+.task-item p {
+	display: inline-block;
+}
+
+.task-item h5 {
+	display: inline-block;
+}
+
+.occurences-list > div > ul > li:last-child,
+.task-list > div > ul > li:last-child { float: right; }
+
+.tasklist h5, .tasklist p, .tasklist button, .tasklist textarea, .tasklist em {
+	margin-left: 5px;
+}
+
+.newOcc {
+	display: inline;
+	position: absolute;
+	right: -45px;
+  top: 5px;
+}
+
+.selectedOccurrence { 
+	background-color: #eee;
+}
+
+.selectedOccurrence td:last-child:hover { 
+	background-color: transparent!important;
+	cursor: auto;
+}
+.selectedOccurence tr:first-child {
+		border-bottom: 1px solid white !important;
+}
+
+.done-true {
+  text-decoration: line-through;
+  color: #bbb;
+}
+
+.selectStateBox select {
+  text-transform: uppercase;
+  border: none;
+  display: inline;
+  padding: .2em .1em .2em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  cursor: pointer;
+}
+
+.selectStateBox select option {
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  white-space: nowrap;
+  vertical-align: baseline;
+  padding-top: 4em;
+  padding-bottom: .4em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.selectStateBox select:focus {
+  outline-color: transparent;
+  outline-style: none;
+}
+
+
+/* Side Notifications */
+
+growl-notifications {
+    position: fixed;
+    bottom: 50px;
+    right: 10px;
+    z-index: 1000
+}
+
+growl-notifications growl-notification {
+    background: white;
+    padding: 10px 30px;
+    width: 500px;
+    display: block;
+    border-radius: 5px;
+    margin-top: 15px;
+    border: 1px solid #eeeeee;
+    border-left-width: 5px;
+    border-radius: 3px;
+    border-left-color: #f0ad4e
+}
+
+growl-notifications growl-notification:first-child {
+    margin-top: 0
+}
+
+
+growl-notification.fading.ng-move{
+    opacity: 0;
+    -webkit-transition: 1s linear all; /* Safari/Chrome */
+    transition: 1s linear all; /* All other modern browsers and IE10+ */
+}
+
+growl-notification.fading.ng-move.ng-move-active {
+    opacity: 1;
+}
+growl-notification.fading.ng-leave {
+    opacity: 1;
+    -webkit-transition: 1s linear all; /* Safari/Chrome */
+    transition: 1s linear all; /* All other modern browsers and IE10+ */
+}
+
+growl-notification.fading.ng-leave.ng-leave-active {
+    opacity: 0;
+}
+
+
+
+.iconSequence img {
+  float: left;
+  margin-right: 5px;
+  margin-top: 7px;
+}
+
+.iconSequence img:last-child {
+  margin-right: 15px;
+};
+
+
+.closeNotifButton {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+}
+
+
+.liveupdate {
+    background-color: lightsalmon;
+}
+
+
+
+
+.btn-info-outline {
+  color: #5bc0de;
+  background-color: #fff;
+  border-color: #5bc0de;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.btn-info-outline:hover,
+.btn-info-outline:focus
+ {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+  border-width: 1px;
+  border-style: solid;
+}
+
+/* NEW DASHBOARD */
+
+.drop-graph {
+  color: black;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: right;
+}
+
+.drop-graph option {
+  color:black;
+}
+
+.a-color {
+  color: white;
+}
+
+.statistics {
+  margin: 0 auto;
+}
+
+.statistics td {
+  padding: 5px;
+}
+
+.statistics table {
+  margin: 0 auto;
+  border: 1px solid #F0F0ED;
+}
+
+/* delete
+.statitics li {
+  display: inline-block;
+  padding: 0 1%;
+}
+
+.statitics span {
+  margin-left: 5px;
+}*/
+
+.arrow-left {
+  display: inline-block;
+  position: absolute;
+  left:0; 
+  top:40%; 
+}
+
+.arrow-right {
+  display: inline-block;
+  position: absolute;
+  right:0; 
+  top:40%; 
+}
+
+.btn-kpi {
+  width:150px;
+}
+
+.btn-kpi-title {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.75em;
+}
+
+.block-kpis {
+  display: inline-block;
+  overflow:hidden; 
+  white-space:nowrap;
+  width: 95%;
+}
+
+.block-kpis a {
+  margin-right: 15px;
+}
+
+.heatmap-config select {
+  color: #555;
+}
+
+.filter-icons a:hover {
+  color:#82B964;
+}
+
+.variation-title {
+  font-size:10px; 
+  font-weight:bold; 
+  margin:0;
+  text-transform: uppercase;
+}
+
+.spinner-icon {
+  width: 50px;
+  height: 50px;
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  z-index: 2
+}
+
+.table th {
+  text-align: center;
+}
+
+.table tr td:first-child {
+  text-align: left;
+}
+
+.table td {
+  text-align: center;
+}
+
+.header-select {
+  border: 1px solid #89BBD7;
+  border-radius: 4px;
+  padding: 0px 6px;
+  font-weight: normal;
+  margin-top: -1px;
+  line-height: 18px;
+}
+
+.header-select:focus{
+    outline: 0;
+}
+
+
+
+.header-select-icon {
+  float: left;
+  line-height: 20px;
+  padding-right: 5px;  
+  color: black;
+}
+
+.datepicker-header {
+  border: 1px solid #89BBD7;
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.datepicker {
+  z-index: 1001!important;
+  background-color: white;
+  box-shadow:  0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  padding: 10px;
+  color: black;
+}
+
+.datepicker button {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+/* REPORT */
+
+.report .btn-new {
+  border: 1px dashed #949fb2;
+  background-color: #f0f0ed;
+}
+
+.report .btn-new h4 {
+  color: #949fb2;
+}
+
+/* CREATE REPORT */
+  
+.create-report select {
+  text-transform: capitalize;
+}
+
+.create-report .powerwidget {
+  border: 1px solid #dddddb;
+  /*box-shadow:  0 2px 5px 0 rgba(0,0,0,.26);*/
+}
+
+/*.create-report .filter-buttons  {
+ margin-bottom: 10px;
+}*/
+
+.create-report .filter-buttons button {
+  width: 200px;
+  text-transform: uppercase;
+}
+
+.create-report .filter-buttons .active  {
+  background-color: #5bc0de!important;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+}
+
+/*.create-report .filter-options button {
+  margin-right: 5px;
+  box-shadow:  0 2px 5px 0 rgba(0,0,0,.26);
+}*/
+
+.create-report .filter-summary span {
+  margin-right: 5px;
+}
+
+.create-report .create-visualization .icons {
+  margin-bottom: 20px;
+}
+
+.create-report .create-visualization .icons div {
+  width: 75px;
+}
+
+.create-report .chart-options .icons div {
+  margin-right: 15px;
+}
+
+.create-report .chart-options .icons a:hover {
+  color: #3e6f82 !important;
+}
+
+.create-report .chart-options .icons .active {
+  color: #5bc0de!important;
+}
+
+
+.arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid white;
+}
+
+/* DATEPICKER CUSTOM THEME */
+  
+.create-report .custom-dp-theme div {
+    color: #333;
+    background-color: white;
+}
+
+   
+.create-report .custom-dp-theme button {
+    color: inherit;
+    font: inherit;
+    margin: 0;
+    background-color: white;
+}
+      
+.create-report .custom-dp-theme .active {
+  background-color: orange;
+}
+
+
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
+.selectedDataSource,
+.selectedDataSource:focus {
+  background-color: orange!important;
+}
+
+.selectedDataSource:hover {
+  background-color: darkorange!important;
+}
+
+.list-group-item.thin {
+  padding: 3px 15px;
+}
+
+/* GRID 5 */
+
+.col-xs-5ths,
+.col-sm-5ths,
+.col-md-5ths,
+.col-lg-5ths {
+    position: relative;
+    min-height: 1px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.col-xs-5ths {
+    width: 20%;
+    float: left;
+}
+
+@media (min-width: 768px) {
+    .col-sm-5ths {
+        width: 20%;
+        float: left;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-md-5ths {
+        width: 20%;
+        float: left;
+    }
+}
+
+@media (min-width: 1200px) {
+    .col-lg-5ths {
+        width: 20%;
+        float: left;
+    }
+}
+
+.col-md-15{
+    width:20%;
+}

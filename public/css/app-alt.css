@@ -1,0 +1,244 @@
+body{
+    background-color: #231f20;
+    color: white;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+header{
+    background-color: #231f20;
+    border-bottom: 1px #231f20 solid;
+}
+
+header h2{
+  /*float: center;*/
+  margin-top: 22px;
+}
+
+header ul{
+  margin-top: 23px;
+}
+
+.item{
+    background-color: #444444;
+    border: 1px #231f20 solid;
+    color:#292E37;
+    color: white;
+    border-radius: 2px;
+}
+
+.item-to-add{
+    background-color: #231f20;
+    border: 1px #444444 dashed;
+}
+
+@media screen and (max-width: 1400px) {
+    .item{
+        width:167px;
+        height:167px;
+    }
+
+    .big-item{
+        width: 364px;
+        height: 364px;
+    }
+
+    .areaInfo{
+        margin-bottom: 15px;
+    }
+
+    #map {
+        /*height: 505px;*/
+        height: 360px;
+        border-radius: 5px;
+    }
+}
+
+@media screen and (max-width: 2000px) {
+    .item{
+        width:165px;
+        height:165px;
+    }
+
+    .big-item{
+        width: 360px;
+        height: 360px;
+    }
+
+    .areaInfo{
+        margin-bottom: 15px;
+    }
+
+    #map {
+        /*height: 505px;*/
+        height: 355px;
+        border-radius: 5px;
+    }
+}
+
+.toAdd{
+    background-color: #231f20;
+    color: #bbb;
+    border: 1px dashed #bbb;
+}
+
+.toAdd:hover{
+    color:#292E37;
+    border: 1px solid #bbb;
+}
+
+.topBarDiv{
+    background-color: #231f20;
+    border-bottom: 1px solid #bbb;
+}
+
+.leftBarDiv{
+    color: #a4a4a4;
+}
+.rightBarDiv{
+    color: #a4a4a4;
+}
+
+.widgetTitle{
+  color: #a4a4a4;
+}
+
+.value{
+    font-size: 2.5em;
+    margin-right:5px!important;
+    font-weight:bold;
+}
+
+.unit{
+    vertical-align: bottom;
+    /*margin-left:5px!important;*/
+    margin-left: 0!important;
+    margin-right: 0!important;
+    font-size: 0.7em;
+}
+
+a{
+    color: white;
+}
+a:visited{
+    color: white;
+}
+
+.leaflet-container {
+    background: #444;
+}
+
+.thumbnail{
+    border-radius: 2px;
+}
+
+.nvtooltip{
+    color: black;
+}
+
+
+
+
+
+.button a:hover{
+  /*background-color: #aeaeae;*/
+  border-top: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+}
+
+.button{
+  color: black;
+}
+a{
+  text-decoration: none;
+  color: black;
+}
+
+a:visited {text-decoration:none; color: black;}
+
+
+.widgetTitle{
+  margin-top: 10px;
+  font-size: 12pt;
+  margin-bottom:20px;
+}
+.line{
+    display: inline-block;
+}
+.line-item{
+    float: left;
+}
+.value{
+    font-size: 2em;
+    margin-bottom:15px;
+}
+.unit{
+    vertical-align: bottom;
+    margin-left:5px!important;
+    margin-right:5px!important;
+    font-size: 0.6em;
+}
+
+.smallButton{
+  font-size: 0.6em;
+  margin-left:5px!important;
+  margin-right:5px!important;
+  padding: 0;
+}
+
+.bottomRow{
+  /*margin: 0 auto;*/
+  /*margin-top: 5px;*/
+  /*width: 42px;*/
+  width: 52px;
+}
+
+
+/*
+style the bullet charts
+*/
+g text{
+  fill:#a4a4a4;
+}
+
+g .nv-tick text{
+  fill:#a4a4a4;
+}
+
+
+
+.project-item{
+  background-color:#333;
+}
+
+
+
+
+/* list for activities */
+
+.menuItem{
+  color:#a4a4a4;
+  /*height:500px;*/
+}
+.listItem{
+  background: #fff;
+  background: #ececec;
+  background-color: #444444;
+}
+
+.add-project{
+  border: 1px #333 dashed;
+  background-color:#231f20!important;
+}
+
+.projectTitle{
+  color:#eee;
+}
+
+.innerItem{
+  vertical-align: baseline;
+}
+
+.innerItem img{
+  /*border: 1px solid #fff; */
+  border-radius: 2px;
+}
