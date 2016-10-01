@@ -1,4 +1,4 @@
-# Earthindicators web application
+# Web application example
 
 Application with the following stack:
 
@@ -104,18 +104,5 @@ PostgreSQL DBMS installed and a database
         stats.jade                 --> config page (contains some metrics and users' login state)
 
 
-
-
-## App Link
-
-You can find the app in:
-http://app.earthindicators.com
-
-
-
-## Contact
-
-dev@earthindicators.com
-
 ## License
-TODO
+None
